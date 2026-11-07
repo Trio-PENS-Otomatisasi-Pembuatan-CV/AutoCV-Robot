@@ -87,7 +87,7 @@
       <AssemblyReference>System.Text.RegularExpressions</AssemblyReference>
     </sco:Collection>
   </TextExpression.ReferencesForImplementation>
-  <Sequence DisplayName="Main Sequence" sap:VirtualizedContainerService.HintSize="897.2,4632.8" sap2010:WorkflowViewState.IdRef="Sequence_1">
+  <Sequence DisplayName="Main Sequence" sap:VirtualizedContainerService.HintSize="897.2,4800" sap2010:WorkflowViewState.IdRef="Sequence_1">
     <Sequence.Variables>
       <Variable x:TypeArguments="x:String" Name="str_JobStatus" />
       <Variable x:TypeArguments="x:String" Name="str_DraftPayload" />
@@ -96,13 +96,14 @@
       <Variable x:TypeArguments="x:String" Name="str_NormalizedGitHubUrl" />
       <Variable x:TypeArguments="x:String" Name="str_NormalizedEmail" />
       <Variable x:TypeArguments="x:String" Name="str_NormalizedRole" />
+      <Variable x:TypeArguments="x:String" Name="str_LinkedInDataJson" />
     </Sequence.Variables>
     <sap:WorkflowViewStateService.ViewState>
       <scg:Dictionary x:TypeArguments="x:String, x:Object">
         <x:Boolean x:Key="IsExpanded">True</x:Boolean>
       </scg:Dictionary>
     </sap:WorkflowViewStateService.ViewState>
-    <Sequence DisplayName="AutoCV Orchestration - Sequence_2" sap:VirtualizedContainerService.HintSize="649.6,4609.6" sap2010:WorkflowViewState.IdRef="Sequence_2">
+    <Sequence DisplayName="AutoCV Orchestration - Sequence_2" sap:VirtualizedContainerService.HintSize="649.6,4750" sap2010:WorkflowViewState.IdRef="Sequence_2">
       <sap:WorkflowViewStateService.ViewState>
         <scg:Dictionary x:TypeArguments="x:String, x:Object">
           <x:Boolean x:Key="IsExpanded">True</x:Boolean>
@@ -256,13 +257,21 @@
           <InArgument x:TypeArguments="x:String">[str_JobStatus]</InArgument>
         </Assign.Value>
       </Assign>
-      <ui:LogMessage DisplayName="Publish scraping progress" sap:VirtualizedContainerService.HintSize="616,174.4" sap2010:WorkflowViewState.IdRef="LogMessage_5" Level="Info" Message="[&quot;SCRAPING: LinkedIn and GitHub ingestion modules are next.&quot;]" />
+      <ui:LogMessage DisplayName="Publish scraping progress" sap:VirtualizedContainerService.HintSize="616,174.4" sap2010:WorkflowViewState.IdRef="LogMessage_5" Level="Info" Message="[&quot;SCRAPING: Ingesting LinkedIn profile via 01_LinkedIn_ScrapeProfile module.&quot;]" />
+      <ui:InvokeWorkflowFile ArgumentsVariable="{x:Null}" ContinueOnError="{x:Null}" DisplayName="Invoke 01_LinkedIn_ScrapeProfile workflow" sap:VirtualizedContainerService.HintSize="616,113.6" sap2010:WorkflowViewState.IdRef="InvokeWorkflowFile_1" UnSafe="False" WorkflowFileName="Modules\01_LinkedIn_ScrapeProfile.xaml">
+        <ui:InvokeWorkflowFile.Arguments>
+          <InArgument x:TypeArguments="x:String" x:Key="in_LinkedInUrl">[str_NormalizedLinkedInUrl]</InArgument>
+          <InArgument x:TypeArguments="x:String" x:Key="in_BrowserType">["Chrome"]</InArgument>
+          <InArgument x:TypeArguments="x:Boolean" x:Key="in_UseMockFallback">[True]</InArgument>
+          <OutArgument x:TypeArguments="x:String" x:Key="out_LinkedInDataJson">[str_LinkedInDataJson]</OutArgument>
+        </ui:InvokeWorkflowFile.Arguments>
+      </ui:InvokeWorkflowFile>
       <Assign DisplayName="Build draft resume contract" sap:VirtualizedContainerService.HintSize="616,174.4" sap2010:WorkflowViewState.IdRef="Assign_9">
         <Assign.To>
           <OutArgument x:TypeArguments="x:String">[str_DraftPayload]</OutArgument>
         </Assign.To>
         <Assign.Value>
-          <InArgument x:TypeArguments="x:String">["{""schema_version"":""2.0"",""personal_info"":{""linkedin_url"":""" &amp; str_NormalizedLinkedInUrl.Replace(ChrW(34).ToString(), "") &amp; """,""github_url"":""" &amp; str_NormalizedGitHubUrl.Replace(ChrW(34).ToString(), "") &amp; """,""target_job_role"":""" &amp; str_NormalizedRole.Replace(ChrW(34).ToString(), "") &amp; """,""recipient_email"":""" &amp; str_NormalizedEmail.Replace(ChrW(34).ToString(), "") &amp; """},""experiences"":[],""projects"":[],""skills"":{""languages"":[],""frameworks"":[],""developer_tools"":[]},""education"":[],""pipeline"":{""linkedin"":""pending"",""github"":""pending"",""ai"":""pending"",""human_curation"":""awaiting"",""document"":""pending_approval""}}"]</InArgument>
+          <InArgument x:TypeArguments="x:String">["{""schema_version"":""2.0"",""personal_info"":{""linkedin_url"":""" &amp; str_NormalizedLinkedInUrl.Replace(ChrW(34).ToString(), "") &amp; """,""github_url"":""" &amp; str_NormalizedGitHubUrl.Replace(ChrW(34).ToString(), "") &amp; """,""target_job_role"":""" &amp; str_NormalizedRole.Replace(ChrW(34).ToString(), "") &amp; """,""recipient_email"":""" &amp; str_NormalizedEmail.Replace(ChrW(34).ToString(), "") &amp; """},""experiences"":[],""projects"":[],""skills"":{""languages"":[],""frameworks"":[],""developer_tools"":[]},""education"":[],""pipeline"":{""linkedin"":""completed"",""github"":""pending"",""ai"":""pending"",""human_curation"":""awaiting"",""document"":""pending_approval""},""raw_linkedin_data"":" &amp; If(String.IsNullOrWhiteSpace(str_LinkedInDataJson), """{}\""", str_LinkedInDataJson) &amp; "}"]</InArgument>
         </Assign.Value>
       </Assign>
       <Assign DisplayName="Set synthesis status" sap:VirtualizedContainerService.HintSize="616,174.4" sap2010:WorkflowViewState.IdRef="Assign_10">

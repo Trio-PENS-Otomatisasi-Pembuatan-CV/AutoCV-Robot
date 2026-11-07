@@ -1,0 +1,45 @@
+{
+  "full_name": "Muhammad Farid Al Hasan",
+  "headline": "Fullstack Software Engineer & AI Specialist | Computer Engineering Student at PENS",
+  "about": "Passionate software engineer experienced in building robust web applications, automation pipelines with UiPath RPA, and generative AI integrations. Enthusiastic about creating impactful solutions with clean architecture.",
+  "experiences": [
+    {
+      "position": "Lead Software Engineer",
+      "company": "Trio PENS Hackathon Team",
+      "period": "Nov 2026 - Present",
+      "description": "Architected AutoCV intelligent career dossier portal integrating UiPath RPA, Next.js, and Google Gemini."
+    },
+    {
+      "position": "Software Engineering Intern",
+      "company": "Tech Solutions Indonesia",
+      "period": "Jul 2025 - Dec 2025",
+      "description": "Developed microservices and automated deployment workflows using Docker, REST APIs, and modern CI/CD practices."
+    }
+  ],
+  "education": [
+    {
+      "institution": "Politeknik Elektronika Negeri Surabaya (PENS)",
+      "degree": "Applied Bachelor of Engineering (S.Tr.T)",
+      "year": "2023 - 2027"
+    }
+  ],
+  "certifications": [
+    {
+      "name": "UiPath Certified Professional RPA Associate",
+      "issuer": "UiPath",
+      "year": "2026"
+    }
+  ],
+  "skills": [
+    "JavaScript",
+    "TypeScript",
+    "Go",
+    "Python",
+    "React",
+    "Next.js",
+    "UiPath Studio",
+    "RPA",
+    "Docker",
+    "RESTful APIs"
+  ]
+}
