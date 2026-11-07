@@ -3,8 +3,43 @@
   "entryPoints": [
     {
       "filePath": "Main.xaml",
-      "uniqueId": "c4d03029-a04a-41f8-a222-d603bf706d59",
-      "type": "process"
+      "uniqueId": "7635ecd4-b760-4df4-8bfc-a6b8dd00693d",
+      "type": "process",
+      "input": {
+        "type": "object",
+        "properties": {
+          "in_LinkedInUrl": {
+            "type": "string"
+          },
+          "in_GitHubUrl": {
+            "type": "string"
+          },
+          "in_TargetJobRole": {
+            "type": "string"
+          },
+          "in_RecipientEmail": {
+            "type": "string"
+          },
+          "in_ApprovedResumePayload": {
+            "type": "string"
+          }
+        },
+        "required": []
+      },
+      "output": {
+        "type": "object",
+        "properties": {
+          "out_JobStatus": {
+            "type": "string"
+          },
+          "out_DraftResumePayload": {
+            "type": "string"
+          },
+          "out_OutputPdfPath": {
+            "type": "string"
+          }
+        }
+      }
     }
   ]
 }

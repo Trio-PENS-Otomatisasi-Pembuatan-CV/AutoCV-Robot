@@ -1,7 +1,6 @@
 ﻿{
   "UiPath.UIAutomationNext.Activities.Generic.CaptureScreenshots": "True",
   "UiPath.UIAutomationNext.Activities.Generic.EnableAutoAddToOR": "True",
-  "UiPath.UIAutomationNext.Activities.Generic.UseClassicExperience": "False",
   "UiPath.UIAutomationNext.Activities.SearchStepsWnd.InteractionMode": "HardwareEvents",
   "UiPath.UIAutomationNext.Activities.SearchStepsWnd.FindSelectorType": "Auto",
   "UiPath.UIAutomationNext.Activities.SearchStepsWnd.ComputerVision": "False",
