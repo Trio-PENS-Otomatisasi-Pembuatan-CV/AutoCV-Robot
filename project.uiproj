@@ -1,0 +1,6 @@
+{
+  "Name": "AutoCV_Robot",
+  "ProjectType": "Process",
+  "Description": "Auto CV robot process",
+  "MainFile": "Main.xaml"
+}
