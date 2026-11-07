@@ -9,19 +9,24 @@
         "type": "object",
         "properties": {
           "in_LinkedInUrl": {
-            "type": "string"
+            "type": "string",
+            "description": "Public LinkedIn profile URL (e.g., https://www.linkedin.com/in/username)"
           },
           "in_GitHubUrl": {
-            "type": "string"
+            "type": "string",
+            "description": "GitHub profile URL or username (e.g., https://github.com/username or username)"
           },
           "in_TargetJobRole": {
-            "type": "string"
+            "type": "string",
+            "description": "Target job role or title (optional, e.g., Fullstack Engineer)"
           },
           "in_RecipientEmail": {
-            "type": "string"
+            "type": "string",
+            "description": "Recipient email address for final ATS CV PDF delivery"
           },
           "in_ApprovedResumePayload": {
-            "type": "string"
+            "type": "string",
+            "description": "Approved and curated resume JSON payload from Web Dashboard (#HumanInTheLead)"
           }
         },
         "required": []
@@ -30,13 +35,16 @@
         "type": "object",
         "properties": {
           "out_JobStatus": {
-            "type": "string"
+            "type": "string",
+            "description": "Current execution status of the pipeline (PENDING, SCRAPING, SYNTHESIZING, CURATING, APPROVED)"
           },
           "out_DraftResumePayload": {
-            "type": "string"
+            "type": "string",
+            "description": "Synthesized draft resume JSON payload ready for human curation"
           },
           "out_OutputPdfPath": {
-            "type": "string"
+            "type": "string",
+            "description": "Local path of the generated ATS CV PDF document"
           }
         }
       }
