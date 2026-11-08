@@ -89,12 +89,14 @@
       <AssemblyReference>System.IO.FileSystem.DriveInfo</AssemblyReference>
     </sco:Collection>
   </TextExpression.ReferencesForImplementation>
-  <Sequence DisplayName="01_LinkedIn_ScrapeProfile" sap:VirtualizedContainerService.HintSize="892,2400" sap2010:WorkflowViewState.IdRef="Sequence_1">
+  <Sequence DisplayName="01_LinkedIn_ScrapeProfile" sap:VirtualizedContainerService.HintSize="892,2500" sap2010:WorkflowViewState.IdRef="Sequence_1">
     <Sequence.Variables>
       <Variable x:TypeArguments="x:String" Name="str_BrowserName" />
       <Variable x:TypeArguments="x:String" Name="str_ScrapedJsonRaw" />
       <Variable x:TypeArguments="x:Boolean" Name="bool_ExtractionSuccessful" />
       <Variable x:TypeArguments="x:String" Name="str_MockFilePath" />
+      <Variable x:TypeArguments="x:String" Name="str_JsFilePath" />
+      <Variable x:TypeArguments="x:String" Name="str_JsScriptCode" />
     </Sequence.Variables>
     <sap:WorkflowViewStateService.ViewState>
       <scg:Dictionary x:TypeArguments="x:String, x:Object">
@@ -126,35 +128,51 @@
         <InArgument x:TypeArguments="x:String">[""]</InArgument>
       </Assign.Value>
     </Assign>
-    <TryCatch DisplayName="Try Catch Live Profile Scraping" sap:VirtualizedContainerService.HintSize="656,1200" sap2010:WorkflowViewState.IdRef="TryCatch_1">
+    <TryCatch DisplayName="Try Catch Live Profile Scraping" sap:VirtualizedContainerService.HintSize="656,1350" sap2010:WorkflowViewState.IdRef="TryCatch_1">
       <TryCatch.Try>
-        <Sequence DisplayName="Browser Automation Sequence" sap:VirtualizedContainerService.HintSize="510,800" sap2010:WorkflowViewState.IdRef="Sequence_2">
+        <Sequence DisplayName="Browser Automation Sequence" sap:VirtualizedContainerService.HintSize="510,950" sap2010:WorkflowViewState.IdRef="Sequence_2">
           <sap:WorkflowViewStateService.ViewState>
             <scg:Dictionary x:TypeArguments="x:String, x:Object">
               <x:Boolean x:Key="IsExpanded">True</x:Boolean>
             </scg:Dictionary>
           </sap:WorkflowViewStateService.ViewState>
-          <ui:OpenBrowser AutomaticallyDownloadWebDriver="{x:Null}" CommunicationMethod="{x:Null}" Hidden="{x:Null}" Private="{x:Null}" UiBrowser="{x:Null}" BrowserType="[If(str_BrowserName.ToLower().Equals(&quot;edge&quot;), UiPath.Core.BrowserType.Edge, UiPath.Core.BrowserType.Chrome)]" DisplayName="Open Browser with Existing User Session" sap:VirtualizedContainerService.HintSize="476,600" sap2010:WorkflowViewState.IdRef="OpenBrowser_1" NewSession="False" Url="[in_LinkedInUrl]">
+          <ui:OpenBrowser AutomaticallyDownloadWebDriver="{x:Null}" CommunicationMethod="{x:Null}" Hidden="{x:Null}" Private="{x:Null}" UiBrowser="{x:Null}" BrowserType="[If(str_BrowserName.ToLower().Equals(&quot;edge&quot;), UiPath.Core.BrowserType.Edge, UiPath.Core.BrowserType.Chrome)]" DisplayName="Open Browser with Existing User Session" sap:VirtualizedContainerService.HintSize="476,750" sap2010:WorkflowViewState.IdRef="OpenBrowser_1" NewSession="False" Url="[in_LinkedInUrl]">
             <ui:OpenBrowser.Body>
               <ActivityAction x:TypeArguments="x:Object">
                 <ActivityAction.Argument>
                   <DelegateInArgument x:TypeArguments="x:Object" Name="ContextTarget" />
                 </ActivityAction.Argument>
-                <Sequence DisplayName="Execute DOM Extraction" sap:VirtualizedContainerService.HintSize="442,475" sap2010:WorkflowViewState.IdRef="Sequence_3">
+                <Sequence DisplayName="Execute DOM Extraction" sap:VirtualizedContainerService.HintSize="442,625" sap2010:WorkflowViewState.IdRef="Sequence_3">
                   <sap:WorkflowViewStateService.ViewState>
                     <scg:Dictionary x:TypeArguments="x:String, x:Object">
                       <x:Boolean x:Key="IsExpanded">True</x:Boolean>
                     </scg:Dictionary>
                   </sap:WorkflowViewStateService.ViewState>
-                  <ui:InjectJsScript InputParameter="{x:Null}" DisplayName="Inject Resilient Profile Scraper" sap:VirtualizedContainerService.HintSize="408,135" sap2010:WorkflowViewState.IdRef="InjectJsScript_1" ScriptCode="function(e) { try { var res = { full_name: '', headline: '', about: '', experiences: [], education: [], certifications: [], skills: [] }; var h1 = document.querySelector('h1.text-heading-xlarge, h1.inline, h1'); if (h1) res.full_name = h1.innerText.trim(); var hl = document.querySelector('.text-body-medium.break-words, div.text-body-medium'); if (hl) res.headline = hl.innerText.trim(); var ab = document.getElementById('about'); if (ab) { var sec = ab.closest('section'); if (sec) { var t = sec.querySelector('.inline-show-more-text, div.display-flex'); if (t) res.about = t.innerText.trim(); } } function parseSec(id) { var a = document.getElementById(id); if (!a) return []; var s = a.closest('section'); if (!s) return []; var lis = s.querySelectorAll('li.artdeco-list__item, li.pvs-list__paged-list-item'); var items = []; lis.forEach(function(li) { var spans = Array.from(li.querySelectorAll('span[aria-hidden=\&quot;true\&quot;]')).map(function(sp) { return sp.innerText.trim(); }).filter(Boolean); if (spans.length &gt; 0) items.push(spans); }); return items; } var rawExp = parseSec('experience'); rawExp.forEach(function(sp) { res.experiences.push({ position: sp[0] || '', company: sp[1] || '', period: sp[2] || '', description: sp.slice(3).join('\n') || '' }); }); var rawEdu = parseSec('education'); rawEdu.forEach(function(sp) { res.education.push({ institution: sp[0] || '', degree: sp[1] || '', year: sp[2] || '' }); }); var rawCert = parseSec('certifications'); if (rawCert.length === 0) rawCert = parseSec('licenses_and_certifications'); rawCert.forEach(function(sp) { res.certifications.push({ name: sp[0] || '', issuer: sp[1] || '', year: sp[2] || '' }); }); var rawSk = parseSec('skills'); rawSk.forEach(function(sp) { if (sp[0]) res.skills.push(sp[0]); }); return JSON.stringify(res); } catch(err) { return JSON.stringify({ error: err.message, full_name: '', experiences: [], education: [], certifications: [], skills: [] }); } }">
+                  <Assign DisplayName="Set JS Extractor File Path" sap:VirtualizedContainerService.HintSize="408,113.6" sap2010:WorkflowViewState.IdRef="Assign_SetJsPath">
+                    <Assign.To>
+                      <OutArgument x:TypeArguments="x:String">[str_JsFilePath]</OutArgument>
+                    </Assign.To>
+                    <Assign.Value>
+                      <InArgument x:TypeArguments="x:String">["Data\Scripts\LinkedInDomExtractor.js"]</InArgument>
+                    </Assign.Value>
+                  </Assign>
+                  <Assign DisplayName="Load Extractor Script from File" sap:VirtualizedContainerService.HintSize="408,113.6" sap2010:WorkflowViewState.IdRef="Assign_LoadJs">
+                    <Assign.To>
+                      <OutArgument x:TypeArguments="x:String">[str_JsScriptCode]</OutArgument>
+                    </Assign.To>
+                    <Assign.Value>
+                      <InArgument x:TypeArguments="x:String">[If(System.IO.File.Exists(str_JsFilePath), System.IO.File.ReadAllText(str_JsFilePath), "function(e){return JSON.stringify({full_name:'',experiences:[],education:[],skills:[]});}")]</InArgument>
+                    </Assign.Value>
+                  </Assign>
+                  <ui:InjectJsScript InputParameter="{x:Null}" DisplayName="Inject Resilient Profile Scraper" sap:VirtualizedContainerService.HintSize="408,135" sap2010:WorkflowViewState.IdRef="InjectJsScript_1" ScriptCode="[str_JsScriptCode]">
                     <ui:InjectJsScript.ScriptOutput>
                       <OutArgument x:TypeArguments="x:String">[str_ScrapedJsonRaw]</OutArgument>
                     </ui:InjectJsScript.ScriptOutput>
                     <ui:InjectJsScript.Target>
-                      <ui:Target ClippingRegion="{x:Null}" Element="{x:Null}" Selector="&lt;html app='*.exe' /&gt;" TimeoutMS="15000" WaitForReady="COMPLETE" />
+                      <ui:Target ClippingRegion="{x:Null}" Element="{x:Null}" Selector="&lt;webctrl tag='body' /&gt;" TimeoutMS="15000" WaitForReady="COMPLETE" />
                     </ui:InjectJsScript.Target>
                   </ui:InjectJsScript>
-                  <If Condition="[Not String.IsNullOrWhiteSpace(str_ScrapedJsonRaw) AndAlso Not str_ScrapedJsonRaw.Contains(&quot;&quot;&quot;full_name&quot;&quot;:&quot;&quot;&quot;&quot;&quot;) AndAlso Not str_ScrapedJsonRaw.Contains(&quot;&quot;&quot;error&quot;&quot;&quot;)]" DisplayName="Verify Non-Empty Extraction" sap:VirtualizedContainerService.HintSize="408,208" sap2010:WorkflowViewState.IdRef="If_1">
+                  <If Condition="[Not String.IsNullOrWhiteSpace(str_ScrapedJsonRaw) AndAlso Not str_ScrapedJsonRaw.Contains(&quot;&quot;&quot;full_name&quot;&quot;:&quot;&quot;&quot;&quot;&quot;) AndAlso Not str_ScrapedJsonRaw.Contains(&quot;&quot;&quot;error&quot;&quot;:&quot;)]" DisplayName="Verify Non-Empty Extraction" sap:VirtualizedContainerService.HintSize="408,208" sap2010:WorkflowViewState.IdRef="If_1">
                     <If.Then>
                       <Assign DisplayName="Mark Success" sap:VirtualizedContainerService.HintSize="262,60" sap2010:WorkflowViewState.IdRef="Assign_4">
                         <Assign.To>

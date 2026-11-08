@@ -1,0 +1,217 @@
+<Activity mc:Ignorable="sap sap2010" x:Class="_00_ValidateAndNormalizeInputs" xmlns="http://schemas.microsoft.com/netfx/2009/xaml/activities" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:sap="http://schemas.microsoft.com/netfx/2009/xaml/activities/presentation" xmlns:sap2010="http://schemas.microsoft.com/netfx/2010/xaml/activities/presentation" xmlns:scg="clr-namespace:System.Collections.Generic;assembly=System.Private.CoreLib" xmlns:sco="clr-namespace:System.Collections.ObjectModel;assembly=System.Private.CoreLib" xmlns:ui="http://schemas.uipath.com/workflow/activities" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <x:Members>
+    <x:Property Name="in_LinkedInUrl" Type="InArgument(x:String)" />
+    <x:Property Name="in_GitHubUrl" Type="InArgument(x:String)" />
+    <x:Property Name="in_TargetJobRole" Type="InArgument(x:String)" />
+    <x:Property Name="in_RecipientEmail" Type="InArgument(x:String)" />
+    <x:Property Name="out_NormalizedLinkedInUrl" Type="OutArgument(x:String)" />
+    <x:Property Name="out_NormalizedGitHubUrl" Type="OutArgument(x:String)" />
+    <x:Property Name="out_NormalizedRole" Type="OutArgument(x:String)" />
+    <x:Property Name="out_NormalizedEmail" Type="OutArgument(x:String)" />
+  </x:Members>
+  <VisualBasic.Settings>
+    <x:Null />
+  </VisualBasic.Settings>
+  <sap2010:WorkflowViewState.IdRef>_00_ValidateAndNormalizeInputs_1</sap2010:WorkflowViewState.IdRef>
+  <TextExpression.NamespacesForImplementation>
+    <sco:Collection x:TypeArguments="x:String">
+      <x:String>System.Activities</x:String>
+      <x:String>System.Activities.Statements</x:String>
+      <x:String>System.Activities.Expressions</x:String>
+      <x:String>System.Activities.Validation</x:String>
+      <x:String>System.Activities.XamlIntegration</x:String>
+      <x:String>Microsoft.VisualBasic</x:String>
+      <x:String>Microsoft.VisualBasic.Activities</x:String>
+      <x:String>System</x:String>
+      <x:String>System.Collections</x:String>
+      <x:String>System.Collections.Generic</x:String>
+      <x:String>System.Collections.ObjectModel</x:String>
+      <x:String>System.Data</x:String>
+      <x:String>System.Diagnostics</x:String>
+      <x:String>System.Drawing</x:String>
+      <x:String>System.IO</x:String>
+      <x:String>System.Linq</x:String>
+      <x:String>System.Net.Mail</x:String>
+      <x:String>System.Xml</x:String>
+      <x:String>System.Xml.Linq</x:String>
+      <x:String>UiPath.Core</x:String>
+      <x:String>UiPath.Core.Activities</x:String>
+      <x:String>System.Windows.Markup</x:String>
+      <x:String>GlobalVariablesNamespace</x:String>
+      <x:String>GlobalConstantsNamespace</x:String>
+      <x:String>System.Text.RegularExpressions</x:String>
+      <x:String>System.Linq.Expressions</x:String>
+      <x:String>System.Runtime.Serialization</x:String>
+    </sco:Collection>
+  </TextExpression.NamespacesForImplementation>
+  <TextExpression.ReferencesForImplementation>
+    <sco:Collection x:TypeArguments="AssemblyReference">
+      <AssemblyReference>System.Activities</AssemblyReference>
+      <AssemblyReference>Microsoft.VisualBasic</AssemblyReference>
+      <AssemblyReference>System.Private.CoreLib</AssemblyReference>
+      <AssemblyReference>mscorlib</AssemblyReference>
+      <AssemblyReference>System.Data</AssemblyReference>
+      <AssemblyReference>System</AssemblyReference>
+      <AssemblyReference>System.Linq</AssemblyReference>
+      <AssemblyReference>System.Data.Common</AssemblyReference>
+      <AssemblyReference>System.Drawing</AssemblyReference>
+      <AssemblyReference>System.Drawing.Primitives</AssemblyReference>
+      <AssemblyReference>System.Drawing.Common</AssemblyReference>
+      <AssemblyReference>System.Core</AssemblyReference>
+      <AssemblyReference>System.Xml</AssemblyReference>
+      <AssemblyReference>System.Xml.Linq</AssemblyReference>
+      <AssemblyReference>PresentationFramework</AssemblyReference>
+      <AssemblyReference>WindowsBase</AssemblyReference>
+      <AssemblyReference>PresentationCore</AssemblyReference>
+      <AssemblyReference>System.Xaml</AssemblyReference>
+      <AssemblyReference>UiPath.System.Activities</AssemblyReference>
+      <AssemblyReference>UiPath.UiAutomation.Activities</AssemblyReference>
+      <AssemblyReference>System.Data.DataSetExtensions</AssemblyReference>
+      <AssemblyReference>System.Net.Mail</AssemblyReference>
+      <AssemblyReference>System.ObjectModel</AssemblyReference>
+      <AssemblyReference>System.ComponentModel.TypeConverter</AssemblyReference>
+      <AssemblyReference>UiPath.Studio.Constants</AssemblyReference>
+      <AssemblyReference>System.Console</AssemblyReference>
+      <AssemblyReference>System.Security.Permissions</AssemblyReference>
+      <AssemblyReference>System.Configuration.ConfigurationManager</AssemblyReference>
+      <AssemblyReference>System.ComponentModel</AssemblyReference>
+      <AssemblyReference>System.Memory</AssemblyReference>
+      <AssemblyReference>System.Private.Uri</AssemblyReference>
+      <AssemblyReference>System.Private.ServiceModel</AssemblyReference>
+      <AssemblyReference>System.Collections</AssemblyReference>
+      <AssemblyReference>System.Collections.NonGeneric</AssemblyReference>
+      <AssemblyReference>System.Text.RegularExpressions</AssemblyReference>
+      <AssemblyReference>System.Linq.Expressions</AssemblyReference>
+      <AssemblyReference>System.Runtime.Serialization.Formatters</AssemblyReference>
+      <AssemblyReference>System.Private.DataContractSerialization</AssemblyReference>
+      <AssemblyReference>System.Runtime.Serialization.Primitives</AssemblyReference>
+    </sco:Collection>
+  </TextExpression.ReferencesForImplementation>
+  <Sequence DisplayName="00_ValidateAndNormalizeInputs" sap:VirtualizedContainerService.HintSize="892,1900" sap2010:WorkflowViewState.IdRef="Sequence_1">
+    <sap:WorkflowViewStateService.ViewState>
+      <scg:Dictionary x:TypeArguments="x:String, x:Object">
+        <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+      </scg:Dictionary>
+    </sap:WorkflowViewStateService.ViewState>
+    <ui:LogMessage DisplayName="Log Validation Start" sap:VirtualizedContainerService.HintSize="510,141" sap2010:WorkflowViewState.IdRef="LogMessage_1" Level="Info" Message="[&quot;[00_ValidateAndNormalizeInputs] Starting input parameter validation &amp; normalization.&quot;]" />
+    
+    <!-- 1. Validate & Normalize LinkedIn URL -->
+    <If Condition="[String.IsNullOrWhiteSpace(in_LinkedInUrl) OrElse Not System.Text.RegularExpressions.Regex.IsMatch(in_LinkedInUrl.Trim(), &quot;^https?:\/\/(www\.)?linkedin\.com\/in\/[A-Za-z0-9_\-\%]+&quot;, System.Text.RegularExpressions.RegexOptions.IgnoreCase)]" DisplayName="Validate LinkedIn URL Format" sap:VirtualizedContainerService.HintSize="510,336" sap2010:WorkflowViewState.IdRef="If_LinkedIn">
+      <If.Then>
+        <Sequence DisplayName="Invalid LinkedIn URL" sap:VirtualizedContainerService.HintSize="449.6,173.6" sap2010:WorkflowViewState.IdRef="Sequence_InvalidLinkedIn">
+          <sap:WorkflowViewStateService.ViewState>
+            <scg:Dictionary x:TypeArguments="x:String, x:Object">
+              <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+            </scg:Dictionary>
+          </sap:WorkflowViewStateService.ViewState>
+          <Throw DisplayName="Reject Invalid LinkedIn URL" Exception="[New UiPath.Core.BusinessRuleException(&quot;LinkedIn_URL must be a valid public profile URL (e.g., https://www.linkedin.com/in/username).&quot;)]" sap:VirtualizedContainerService.HintSize="416,113.6" sap2010:WorkflowViewState.IdRef="Throw_LinkedIn" />
+        </Sequence>
+      </If.Then>
+      <If.Else>
+        <Assign DisplayName="Assign Normalized LinkedIn URL" sap:VirtualizedContainerService.HintSize="449.6,113.6" sap2010:WorkflowViewState.IdRef="Assign_NormLinkedIn">
+          <Assign.To>
+            <OutArgument x:TypeArguments="x:String">[out_NormalizedLinkedInUrl]</OutArgument>
+          </Assign.To>
+          <Assign.Value>
+            <InArgument x:TypeArguments="x:String">[in_LinkedInUrl.Trim()]</InArgument>
+          </Assign.Value>
+        </Assign>
+      </If.Else>
+    </If>
+
+    <!-- 2. Validate & Normalize GitHub Input -->
+    <If Condition="[String.IsNullOrWhiteSpace(in_GitHubUrl)]" DisplayName="Validate GitHub Required" sap:VirtualizedContainerService.HintSize="510,336" sap2010:WorkflowViewState.IdRef="If_GitHubEmpty">
+      <If.Then>
+        <Sequence DisplayName="Empty GitHub Input" sap:VirtualizedContainerService.HintSize="449.6,173.6" sap2010:WorkflowViewState.IdRef="Sequence_EmptyGitHub">
+          <sap:WorkflowViewStateService.ViewState>
+            <scg:Dictionary x:TypeArguments="x:String, x:Object">
+              <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+            </scg:Dictionary>
+          </sap:WorkflowViewStateService.ViewState>
+          <Throw DisplayName="Reject Empty GitHub Input" Exception="[New UiPath.Core.BusinessRuleException(&quot;GitHub_URL or username is required.&quot;)]" sap:VirtualizedContainerService.HintSize="416,113.6" sap2010:WorkflowViewState.IdRef="Throw_GitHubEmpty" />
+        </Sequence>
+      </If.Then>
+      <If.Else>
+        <Sequence DisplayName="Normalize GitHub Input Sequence" sap:VirtualizedContainerService.HintSize="472,400" sap2010:WorkflowViewState.IdRef="Sequence_NormalizeGitHub">
+          <sap:WorkflowViewStateService.ViewState>
+            <scg:Dictionary x:TypeArguments="x:String, x:Object">
+              <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+            </scg:Dictionary>
+          </sap:WorkflowViewStateService.ViewState>
+          <If Condition="[in_GitHubUrl.Trim().ToLower().StartsWith(&quot;http://&quot;) OrElse in_GitHubUrl.Trim().ToLower().StartsWith(&quot;https://&quot;)]" DisplayName="Check If GitHub Full URL" sap:VirtualizedContainerService.HintSize="438.4,336" sap2010:WorkflowViewState.IdRef="If_GitHubUrlCheck">
+            <If.Then>
+              <If Condition="[Not System.Text.RegularExpressions.Regex.IsMatch(in_GitHubUrl.Trim(), &quot;^https?:\/\/(www\.)?github\.com\/[A-Za-z0-9_\-\.]+&quot;, System.Text.RegularExpressions.RegexOptions.IgnoreCase)]" DisplayName="Validate GitHub URL Pattern" sap:VirtualizedContainerService.HintSize="416,280" sap2010:WorkflowViewState.IdRef="If_GitHubUrlPattern">
+                <If.Then>
+                  <Throw DisplayName="Reject Invalid GitHub URL" Exception="[New UiPath.Core.BusinessRuleException(&quot;GitHub_URL must point to a valid GitHub profile (e.g., https://github.com/username).&quot;)]" sap:VirtualizedContainerService.HintSize="382.4,113.6" sap2010:WorkflowViewState.IdRef="Throw_InvalidGitHubUrl" />
+                </If.Then>
+                <If.Else>
+                  <Assign DisplayName="Assign Full GitHub URL" sap:VirtualizedContainerService.HintSize="382.4,113.6" sap2010:WorkflowViewState.IdRef="Assign_FullGitHubUrl">
+                    <Assign.To>
+                      <OutArgument x:TypeArguments="x:String">[out_NormalizedGitHubUrl]</OutArgument>
+                    </Assign.To>
+                    <Assign.Value>
+                      <InArgument x:TypeArguments="x:String">[in_GitHubUrl.Trim()]</InArgument>
+                    </Assign.Value>
+                  </Assign>
+                </If.Else>
+              </If>
+            </If.Then>
+            <If.Else>
+              <If Condition="[Not System.Text.RegularExpressions.Regex.IsMatch(in_GitHubUrl.Trim(), &quot;^[A-Za-z0-9_\-\.]+$&quot;)]" DisplayName="Validate GitHub Username Characters" sap:VirtualizedContainerService.HintSize="416,280" sap2010:WorkflowViewState.IdRef="If_GitHubUsernameChars">
+                <If.Then>
+                  <Throw DisplayName="Reject Invalid GitHub Username" Exception="[New UiPath.Core.BusinessRuleException(&quot;GitHub username contains invalid characters.&quot;)]" sap:VirtualizedContainerService.HintSize="382.4,113.6" sap2010:WorkflowViewState.IdRef="Throw_InvalidGitHubUsername" />
+                </If.Then>
+                <If.Else>
+                  <Assign DisplayName="Normalize Username to URL" sap:VirtualizedContainerService.HintSize="382.4,113.6" sap2010:WorkflowViewState.IdRef="Assign_NormGitHubUsername">
+                    <Assign.To>
+                      <OutArgument x:TypeArguments="x:String">[out_NormalizedGitHubUrl]</OutArgument>
+                    </Assign.To>
+                    <Assign.Value>
+                      <InArgument x:TypeArguments="x:String">["https://github.com/" &amp; in_GitHubUrl.Trim().TrimStart("/"c)]</InArgument>
+                    </Assign.Value>
+                  </Assign>
+                </If.Else>
+              </If>
+            </If.Else>
+          </If>
+        </Sequence>
+      </If.Else>
+    </If>
+
+    <!-- 3. Validate Recipient Email -->
+    <If Condition="[String.IsNullOrWhiteSpace(in_RecipientEmail) OrElse Not System.Text.RegularExpressions.Regex.IsMatch(in_RecipientEmail.Trim(), &quot;^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$&quot;)]" DisplayName="Validate Recipient Email Format" sap:VirtualizedContainerService.HintSize="510,336" sap2010:WorkflowViewState.IdRef="If_Email">
+      <If.Then>
+        <Sequence DisplayName="Invalid Recipient Email" sap:VirtualizedContainerService.HintSize="449.6,173.6" sap2010:WorkflowViewState.IdRef="Sequence_InvalidEmail">
+          <sap:WorkflowViewStateService.ViewState>
+            <scg:Dictionary x:TypeArguments="x:String, x:Object">
+              <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+            </scg:Dictionary>
+          </sap:WorkflowViewStateService.ViewState>
+          <Throw DisplayName="Reject Invalid Email" Exception="[New UiPath.Core.BusinessRuleException(&quot;Recipient_Email must contain a valid email address (e.g., user@example.com).&quot;)]" sap:VirtualizedContainerService.HintSize="416,113.6" sap2010:WorkflowViewState.IdRef="Throw_Email" />
+        </Sequence>
+      </If.Then>
+      <If.Else>
+        <Assign DisplayName="Assign Normalized Email" sap:VirtualizedContainerService.HintSize="449.6,113.6" sap2010:WorkflowViewState.IdRef="Assign_NormEmail">
+          <Assign.To>
+            <OutArgument x:TypeArguments="x:String">[out_NormalizedEmail]</OutArgument>
+          </Assign.To>
+          <Assign.Value>
+            <InArgument x:TypeArguments="x:String">[in_RecipientEmail.Trim()]</InArgument>
+          </Assign.Value>
+        </Assign>
+      </If.Else>
+    </If>
+
+    <!-- 4. Normalize Target Job Role (Optional) -->
+    <Assign DisplayName="Normalize Target Job Role" sap:VirtualizedContainerService.HintSize="510,113.6" sap2010:WorkflowViewState.IdRef="Assign_NormRole">
+      <Assign.To>
+        <OutArgument x:TypeArguments="x:String">[out_NormalizedRole]</OutArgument>
+      </Assign.To>
+      <Assign.Value>
+        <InArgument x:TypeArguments="x:String">[If(String.IsNullOrWhiteSpace(in_TargetJobRole), "", in_TargetJobRole.Trim())]</InArgument>
+      </Assign.Value>
+    </Assign>
+
+    <ui:LogMessage DisplayName="Log Validation Success" sap:VirtualizedContainerService.HintSize="510,141" sap2010:WorkflowViewState.IdRef="LogMessage_2" Level="Info" Message="[&quot;[00_ValidateAndNormalizeInputs] All inputs validated and normalized successfully.&quot;]" />
+  </Sequence>
+</Activity>

@@ -87,7 +87,7 @@
       <AssemblyReference>System.Text.RegularExpressions</AssemblyReference>
     </sco:Collection>
   </TextExpression.ReferencesForImplementation>
-  <Sequence DisplayName="Main Sequence" sap:VirtualizedContainerService.HintSize="897.2,4800" sap2010:WorkflowViewState.IdRef="Sequence_1">
+  <Sequence DisplayName="Main Sequence" sap:VirtualizedContainerService.HintSize="897.2,3500" sap2010:WorkflowViewState.IdRef="Sequence_1">
     <Sequence.Variables>
       <Variable x:TypeArguments="x:String" Name="str_JobStatus" />
       <Variable x:TypeArguments="x:String" Name="str_DraftPayload" />
@@ -103,145 +103,47 @@
         <x:Boolean x:Key="IsExpanded">True</x:Boolean>
       </scg:Dictionary>
     </sap:WorkflowViewStateService.ViewState>
-    <Sequence DisplayName="AutoCV Orchestration - Sequence_2" sap:VirtualizedContainerService.HintSize="649.6,4750" sap2010:WorkflowViewState.IdRef="Sequence_2">
+    <Sequence DisplayName="AutoCV Orchestration - Sequence_2" sap:VirtualizedContainerService.HintSize="649.6,3450" sap2010:WorkflowViewState.IdRef="Sequence_2">
       <sap:WorkflowViewStateService.ViewState>
         <scg:Dictionary x:TypeArguments="x:String, x:Object">
           <x:Boolean x:Key="IsExpanded">True</x:Boolean>
         </scg:Dictionary>
       </sap:WorkflowViewStateService.ViewState>
-      <Sequence DisplayName="Validate and Normalize Inputs" sap:VirtualizedContainerService.HintSize="616,1800" sap2010:WorkflowViewState.IdRef="Sequence_ValidateInputs">
-        <sap:WorkflowViewStateService.ViewState>
-          <scg:Dictionary x:TypeArguments="x:String, x:Object">
-            <x:Boolean x:Key="IsExpanded">True</x:Boolean>
-          </scg:Dictionary>
-        </sap:WorkflowViewStateService.ViewState>
-        <Assign DisplayName="Initialize job status" sap:VirtualizedContainerService.HintSize="510,113.6" sap2010:WorkflowViewState.IdRef="Assign_5">
-          <Assign.To>
-            <OutArgument x:TypeArguments="x:String">[str_JobStatus]</OutArgument>
-          </Assign.To>
-          <Assign.Value>
-            <InArgument x:TypeArguments="x:String">["PENDING"]</InArgument>
-          </Assign.Value>
-        </Assign>
-        <Assign DisplayName="Initialize output path" sap:VirtualizedContainerService.HintSize="510,113.6" sap2010:WorkflowViewState.IdRef="Assign_6">
-          <Assign.To>
-            <OutArgument x:TypeArguments="x:String">[str_OutputPdfPath]</OutArgument>
-          </Assign.To>
-          <Assign.Value>
-            <InArgument x:TypeArguments="x:String">[""]</InArgument>
-          </Assign.Value>
-        </Assign>
-        <If Condition="[String.IsNullOrWhiteSpace(in_LinkedInUrl) OrElse Not System.Text.RegularExpressions.Regex.IsMatch(in_LinkedInUrl.Trim(), &quot;^https?:\/\/(www\.)?linkedin\.com\/in\/[A-Za-z0-9_\-\%]+&quot;, System.Text.RegularExpressions.RegexOptions.IgnoreCase)]" DisplayName="Validate LinkedIn URL" sap:VirtualizedContainerService.HintSize="510,336" sap2010:WorkflowViewState.IdRef="If_2">
-          <If.Then>
-            <Sequence DisplayName="Invalid LinkedIn URL" sap:VirtualizedContainerService.HintSize="449.6,173.6" sap2010:WorkflowViewState.IdRef="Sequence_3">
-              <sap:WorkflowViewStateService.ViewState>
-                <scg:Dictionary x:TypeArguments="x:String, x:Object">
-                  <x:Boolean x:Key="IsExpanded">True</x:Boolean>
-                </scg:Dictionary>
-              </sap:WorkflowViewStateService.ViewState>
-              <Throw DisplayName="Reject invalid LinkedIn URL" Exception="[New UiPath.Core.BusinessRuleException(&quot;LinkedIn_URL must be a valid public profile URL (e.g., https://www.linkedin.com/in/username).&quot;)]" sap:VirtualizedContainerService.HintSize="416,113.6" sap2010:WorkflowViewState.IdRef="Throw_1" />
-            </Sequence>
-          </If.Then>
-          <If.Else>
-            <Assign DisplayName="Normalize LinkedIn URL" sap:VirtualizedContainerService.HintSize="449.6,113.6" sap2010:WorkflowViewState.IdRef="Assign_NormLinkedIn">
-              <Assign.To>
-                <OutArgument x:TypeArguments="x:String">[str_NormalizedLinkedInUrl]</OutArgument>
-              </Assign.To>
-              <Assign.Value>
-                <InArgument x:TypeArguments="x:String">[in_LinkedInUrl.Trim()]</InArgument>
-              </Assign.Value>
-            </Assign>
-          </If.Else>
-        </If>
-        <If Condition="[String.IsNullOrWhiteSpace(in_GitHubUrl)]" DisplayName="Validate GitHub input required" sap:VirtualizedContainerService.HintSize="510,336" sap2010:WorkflowViewState.IdRef="If_3">
-          <If.Then>
-            <Sequence DisplayName="Empty GitHub input" sap:VirtualizedContainerService.HintSize="449.6,173.6" sap2010:WorkflowViewState.IdRef="Sequence_4">
-              <sap:WorkflowViewStateService.ViewState>
-                <scg:Dictionary x:TypeArguments="x:String, x:Object">
-                  <x:Boolean x:Key="IsExpanded">True</x:Boolean>
-                </scg:Dictionary>
-              </sap:WorkflowViewStateService.ViewState>
-              <Throw DisplayName="Reject empty GitHub input" Exception="[New UiPath.Core.BusinessRuleException(&quot;GitHub_URL or username is required.&quot;)]" sap:VirtualizedContainerService.HintSize="416,113.6" sap2010:WorkflowViewState.IdRef="Throw_2" />
-            </Sequence>
-          </If.Then>
-          <If.Else>
-            <Sequence DisplayName="Normalize GitHub input" sap:VirtualizedContainerService.HintSize="472,400" sap2010:WorkflowViewState.IdRef="Sequence_NormGH">
-              <sap:WorkflowViewStateService.ViewState>
-                <scg:Dictionary x:TypeArguments="x:String, x:Object">
-                  <x:Boolean x:Key="IsExpanded">True</x:Boolean>
-                </scg:Dictionary>
-              </sap:WorkflowViewStateService.ViewState>
-              <If Condition="[in_GitHubUrl.Trim().ToLower().StartsWith(&quot;http://&quot;) OrElse in_GitHubUrl.Trim().ToLower().StartsWith(&quot;https://&quot;)]" DisplayName="Check if GitHub input is full URL" sap:VirtualizedContainerService.HintSize="438.4,336" sap2010:WorkflowViewState.IdRef="If_GH_UrlCheck">
-                <If.Then>
-                  <If Condition="[Not System.Text.RegularExpressions.Regex.IsMatch(in_GitHubUrl.Trim(), &quot;^https?:\/\/(www\.)?github\.com\/[A-Za-z0-9_\-\.]+&quot;, System.Text.RegularExpressions.RegexOptions.IgnoreCase)]" DisplayName="Validate GitHub URL format" sap:VirtualizedContainerService.HintSize="416,280" sap2010:WorkflowViewState.IdRef="If_GH_UrlFormat">
-                    <If.Then>
-                      <Throw DisplayName="Reject invalid GitHub URL" Exception="[New UiPath.Core.BusinessRuleException(&quot;GitHub_URL must point to a valid GitHub profile (e.g., https://github.com/username).&quot;)]" sap:VirtualizedContainerService.HintSize="382.4,113.6" sap2010:WorkflowViewState.IdRef="Throw_GH_Url" />
-                    </If.Then>
-                    <If.Else>
-                      <Assign DisplayName="Assign GitHub URL" sap:VirtualizedContainerService.HintSize="382.4,113.6" sap2010:WorkflowViewState.IdRef="Assign_GH_FullUrl">
-                        <Assign.To>
-                          <OutArgument x:TypeArguments="x:String">[str_NormalizedGitHubUrl]</OutArgument>
-                        </Assign.To>
-                        <Assign.Value>
-                          <InArgument x:TypeArguments="x:String">[in_GitHubUrl.Trim()]</InArgument>
-                        </Assign.Value>
-                      </Assign>
-                    </If.Else>
-                  </If>
-                </If.Then>
-                <If.Else>
-                  <If Condition="[Not System.Text.RegularExpressions.Regex.IsMatch(in_GitHubUrl.Trim(), &quot;^[A-Za-z0-9_\-\.]+$&quot;)]" DisplayName="Validate GitHub username format" sap:VirtualizedContainerService.HintSize="416,280" sap2010:WorkflowViewState.IdRef="If_GH_UserFormat">
-                    <If.Then>
-                      <Throw DisplayName="Reject invalid GitHub username" Exception="[New UiPath.Core.BusinessRuleException(&quot;GitHub username contains invalid characters.&quot;)]" sap:VirtualizedContainerService.HintSize="382.4,113.6" sap2010:WorkflowViewState.IdRef="Throw_GH_Username" />
-                    </If.Then>
-                    <If.Else>
-                      <Assign DisplayName="Normalize username to URL" sap:VirtualizedContainerService.HintSize="382.4,113.6" sap2010:WorkflowViewState.IdRef="Assign_GH_NormUsername">
-                        <Assign.To>
-                          <OutArgument x:TypeArguments="x:String">[str_NormalizedGitHubUrl]</OutArgument>
-                        </Assign.To>
-                        <Assign.Value>
-                          <InArgument x:TypeArguments="x:String">["https://github.com/" &amp; in_GitHubUrl.Trim()]</InArgument>
-                        </Assign.Value>
-                      </Assign>
-                    </If.Else>
-                  </If>
-                </If.Else>
-              </If>
-            </Sequence>
-          </If.Else>
-        </If>
-        <If Condition="[String.IsNullOrWhiteSpace(in_RecipientEmail) OrElse Not System.Text.RegularExpressions.Regex.IsMatch(in_RecipientEmail.Trim(), &quot;^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$&quot;)]" DisplayName="Validate recipient email" sap:VirtualizedContainerService.HintSize="510,336" sap2010:WorkflowViewState.IdRef="If_4">
-          <If.Then>
-            <Sequence DisplayName="Invalid recipient email" sap:VirtualizedContainerService.HintSize="449.6,173.6" sap2010:WorkflowViewState.IdRef="Sequence_5">
-              <sap:WorkflowViewStateService.ViewState>
-                <scg:Dictionary x:TypeArguments="x:String, x:Object">
-                  <x:Boolean x:Key="IsExpanded">True</x:Boolean>
-                </scg:Dictionary>
-              </sap:WorkflowViewStateService.ViewState>
-              <Throw DisplayName="Reject invalid recipient email" Exception="[New UiPath.Core.BusinessRuleException(&quot;Recipient_Email must contain a valid email address (e.g., user@example.com).&quot;)]" sap:VirtualizedContainerService.HintSize="416,113.6" sap2010:WorkflowViewState.IdRef="Throw_3" />
-            </Sequence>
-          </If.Then>
-          <If.Else>
-            <Assign DisplayName="Normalize recipient email" sap:VirtualizedContainerService.HintSize="449.6,113.6" sap2010:WorkflowViewState.IdRef="Assign_NormEmail">
-              <Assign.To>
-                <OutArgument x:TypeArguments="x:String">[str_NormalizedEmail]</OutArgument>
-              </Assign.To>
-              <Assign.Value>
-                <InArgument x:TypeArguments="x:String">[in_RecipientEmail.Trim()]</InArgument>
-              </Assign.Value>
-            </Assign>
-          </If.Else>
-        </If>
-        <Assign DisplayName="Normalize Target Job Role" sap:VirtualizedContainerService.HintSize="510,113.6" sap2010:WorkflowViewState.IdRef="Assign_NormRole">
-          <Assign.To>
-            <OutArgument x:TypeArguments="x:String">[str_NormalizedRole]</OutArgument>
-          </Assign.To>
-          <Assign.Value>
-            <InArgument x:TypeArguments="x:String">[If(String.IsNullOrWhiteSpace(in_TargetJobRole), "", in_TargetJobRole.Trim())]</InArgument>
-          </Assign.Value>
-        </Assign>
-      </Sequence>
-      <Assign DisplayName="Set scraping status" sap:VirtualizedContainerService.HintSize="616,174.4" sap2010:WorkflowViewState.IdRef="Assign_7">
+      
+      <!-- 1. Initialization -->
+      <Assign DisplayName="Initialize job status" sap:VirtualizedContainerService.HintSize="616,113.6" sap2010:WorkflowViewState.IdRef="Assign_5">
+        <Assign.To>
+          <OutArgument x:TypeArguments="x:String">[str_JobStatus]</OutArgument>
+        </Assign.To>
+        <Assign.Value>
+          <InArgument x:TypeArguments="x:String">["PENDING"]</InArgument>
+        </Assign.Value>
+      </Assign>
+      <Assign DisplayName="Initialize output path" sap:VirtualizedContainerService.HintSize="616,113.6" sap2010:WorkflowViewState.IdRef="Assign_6">
+        <Assign.To>
+          <OutArgument x:TypeArguments="x:String">[str_OutputPdfPath]</OutArgument>
+        </Assign.To>
+        <Assign.Value>
+          <InArgument x:TypeArguments="x:String">[""]</InArgument>
+        </Assign.Value>
+      </Assign>
+
+      <!-- 2. Invoke 00_ValidateAndNormalizeInputs -->
+      <ui:InvokeWorkflowFile ArgumentsVariable="{x:Null}" ContinueOnError="{x:Null}" DisplayName="Invoke 00_ValidateAndNormalizeInputs workflow" sap:VirtualizedContainerService.HintSize="616,113.6" sap2010:WorkflowViewState.IdRef="InvokeWorkflowFile_ValidateInputs" UnSafe="False" WorkflowFileName="Modules\00_ValidateAndNormalizeInputs.xaml">
+        <ui:InvokeWorkflowFile.Arguments>
+          <InArgument x:TypeArguments="x:String" x:Key="in_LinkedInUrl">[in_LinkedInUrl]</InArgument>
+          <InArgument x:TypeArguments="x:String" x:Key="in_GitHubUrl">[in_GitHubUrl]</InArgument>
+          <InArgument x:TypeArguments="x:String" x:Key="in_TargetJobRole">[in_TargetJobRole]</InArgument>
+          <InArgument x:TypeArguments="x:String" x:Key="in_RecipientEmail">[in_RecipientEmail]</InArgument>
+          <OutArgument x:TypeArguments="x:String" x:Key="out_NormalizedLinkedInUrl">[str_NormalizedLinkedInUrl]</OutArgument>
+          <OutArgument x:TypeArguments="x:String" x:Key="out_NormalizedGitHubUrl">[str_NormalizedGitHubUrl]</OutArgument>
+          <OutArgument x:TypeArguments="x:String" x:Key="out_NormalizedRole">[str_NormalizedRole]</OutArgument>
+          <OutArgument x:TypeArguments="x:String" x:Key="out_NormalizedEmail">[str_NormalizedEmail]</OutArgument>
+        </ui:InvokeWorkflowFile.Arguments>
+      </ui:InvokeWorkflowFile>
+
+      <!-- 3. Ingestion Phase: LinkedIn & GitHub -->
+      <Assign DisplayName="Set scraping status" sap:VirtualizedContainerService.HintSize="616,113.6" sap2010:WorkflowViewState.IdRef="Assign_7">
         <Assign.To>
           <OutArgument x:TypeArguments="x:String">[str_JobStatus]</OutArgument>
         </Assign.To>
@@ -249,7 +151,7 @@
           <InArgument x:TypeArguments="x:String">["SCRAPING"]</InArgument>
         </Assign.Value>
       </Assign>
-      <Assign DisplayName="Expose scraping status" sap:VirtualizedContainerService.HintSize="616,174.4" sap2010:WorkflowViewState.IdRef="Assign_8">
+      <Assign DisplayName="Expose scraping status" sap:VirtualizedContainerService.HintSize="616,113.6" sap2010:WorkflowViewState.IdRef="Assign_8">
         <Assign.To>
           <OutArgument x:TypeArguments="x:String">[out_JobStatus]</OutArgument>
         </Assign.To>
@@ -257,7 +159,9 @@
           <InArgument x:TypeArguments="x:String">[str_JobStatus]</InArgument>
         </Assign.Value>
       </Assign>
-      <ui:LogMessage DisplayName="Publish scraping progress" sap:VirtualizedContainerService.HintSize="616,174.4" sap2010:WorkflowViewState.IdRef="LogMessage_5" Level="Info" Message="[&quot;SCRAPING: Ingesting LinkedIn profile via 01_LinkedIn_ScrapeProfile module.&quot;]" />
+      <ui:LogMessage DisplayName="Publish scraping progress" sap:VirtualizedContainerService.HintSize="616,141" sap2010:WorkflowViewState.IdRef="LogMessage_5" Level="Info" Message="[&quot;SCRAPING: Ingesting LinkedIn profile via 01_LinkedIn_ScrapeProfile module.&quot;]" />
+      
+      <!-- Invoke 01_LinkedIn_ScrapeProfile -->
       <ui:InvokeWorkflowFile ArgumentsVariable="{x:Null}" ContinueOnError="{x:Null}" DisplayName="Invoke 01_LinkedIn_ScrapeProfile workflow" sap:VirtualizedContainerService.HintSize="616,113.6" sap2010:WorkflowViewState.IdRef="InvokeWorkflowFile_1" UnSafe="False" WorkflowFileName="Modules\01_LinkedIn_ScrapeProfile.xaml">
         <ui:InvokeWorkflowFile.Arguments>
           <InArgument x:TypeArguments="x:String" x:Key="in_LinkedInUrl">[str_NormalizedLinkedInUrl]</InArgument>
@@ -266,6 +170,8 @@
           <OutArgument x:TypeArguments="x:String" x:Key="out_LinkedInDataJson">[str_LinkedInDataJson]</OutArgument>
         </ui:InvokeWorkflowFile.Arguments>
       </ui:InvokeWorkflowFile>
+
+      <!-- 4. Synthesis Contract Construction -->
       <Assign DisplayName="Build draft resume contract" sap:VirtualizedContainerService.HintSize="616,174.4" sap2010:WorkflowViewState.IdRef="Assign_9">
         <Assign.To>
           <OutArgument x:TypeArguments="x:String">[str_DraftPayload]</OutArgument>
@@ -274,7 +180,7 @@
           <InArgument x:TypeArguments="x:String">["{""schema_version"":""2.0"",""personal_info"":{""linkedin_url"":""" &amp; str_NormalizedLinkedInUrl.Replace(ChrW(34).ToString(), "") &amp; """,""github_url"":""" &amp; str_NormalizedGitHubUrl.Replace(ChrW(34).ToString(), "") &amp; """,""target_job_role"":""" &amp; str_NormalizedRole.Replace(ChrW(34).ToString(), "") &amp; """,""recipient_email"":""" &amp; str_NormalizedEmail.Replace(ChrW(34).ToString(), "") &amp; """},""experiences"":[],""projects"":[],""skills"":{""languages"":[],""frameworks"":[],""developer_tools"":[]},""education"":[],""pipeline"":{""linkedin"":""completed"",""github"":""pending"",""ai"":""pending"",""human_curation"":""awaiting"",""document"":""pending_approval""},""raw_linkedin_data"":" &amp; If(String.IsNullOrWhiteSpace(str_LinkedInDataJson), """{}\""", str_LinkedInDataJson) &amp; "}"]</InArgument>
         </Assign.Value>
       </Assign>
-      <Assign DisplayName="Set synthesis status" sap:VirtualizedContainerService.HintSize="616,174.4" sap2010:WorkflowViewState.IdRef="Assign_10">
+      <Assign DisplayName="Set synthesis status" sap:VirtualizedContainerService.HintSize="616,113.6" sap2010:WorkflowViewState.IdRef="Assign_10">
         <Assign.To>
           <OutArgument x:TypeArguments="x:String">[str_JobStatus]</OutArgument>
         </Assign.To>
@@ -282,7 +188,7 @@
           <InArgument x:TypeArguments="x:String">["SYNTHESIZING"]</InArgument>
         </Assign.Value>
       </Assign>
-      <Assign DisplayName="Expose synthesis status" sap:VirtualizedContainerService.HintSize="616,174.4" sap2010:WorkflowViewState.IdRef="Assign_11">
+      <Assign DisplayName="Expose synthesis status" sap:VirtualizedContainerService.HintSize="616,113.6" sap2010:WorkflowViewState.IdRef="Assign_11">
         <Assign.To>
           <OutArgument x:TypeArguments="x:String">[out_JobStatus]</OutArgument>
         </Assign.To>
@@ -290,8 +196,10 @@
           <InArgument x:TypeArguments="x:String">[str_JobStatus]</InArgument>
         </Assign.Value>
       </Assign>
-      <ui:LogMessage DisplayName="Publish AI synthesis progress" sap:VirtualizedContainerService.HintSize="616,174.4" sap2010:WorkflowViewState.IdRef="LogMessage_6" Level="Info" Message="[&quot;SYNTHESIZING: STAR/XYZ and ATS mapping module is next.&quot;]" />
-      <Assign DisplayName="Set curation status" sap:VirtualizedContainerService.HintSize="616,174.4" sap2010:WorkflowViewState.IdRef="Assign_12">
+      <ui:LogMessage DisplayName="Publish AI synthesis progress" sap:VirtualizedContainerService.HintSize="616,141" sap2010:WorkflowViewState.IdRef="LogMessage_6" Level="Info" Message="[&quot;SYNTHESIZING: STAR/XYZ and ATS mapping module is next.&quot;]" />
+      
+      <!-- 5. Curation Phase (#HumanInTheLead) -->
+      <Assign DisplayName="Set curation status" sap:VirtualizedContainerService.HintSize="616,113.6" sap2010:WorkflowViewState.IdRef="Assign_12">
         <Assign.To>
           <OutArgument x:TypeArguments="x:String">[str_JobStatus]</OutArgument>
         </Assign.To>
@@ -299,7 +207,7 @@
           <InArgument x:TypeArguments="x:String">["CURATING"]</InArgument>
         </Assign.Value>
       </Assign>
-      <Assign DisplayName="Expose draft for dashboard" sap:VirtualizedContainerService.HintSize="616,174.4" sap2010:WorkflowViewState.IdRef="Assign_13">
+      <Assign DisplayName="Expose draft for dashboard" sap:VirtualizedContainerService.HintSize="616,113.6" sap2010:WorkflowViewState.IdRef="Assign_13">
         <Assign.To>
           <OutArgument x:TypeArguments="x:String">[out_DraftResumePayload]</OutArgument>
         </Assign.To>
@@ -307,7 +215,7 @@
           <InArgument x:TypeArguments="x:String">[str_DraftPayload]</InArgument>
         </Assign.Value>
       </Assign>
-      <Assign DisplayName="Expose curation status" sap:VirtualizedContainerService.HintSize="616,174.4" sap2010:WorkflowViewState.IdRef="Assign_14">
+      <Assign DisplayName="Expose curation status" sap:VirtualizedContainerService.HintSize="616,113.6" sap2010:WorkflowViewState.IdRef="Assign_14">
         <Assign.To>
           <OutArgument x:TypeArguments="x:String">[out_JobStatus]</OutArgument>
         </Assign.To>
@@ -315,7 +223,9 @@
           <InArgument x:TypeArguments="x:String">[str_JobStatus]</InArgument>
         </Assign.Value>
       </Assign>
-      <ui:LogMessage DisplayName="Publish curation handoff" sap:VirtualizedContainerService.HintSize="616,174.4" sap2010:WorkflowViewState.IdRef="LogMessage_7" Level="Info" Message="[&quot;CURATING: Draft is ready for project selection and human approval.&quot;]" />
+      <ui:LogMessage DisplayName="Publish curation handoff" sap:VirtualizedContainerService.HintSize="616,141" sap2010:WorkflowViewState.IdRef="LogMessage_7" Level="Info" Message="[&quot;CURATING: Draft is ready for project selection and human approval.&quot;]" />
+      
+      <!-- 6. Approved Resume Handoff -->
       <If Condition="[Not String.IsNullOrWhiteSpace(in_ApprovedResumePayload)]" DisplayName="Process human approval when supplied" sap:VirtualizedContainerService.HintSize="616,1085.6" sap2010:WorkflowViewState.IdRef="If_5">
         <If.Then>
           <Sequence DisplayName="Approved resume handoff" sap:VirtualizedContainerService.HintSize="449.6,923.2" sap2010:WorkflowViewState.IdRef="Sequence_6">
@@ -324,7 +234,7 @@
                 <x:Boolean x:Key="IsExpanded">True</x:Boolean>
               </scg:Dictionary>
             </sap:WorkflowViewStateService.ViewState>
-            <Assign DisplayName="Set approved status" sap:VirtualizedContainerService.HintSize="416,174.4" sap2010:WorkflowViewState.IdRef="Assign_15">
+            <Assign DisplayName="Set approved status" sap:VirtualizedContainerService.HintSize="416,113.6" sap2010:WorkflowViewState.IdRef="Assign_15">
               <Assign.To>
                 <OutArgument x:TypeArguments="x:String">[str_JobStatus]</OutArgument>
               </Assign.To>
@@ -332,7 +242,7 @@
                 <InArgument x:TypeArguments="x:String">["APPROVED"]</InArgument>
               </Assign.Value>
             </Assign>
-            <Assign DisplayName="Use approved payload" sap:VirtualizedContainerService.HintSize="416,174.4" sap2010:WorkflowViewState.IdRef="Assign_16">
+            <Assign DisplayName="Use approved payload" sap:VirtualizedContainerService.HintSize="416,113.6" sap2010:WorkflowViewState.IdRef="Assign_16">
               <Assign.To>
                 <OutArgument x:TypeArguments="x:String">[str_DraftPayload]</OutArgument>
               </Assign.To>
@@ -340,7 +250,7 @@
                 <InArgument x:TypeArguments="x:String">[in_ApprovedResumePayload]</InArgument>
               </Assign.Value>
             </Assign>
-            <Assign DisplayName="Expose approved payload" sap:VirtualizedContainerService.HintSize="416,174.4" sap2010:WorkflowViewState.IdRef="Assign_17">
+            <Assign DisplayName="Expose approved payload" sap:VirtualizedContainerService.HintSize="416,113.6" sap2010:WorkflowViewState.IdRef="Assign_17">
               <Assign.To>
                 <OutArgument x:TypeArguments="x:String">[out_DraftResumePayload]</OutArgument>
               </Assign.To>
@@ -348,7 +258,7 @@
                 <InArgument x:TypeArguments="x:String">[str_DraftPayload]</InArgument>
               </Assign.Value>
             </Assign>
-            <Assign DisplayName="Expose approved status" sap:VirtualizedContainerService.HintSize="416,174.4" sap2010:WorkflowViewState.IdRef="Assign_18">
+            <Assign DisplayName="Expose approved status" sap:VirtualizedContainerService.HintSize="416,113.6" sap2010:WorkflowViewState.IdRef="Assign_18">
               <Assign.To>
                 <OutArgument x:TypeArguments="x:String">[out_JobStatus]</OutArgument>
               </Assign.To>
@@ -356,11 +266,11 @@
                 <InArgument x:TypeArguments="x:String">[str_JobStatus]</InArgument>
               </Assign.Value>
             </Assign>
-            <ui:LogMessage DisplayName="Publish approved handoff" sap:VirtualizedContainerService.HintSize="416,165.6" sap2010:WorkflowViewState.IdRef="LogMessage_8" Level="Info" Message="[&quot;APPROVED: Payload is ready for Document_GeneratePdf and Notification_SendMail modules.&quot;]" />
+            <ui:LogMessage DisplayName="Publish approved handoff" sap:VirtualizedContainerService.HintSize="416,141" sap2010:WorkflowViewState.IdRef="LogMessage_8" Level="Info" Message="[&quot;APPROVED: Payload is ready for Document_GeneratePdf and Notification_SendMail modules.&quot;]" />
           </Sequence>
         </If.Then>
       </If>
-      <Assign DisplayName="Expose PDF output path" sap:VirtualizedContainerService.HintSize="616,165.6" sap2010:WorkflowViewState.IdRef="Assign_19">
+      <Assign DisplayName="Expose PDF output path" sap:VirtualizedContainerService.HintSize="616,113.6" sap2010:WorkflowViewState.IdRef="Assign_19">
         <Assign.To>
           <OutArgument x:TypeArguments="x:String">[out_OutputPdfPath]</OutArgument>
         </Assign.To>
