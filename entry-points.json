@@ -36,7 +36,7 @@
         "properties": {
           "out_JobStatus": {
             "type": "string",
-            "description": "Current execution status of the pipeline (PENDING, SCRAPING, SYNTHESIZING, CURATING, APPROVED)"
+            "description": "Current execution status of the pipeline (PENDING, SCRAPING, SYNTHESIZING, CURATING, APPROVED, COMPLETED)"
           },
           "out_DraftResumePayload": {
             "type": "string",

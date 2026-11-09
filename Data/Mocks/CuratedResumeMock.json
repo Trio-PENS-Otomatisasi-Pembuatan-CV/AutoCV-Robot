@@ -1,0 +1,85 @@
+{
+  "profile": {
+    "fullName": "Jane Mustika Pratama",
+    "headline": "Fullstack Cloud & AI Engineer",
+    "email": "jane.pratama@example.com",
+    "phone": "+62 812-1234-5678",
+    "location": "Surabaya, Indonesia",
+    "summary": "Software Engineer berorientasi solusi dengan pengalaman 5+ tahun membangun aplikasi cloud berskala besar, sistem terdistribusi, dan otomatisasi dossier cerdas.",
+    "linkedinUrl": "https://linkedin.com/in/janepratama",
+    "githubUrl": "https://github.com/janepratama"
+  },
+  "experiences": [
+    {
+      "id": "exp1",
+      "company": "PT Telko Digital Nusantara",
+      "role": "Senior Backend Engineer",
+      "startDate": "Jan 2023",
+      "endDate": "Present",
+      "bulletPoints": [
+        "Merancang arsitektur microservices Go dan PostgreSQL berkinerja tinggi, menangani 500k transaksi harian dengan 99.99% uptime.",
+        "Mengurangi p95 response latency dari 450ms ke 85ms melalui optimasi query dan distributed caching Redis.",
+        "Mengorkestrasi pipeline deployment Kubernetes dan Docker, memotong waktu rilis dari 45 menit menjadi 7 menit."
+      ]
+    },
+    {
+      "id": "exp2",
+      "company": "PT Inovasi Solusi Cipta",
+      "role": "Fullstack Engineer",
+      "startDate": "Jun 2020",
+      "endDate": "Des 2022",
+      "bulletPoints": [
+        "Membangun portal klien interaktif Next.js dan Tailwind CSS yang melayani lebih dari 100 ribu pengguna aktif bulanan.",
+        "Mengembangkan RESTful API modular yang mengintegrasikan autentikasi OAuth2 dan sistem webhook pembayaran aman."
+      ]
+    }
+  ],
+  "projects": [
+    {
+      "id": "proj1",
+      "name": "cloud-distributed-scheduler",
+      "repoUrl": "https://github.com/janepratama/cloud-distributed-scheduler",
+      "stars": 99,
+      "language": "TypeScript",
+      "techStack": ["Node.js", "Redis", "Docker", "Jest"],
+      "starSummary": "Sistem task scheduling terdistribusi berbasis Redis lock untuk mitigasi race condition dan retry backoff otomatis.",
+      "isSelected": true
+    },
+    {
+      "id": "proj2",
+      "name": "autocv-core-engine",
+      "repoUrl": "https://github.com/janepratama/autocv-core-engine",
+      "stars": 62,
+      "language": "C#",
+      "techStack": ["UiPath", ".NET 10", "Next.js"],
+      "starSummary": "Engine sintesis dossier karir otomatis yang menggabungkan scraping UI LinkedIn, GitHub API, dan ekspor ATS Word/PDF.",
+      "isSelected": true
+    }
+  ],
+  "skills": [
+    {
+      "category": "Languages",
+      "items": ["TypeScript", "Go", "Python", "C#", "SQL"]
+    },
+    {
+      "category": "Frameworks & Libraries",
+      "items": ["Next.js", "React", "Express", "Gin", "Tailwind CSS"]
+    },
+    {
+      "category": "Cloud & DevOps",
+      "items": ["Docker", "Kubernetes", "Redis", "PostgreSQL", "GitHub Actions"]
+    },
+    {
+      "category": "RPA & Automation",
+      "items": ["UiPath Studio", "UiPath Orchestrator", "Headless Browser Automation"]
+    }
+  ],
+  "education": [
+    {
+      "institution": "Politeknik Elektronika Negeri Surabaya (PENS)",
+      "degree": "D4 Teknik Informatika (Applied Bachelor of Informatics)",
+      "graduationYear": "2020 — 2024",
+      "gpa": "3.85 / 4.00"
+    }
+  ]
+}

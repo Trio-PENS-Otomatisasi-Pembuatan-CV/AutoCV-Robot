@@ -28,6 +28,8 @@ nuget.cache
 execution.log
 *.executionlog
 [Oo]utput/
+Data/Outputs/*
+!Data/Outputs/.gitkeep
 [Rr]eports/
 [Tt]estResults/
 [Tt]emp/

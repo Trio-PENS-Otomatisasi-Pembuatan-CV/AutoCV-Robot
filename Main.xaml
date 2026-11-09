@@ -266,7 +266,54 @@
                 <InArgument x:TypeArguments="x:String">[str_JobStatus]</InArgument>
               </Assign.Value>
             </Assign>
-            <ui:LogMessage DisplayName="Publish approved handoff" sap:VirtualizedContainerService.HintSize="416,141" sap2010:WorkflowViewState.IdRef="LogMessage_8" Level="Info" Message="[&quot;APPROVED: Payload is ready for Document_GeneratePdf and Notification_SendMail modules.&quot;]" />
+            <ui:LogMessage DisplayName="Publish approved handoff" sap:VirtualizedContainerService.HintSize="416,141" sap2010:WorkflowViewState.IdRef="LogMessage_8" Level="Info" Message="[&quot;APPROVED: Starting Document_GeneratePdf module.&quot;]" />
+            
+            <!-- Invoke 04_Document_GeneratePdf -->
+            <ui:InvokeWorkflowFile ArgumentsVariable="{x:Null}" ContinueOnError="{x:Null}" DisplayName="Invoke 04_Document_GeneratePdf workflow" sap:VirtualizedContainerService.HintSize="416,113.6" sap2010:WorkflowViewState.IdRef="InvokeWorkflowFile_DocumentGenerate" UnSafe="False" WorkflowFileName="Modules\04_Document_GeneratePdf.xaml">
+              <ui:InvokeWorkflowFile.Arguments>
+                <InArgument x:TypeArguments="x:String" x:Key="in_CuratedResumeJson">[str_DraftPayload]</InArgument>
+                <InArgument x:TypeArguments="x:String" x:Key="in_TemplatePath">["Data\Templates\ATS_Resume_Template.docx"]</InArgument>
+                <InArgument x:TypeArguments="x:String" x:Key="in_OutputDir">["Data\Outputs"]</InArgument>
+                <OutArgument x:TypeArguments="x:String" x:Key="out_GeneratedPdfPath">[str_OutputPdfPath]</OutArgument>
+                <OutArgument x:TypeArguments="x:String" x:Key="out_GeneratedDocxPath" />
+              </ui:InvokeWorkflowFile.Arguments>
+            </ui:InvokeWorkflowFile>
+
+            <!-- Invoke 05_Notification_SendMail -->
+            <ui:LogMessage DisplayName="Publish email dispatch" sap:VirtualizedContainerService.HintSize="416,141" sap2010:WorkflowViewState.IdRef="LogMessage_9" Level="Info" Message="[&quot;DELIVERING: Dispatching final ATS Resume PDF to &quot; &amp; str_NormalizedEmail]" />
+            <ui:InvokeWorkflowFile ArgumentsVariable="{x:Null}" ContinueOnError="{x:Null}" DisplayName="Invoke 05_Notification_SendMail workflow" sap:VirtualizedContainerService.HintSize="416,113.6" sap2010:WorkflowViewState.IdRef="InvokeWorkflowFile_SendMail" UnSafe="False" WorkflowFileName="Modules\05_Notification_SendMail.xaml">
+              <ui:InvokeWorkflowFile.Arguments>
+                <InArgument x:TypeArguments="x:String" x:Key="in_RecipientEmail">[str_NormalizedEmail]</InArgument>
+                <InArgument x:TypeArguments="x:String" x:Key="in_PdfFilePath">[str_OutputPdfPath]</InArgument>
+                <InArgument x:TypeArguments="x:String" x:Key="in_CandidateName">["Candidate"]</InArgument>
+                <InArgument x:TypeArguments="x:String" x:Key="in_SmtpHost" />
+                <InArgument x:TypeArguments="x:Int32" x:Key="in_SmtpPort">[587]</InArgument>
+                <InArgument x:TypeArguments="x:String" x:Key="in_SmtpUser" />
+                <InArgument x:TypeArguments="x:String" x:Key="in_SmtpPassword" />
+                <InArgument x:TypeArguments="x:Boolean" x:Key="in_SimulationMode">[True]</InArgument>
+                <OutArgument x:TypeArguments="x:Boolean" x:Key="out_MailSent" />
+                <OutArgument x:TypeArguments="x:String" x:Key="out_DeliveryStatus" />
+              </ui:InvokeWorkflowFile.Arguments>
+            </ui:InvokeWorkflowFile>
+
+            <!-- Mark Job Completed -->
+            <Assign DisplayName="Set completed status" sap:VirtualizedContainerService.HintSize="416,113.6" sap2010:WorkflowViewState.IdRef="Assign_CompletedStatus">
+              <Assign.To>
+                <OutArgument x:TypeArguments="x:String">[str_JobStatus]</OutArgument>
+              </Assign.To>
+              <Assign.Value>
+                <InArgument x:TypeArguments="x:String">["COMPLETED"]</InArgument>
+              </Assign.Value>
+            </Assign>
+            <Assign DisplayName="Expose completed status" sap:VirtualizedContainerService.HintSize="416,113.6" sap2010:WorkflowViewState.IdRef="Assign_ExposeCompletedStatus">
+              <Assign.To>
+                <OutArgument x:TypeArguments="x:String">[out_JobStatus]</OutArgument>
+              </Assign.To>
+              <Assign.Value>
+                <InArgument x:TypeArguments="x:String">[str_JobStatus]</InArgument>
+              </Assign.Value>
+            </Assign>
+            <ui:LogMessage DisplayName="Publish final completion" sap:VirtualizedContainerService.HintSize="416,141" sap2010:WorkflowViewState.IdRef="LogMessage_10" Level="Info" Message="[&quot;COMPLETED: ATS Resume pipeline finished. File: &quot; &amp; str_OutputPdfPath]" />
           </Sequence>
         </If.Then>
       </If>
