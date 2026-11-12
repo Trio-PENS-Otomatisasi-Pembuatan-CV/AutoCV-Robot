@@ -89,31 +89,27 @@
   </TextExpression.ReferencesForImplementation>
   <Sequence DisplayName="Main Sequence" sap:VirtualizedContainerService.HintSize="897.2,3500" sap2010:WorkflowViewState.IdRef="Sequence_1">
     <Sequence.Variables>
-      <Variable x:TypeArguments="x:String" Name="str_JobStatus" />
-      <Variable x:TypeArguments="x:String" Name="str_DraftPayload" />
-      <Variable x:TypeArguments="x:String" Name="str_OutputPdfPath" />
-      <Variable x:TypeArguments="x:String" Name="str_NormalizedLinkedInUrl" />
-      <Variable x:TypeArguments="x:String" Name="str_NormalizedGitHubUrl" />
-      <Variable x:TypeArguments="x:String" Name="str_NormalizedEmail" />
-      <Variable x:TypeArguments="x:String" Name="str_NormalizedRole" />
-      <Variable x:TypeArguments="x:String" Name="str_LinkedInDataJson" />
+      <Variable x:TypeArguments="x:String" Name="strJobStatus" />
+      <Variable x:TypeArguments="x:String" Name="strDraftPayload" />
+      <Variable x:TypeArguments="x:String" Name="strOutputPdfPath" />
+      <Variable x:TypeArguments="x:String" Name="strNormalizedLinkedInUrl" />
+      <Variable x:TypeArguments="x:String" Name="strNormalizedGitHubUrl" />
+      <Variable x:TypeArguments="x:String" Name="strNormalizedEmail" />
+      <Variable x:TypeArguments="x:String" Name="strNormalizedRole" />
+      <Variable x:TypeArguments="x:String" Name="strLinkedInDataJson" />
+      <Variable x:TypeArguments="x:String" Name="strGitHubDataJson" />
+      <Variable x:TypeArguments="x:String" Name="strAIStatus" />
+      <Variable x:TypeArguments="x:String" Name="strAIWarning" />
     </Sequence.Variables>
     <sap:WorkflowViewStateService.ViewState>
       <scg:Dictionary x:TypeArguments="x:String, x:Object">
         <x:Boolean x:Key="IsExpanded">True</x:Boolean>
       </scg:Dictionary>
     </sap:WorkflowViewStateService.ViewState>
-    <Sequence DisplayName="AutoCV Orchestration - Sequence_2" sap:VirtualizedContainerService.HintSize="649.6,3450" sap2010:WorkflowViewState.IdRef="Sequence_2">
-      <sap:WorkflowViewStateService.ViewState>
-        <scg:Dictionary x:TypeArguments="x:String, x:Object">
-          <x:Boolean x:Key="IsExpanded">True</x:Boolean>
-        </scg:Dictionary>
-      </sap:WorkflowViewStateService.ViewState>
-      
-      <!-- 1. Initialization -->
+    <!-- 1. Initialization -->
       <Assign DisplayName="Initialize job status" sap:VirtualizedContainerService.HintSize="616,113.6" sap2010:WorkflowViewState.IdRef="Assign_5">
         <Assign.To>
-          <OutArgument x:TypeArguments="x:String">[str_JobStatus]</OutArgument>
+          <OutArgument x:TypeArguments="x:String">[strJobStatus]</OutArgument>
         </Assign.To>
         <Assign.Value>
           <InArgument x:TypeArguments="x:String">["PENDING"]</InArgument>
@@ -121,7 +117,7 @@
       </Assign>
       <Assign DisplayName="Initialize output path" sap:VirtualizedContainerService.HintSize="616,113.6" sap2010:WorkflowViewState.IdRef="Assign_6">
         <Assign.To>
-          <OutArgument x:TypeArguments="x:String">[str_OutputPdfPath]</OutArgument>
+          <OutArgument x:TypeArguments="x:String">[strOutputPdfPath]</OutArgument>
         </Assign.To>
         <Assign.Value>
           <InArgument x:TypeArguments="x:String">[""]</InArgument>
@@ -135,17 +131,17 @@
           <InArgument x:TypeArguments="x:String" x:Key="in_GitHubUrl">[in_GitHubUrl]</InArgument>
           <InArgument x:TypeArguments="x:String" x:Key="in_TargetJobRole">[in_TargetJobRole]</InArgument>
           <InArgument x:TypeArguments="x:String" x:Key="in_RecipientEmail">[in_RecipientEmail]</InArgument>
-          <OutArgument x:TypeArguments="x:String" x:Key="out_NormalizedLinkedInUrl">[str_NormalizedLinkedInUrl]</OutArgument>
-          <OutArgument x:TypeArguments="x:String" x:Key="out_NormalizedGitHubUrl">[str_NormalizedGitHubUrl]</OutArgument>
-          <OutArgument x:TypeArguments="x:String" x:Key="out_NormalizedRole">[str_NormalizedRole]</OutArgument>
-          <OutArgument x:TypeArguments="x:String" x:Key="out_NormalizedEmail">[str_NormalizedEmail]</OutArgument>
+          <OutArgument x:TypeArguments="x:String" x:Key="out_NormalizedLinkedInUrl">[strNormalizedLinkedInUrl]</OutArgument>
+          <OutArgument x:TypeArguments="x:String" x:Key="out_NormalizedGitHubUrl">[strNormalizedGitHubUrl]</OutArgument>
+          <OutArgument x:TypeArguments="x:String" x:Key="out_NormalizedRole">[strNormalizedRole]</OutArgument>
+          <OutArgument x:TypeArguments="x:String" x:Key="out_NormalizedEmail">[strNormalizedEmail]</OutArgument>
         </ui:InvokeWorkflowFile.Arguments>
       </ui:InvokeWorkflowFile>
 
       <!-- 3. Ingestion Phase: LinkedIn & GitHub -->
       <Assign DisplayName="Set scraping status" sap:VirtualizedContainerService.HintSize="616,113.6" sap2010:WorkflowViewState.IdRef="Assign_7">
         <Assign.To>
-          <OutArgument x:TypeArguments="x:String">[str_JobStatus]</OutArgument>
+          <OutArgument x:TypeArguments="x:String">[strJobStatus]</OutArgument>
         </Assign.To>
         <Assign.Value>
           <InArgument x:TypeArguments="x:String">["SCRAPING"]</InArgument>
@@ -156,7 +152,7 @@
           <OutArgument x:TypeArguments="x:String">[out_JobStatus]</OutArgument>
         </Assign.To>
         <Assign.Value>
-          <InArgument x:TypeArguments="x:String">[str_JobStatus]</InArgument>
+          <InArgument x:TypeArguments="x:String">[strJobStatus]</InArgument>
         </Assign.Value>
       </Assign>
       <ui:LogMessage DisplayName="Publish scraping progress" sap:VirtualizedContainerService.HintSize="616,141" sap2010:WorkflowViewState.IdRef="LogMessage_5" Level="Info" Message="[&quot;SCRAPING: Ingesting LinkedIn profile via 01_LinkedIn_ScrapeProfile module.&quot;]" />
@@ -164,25 +160,36 @@
       <!-- Invoke 01_LinkedIn_ScrapeProfile -->
       <ui:InvokeWorkflowFile ArgumentsVariable="{x:Null}" ContinueOnError="{x:Null}" DisplayName="Invoke 01_LinkedIn_ScrapeProfile workflow" sap:VirtualizedContainerService.HintSize="616,113.6" sap2010:WorkflowViewState.IdRef="InvokeWorkflowFile_1" UnSafe="False" WorkflowFileName="Modules\01_LinkedIn_ScrapeProfile.xaml">
         <ui:InvokeWorkflowFile.Arguments>
-          <InArgument x:TypeArguments="x:String" x:Key="in_LinkedInUrl">[str_NormalizedLinkedInUrl]</InArgument>
+          <InArgument x:TypeArguments="x:String" x:Key="in_LinkedInUrl">[strNormalizedLinkedInUrl]</InArgument>
           <InArgument x:TypeArguments="x:String" x:Key="in_BrowserType">["Chrome"]</InArgument>
           <InArgument x:TypeArguments="x:Boolean" x:Key="in_UseMockFallback">[True]</InArgument>
-          <OutArgument x:TypeArguments="x:String" x:Key="out_LinkedInDataJson">[str_LinkedInDataJson]</OutArgument>
+          <OutArgument x:TypeArguments="x:String" x:Key="out_LinkedInDataJson">[strLinkedInDataJson]</OutArgument>
         </ui:InvokeWorkflowFile.Arguments>
       </ui:InvokeWorkflowFile>
 
       <!-- 4. Synthesis Contract Construction -->
       <Assign DisplayName="Build draft resume contract" sap:VirtualizedContainerService.HintSize="616,174.4" sap2010:WorkflowViewState.IdRef="Assign_9">
         <Assign.To>
-          <OutArgument x:TypeArguments="x:String">[str_DraftPayload]</OutArgument>
+          <OutArgument x:TypeArguments="x:String">[strDraftPayload]</OutArgument>
         </Assign.To>
         <Assign.Value>
-          <InArgument x:TypeArguments="x:String">["{""schema_version"":""2.0"",""personal_info"":{""linkedin_url"":""" &amp; str_NormalizedLinkedInUrl.Replace(ChrW(34).ToString(), "") &amp; """,""github_url"":""" &amp; str_NormalizedGitHubUrl.Replace(ChrW(34).ToString(), "") &amp; """,""target_job_role"":""" &amp; str_NormalizedRole.Replace(ChrW(34).ToString(), "") &amp; """,""recipient_email"":""" &amp; str_NormalizedEmail.Replace(ChrW(34).ToString(), "") &amp; """},""experiences"":[],""projects"":[],""skills"":{""languages"":[],""frameworks"":[],""developer_tools"":[]},""education"":[],""pipeline"":{""linkedin"":""completed"",""github"":""pending"",""ai"":""pending"",""human_curation"":""awaiting"",""document"":""pending_approval""},""raw_linkedin_data"":" &amp; If(String.IsNullOrWhiteSpace(str_LinkedInDataJson), """{}\""", str_LinkedInDataJson) &amp; "}"]</InArgument>
+          <InArgument x:TypeArguments="x:String">["{""schema_version"":""2.0"",""personal_info"":{""linkedin_url"":""" &amp; strNormalizedLinkedInUrl.Replace(ChrW(34).ToString(), "") &amp; """,""github_url"":""" &amp; strNormalizedGitHubUrl.Replace(ChrW(34).ToString(), "") &amp; """,""target_job_role"":""" &amp; strNormalizedRole.Replace(ChrW(34).ToString(), "") &amp; """,""recipient_email"":""" &amp; strNormalizedEmail.Replace(ChrW(34).ToString(), "") &amp; """},""experiences"":[],""projects"":[],""skills"":{""languages"":[],""frameworks"":[],""developer_tools"":[]},""education"":[],""pipeline"":{""linkedin"":""completed"",""github"":""pending"",""ai"":""pending"",""human_curation"":""awaiting"",""document"":""pending_approval""},""raw_linkedin_data"":" &amp; If(String.IsNullOrWhiteSpace(strLinkedInDataJson), """{}\""", strLinkedInDataJson) &amp; "}"]</InArgument>
         </Assign.Value>
       </Assign>
+      <ui:ReadTextFile DisplayName="Read mock GitHub payload" FileName="Data\Mocks\mock_github_repos.json" Content="[strGitHubDataJson]" sap2010:WorkflowViewState.IdRef="ReadTextFile_1" />
+      <ui:InvokeWorkflowFile ArgumentsVariable="{x:Null}" ContinueOnError="{x:Null}" DisplayName="Invoke 03_AI_SynthesizePortfolio workflow" sap:VirtualizedContainerService.HintSize="616,113.6" sap2010:WorkflowViewState.IdRef="InvokeWorkflowFile_AI" UnSafe="False" WorkflowFileName="Modules\03_AI_SynthesizePortfolio.xaml">
+        <ui:InvokeWorkflowFile.Arguments>
+          <InArgument x:TypeArguments="x:String" x:Key="in_LinkedInDataJson">[strLinkedInDataJson]</InArgument>
+          <InArgument x:TypeArguments="x:String" x:Key="in_GitHubDataJson">[strGitHubDataJson]</InArgument>
+          <InArgument x:TypeArguments="x:String" x:Key="in_TargetJobRole">[strNormalizedRole]</InArgument>
+          <OutArgument x:TypeArguments="x:String" x:Key="out_SynthesizedResumeJson">[strDraftPayload]</OutArgument>
+          <OutArgument x:TypeArguments="x:String" x:Key="out_AIStatus">[strAIStatus]</OutArgument>
+          <OutArgument x:TypeArguments="x:String" x:Key="out_AIWarning">[strAIWarning]</OutArgument>
+        </ui:InvokeWorkflowFile.Arguments>
+      </ui:InvokeWorkflowFile>
       <Assign DisplayName="Set synthesis status" sap:VirtualizedContainerService.HintSize="616,113.6" sap2010:WorkflowViewState.IdRef="Assign_10">
         <Assign.To>
-          <OutArgument x:TypeArguments="x:String">[str_JobStatus]</OutArgument>
+          <OutArgument x:TypeArguments="x:String">[strJobStatus]</OutArgument>
         </Assign.To>
         <Assign.Value>
           <InArgument x:TypeArguments="x:String">["SYNTHESIZING"]</InArgument>
@@ -193,7 +200,7 @@
           <OutArgument x:TypeArguments="x:String">[out_JobStatus]</OutArgument>
         </Assign.To>
         <Assign.Value>
-          <InArgument x:TypeArguments="x:String">[str_JobStatus]</InArgument>
+          <InArgument x:TypeArguments="x:String">[strJobStatus]</InArgument>
         </Assign.Value>
       </Assign>
       <ui:LogMessage DisplayName="Publish AI synthesis progress" sap:VirtualizedContainerService.HintSize="616,141" sap2010:WorkflowViewState.IdRef="LogMessage_6" Level="Info" Message="[&quot;SYNTHESIZING: STAR/XYZ and ATS mapping module is next.&quot;]" />
@@ -201,7 +208,7 @@
       <!-- 5. Curation Phase (#HumanInTheLead) -->
       <Assign DisplayName="Set curation status" sap:VirtualizedContainerService.HintSize="616,113.6" sap2010:WorkflowViewState.IdRef="Assign_12">
         <Assign.To>
-          <OutArgument x:TypeArguments="x:String">[str_JobStatus]</OutArgument>
+          <OutArgument x:TypeArguments="x:String">[strJobStatus]</OutArgument>
         </Assign.To>
         <Assign.Value>
           <InArgument x:TypeArguments="x:String">["CURATING"]</InArgument>
@@ -212,7 +219,7 @@
           <OutArgument x:TypeArguments="x:String">[out_DraftResumePayload]</OutArgument>
         </Assign.To>
         <Assign.Value>
-          <InArgument x:TypeArguments="x:String">[str_DraftPayload]</InArgument>
+          <InArgument x:TypeArguments="x:String">[strDraftPayload]</InArgument>
         </Assign.Value>
       </Assign>
       <Assign DisplayName="Expose curation status" sap:VirtualizedContainerService.HintSize="616,113.6" sap2010:WorkflowViewState.IdRef="Assign_14">
@@ -220,7 +227,7 @@
           <OutArgument x:TypeArguments="x:String">[out_JobStatus]</OutArgument>
         </Assign.To>
         <Assign.Value>
-          <InArgument x:TypeArguments="x:String">[str_JobStatus]</InArgument>
+          <InArgument x:TypeArguments="x:String">[strJobStatus]</InArgument>
         </Assign.Value>
       </Assign>
       <ui:LogMessage DisplayName="Publish curation handoff" sap:VirtualizedContainerService.HintSize="616,141" sap2010:WorkflowViewState.IdRef="LogMessage_7" Level="Info" Message="[&quot;CURATING: Draft is ready for project selection and human approval.&quot;]" />
@@ -236,7 +243,7 @@
             </sap:WorkflowViewStateService.ViewState>
             <Assign DisplayName="Set approved status" sap:VirtualizedContainerService.HintSize="416,113.6" sap2010:WorkflowViewState.IdRef="Assign_15">
               <Assign.To>
-                <OutArgument x:TypeArguments="x:String">[str_JobStatus]</OutArgument>
+                <OutArgument x:TypeArguments="x:String">[strJobStatus]</OutArgument>
               </Assign.To>
               <Assign.Value>
                 <InArgument x:TypeArguments="x:String">["APPROVED"]</InArgument>
@@ -244,7 +251,7 @@
             </Assign>
             <Assign DisplayName="Use approved payload" sap:VirtualizedContainerService.HintSize="416,113.6" sap2010:WorkflowViewState.IdRef="Assign_16">
               <Assign.To>
-                <OutArgument x:TypeArguments="x:String">[str_DraftPayload]</OutArgument>
+                <OutArgument x:TypeArguments="x:String">[strDraftPayload]</OutArgument>
               </Assign.To>
               <Assign.Value>
                 <InArgument x:TypeArguments="x:String">[in_ApprovedResumePayload]</InArgument>
@@ -255,7 +262,7 @@
                 <OutArgument x:TypeArguments="x:String">[out_DraftResumePayload]</OutArgument>
               </Assign.To>
               <Assign.Value>
-                <InArgument x:TypeArguments="x:String">[str_DraftPayload]</InArgument>
+                <InArgument x:TypeArguments="x:String">[strDraftPayload]</InArgument>
               </Assign.Value>
             </Assign>
             <Assign DisplayName="Expose approved status" sap:VirtualizedContainerService.HintSize="416,113.6" sap2010:WorkflowViewState.IdRef="Assign_18">
@@ -263,7 +270,7 @@
                 <OutArgument x:TypeArguments="x:String">[out_JobStatus]</OutArgument>
               </Assign.To>
               <Assign.Value>
-                <InArgument x:TypeArguments="x:String">[str_JobStatus]</InArgument>
+                <InArgument x:TypeArguments="x:String">[strJobStatus]</InArgument>
               </Assign.Value>
             </Assign>
             <ui:LogMessage DisplayName="Publish approved handoff" sap:VirtualizedContainerService.HintSize="416,141" sap2010:WorkflowViewState.IdRef="LogMessage_8" Level="Info" Message="[&quot;APPROVED: Starting Document_GeneratePdf module.&quot;]" />
@@ -271,20 +278,20 @@
             <!-- Invoke 04_Document_GeneratePdf -->
             <ui:InvokeWorkflowFile ArgumentsVariable="{x:Null}" ContinueOnError="{x:Null}" DisplayName="Invoke 04_Document_GeneratePdf workflow" sap:VirtualizedContainerService.HintSize="416,113.6" sap2010:WorkflowViewState.IdRef="InvokeWorkflowFile_DocumentGenerate" UnSafe="False" WorkflowFileName="Modules\04_Document_GeneratePdf.xaml">
               <ui:InvokeWorkflowFile.Arguments>
-                <InArgument x:TypeArguments="x:String" x:Key="in_CuratedResumeJson">[str_DraftPayload]</InArgument>
+                <InArgument x:TypeArguments="x:String" x:Key="in_CuratedResumeJson">[strDraftPayload]</InArgument>
                 <InArgument x:TypeArguments="x:String" x:Key="in_TemplatePath">["Data\Templates\ATS_Resume_Template.docx"]</InArgument>
                 <InArgument x:TypeArguments="x:String" x:Key="in_OutputDir">["Data\Outputs"]</InArgument>
-                <OutArgument x:TypeArguments="x:String" x:Key="out_GeneratedPdfPath">[str_OutputPdfPath]</OutArgument>
+                <OutArgument x:TypeArguments="x:String" x:Key="out_GeneratedPdfPath">[strOutputPdfPath]</OutArgument>
                 <OutArgument x:TypeArguments="x:String" x:Key="out_GeneratedDocxPath" />
               </ui:InvokeWorkflowFile.Arguments>
             </ui:InvokeWorkflowFile>
 
             <!-- Invoke 05_Notification_SendMail -->
-            <ui:LogMessage DisplayName="Publish email dispatch" sap:VirtualizedContainerService.HintSize="416,141" sap2010:WorkflowViewState.IdRef="LogMessage_9" Level="Info" Message="[&quot;DELIVERING: Dispatching final ATS Resume PDF to &quot; &amp; str_NormalizedEmail]" />
+            <ui:LogMessage DisplayName="Publish email dispatch" sap:VirtualizedContainerService.HintSize="416,141" sap2010:WorkflowViewState.IdRef="LogMessage_9" Level="Info" Message="[&quot;DELIVERING: Dispatching final ATS Resume PDF to &quot; &amp; strNormalizedEmail]" />
             <ui:InvokeWorkflowFile ArgumentsVariable="{x:Null}" ContinueOnError="{x:Null}" DisplayName="Invoke 05_Notification_SendMail workflow" sap:VirtualizedContainerService.HintSize="416,113.6" sap2010:WorkflowViewState.IdRef="InvokeWorkflowFile_SendMail" UnSafe="False" WorkflowFileName="Modules\05_Notification_SendMail.xaml">
               <ui:InvokeWorkflowFile.Arguments>
-                <InArgument x:TypeArguments="x:String" x:Key="in_RecipientEmail">[str_NormalizedEmail]</InArgument>
-                <InArgument x:TypeArguments="x:String" x:Key="in_PdfFilePath">[str_OutputPdfPath]</InArgument>
+                <InArgument x:TypeArguments="x:String" x:Key="in_RecipientEmail">[strNormalizedEmail]</InArgument>
+                <InArgument x:TypeArguments="x:String" x:Key="in_PdfFilePath">[strOutputPdfPath]</InArgument>
                 <InArgument x:TypeArguments="x:String" x:Key="in_CandidateName">["Candidate"]</InArgument>
                 <InArgument x:TypeArguments="x:String" x:Key="in_SmtpHost" />
                 <InArgument x:TypeArguments="x:Int32" x:Key="in_SmtpPort">[587]</InArgument>
@@ -299,7 +306,7 @@
             <!-- Mark Job Completed -->
             <Assign DisplayName="Set completed status" sap:VirtualizedContainerService.HintSize="416,113.6" sap2010:WorkflowViewState.IdRef="Assign_CompletedStatus">
               <Assign.To>
-                <OutArgument x:TypeArguments="x:String">[str_JobStatus]</OutArgument>
+                <OutArgument x:TypeArguments="x:String">[strJobStatus]</OutArgument>
               </Assign.To>
               <Assign.Value>
                 <InArgument x:TypeArguments="x:String">["COMPLETED"]</InArgument>
@@ -310,10 +317,10 @@
                 <OutArgument x:TypeArguments="x:String">[out_JobStatus]</OutArgument>
               </Assign.To>
               <Assign.Value>
-                <InArgument x:TypeArguments="x:String">[str_JobStatus]</InArgument>
+                <InArgument x:TypeArguments="x:String">[strJobStatus]</InArgument>
               </Assign.Value>
             </Assign>
-            <ui:LogMessage DisplayName="Publish final completion" sap:VirtualizedContainerService.HintSize="416,141" sap2010:WorkflowViewState.IdRef="LogMessage_10" Level="Info" Message="[&quot;COMPLETED: ATS Resume pipeline finished. File: &quot; &amp; str_OutputPdfPath]" />
+            <ui:LogMessage DisplayName="Publish final completion" sap:VirtualizedContainerService.HintSize="416,141" sap2010:WorkflowViewState.IdRef="LogMessage_10" Level="Info" Message="[&quot;COMPLETED: ATS Resume pipeline finished. File: &quot; &amp; strOutputPdfPath]" />
           </Sequence>
         </If.Then>
       </If>
@@ -322,9 +329,8 @@
           <OutArgument x:TypeArguments="x:String">[out_OutputPdfPath]</OutArgument>
         </Assign.To>
         <Assign.Value>
-          <InArgument x:TypeArguments="x:String">[str_OutputPdfPath]</InArgument>
+          <InArgument x:TypeArguments="x:String">[strOutputPdfPath]</InArgument>
         </Assign.Value>
       </Assign>
-    </Sequence>
-  </Sequence>
+</Sequence>
 </Activity>

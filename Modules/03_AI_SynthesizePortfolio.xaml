@@ -1,0 +1,51 @@
+<Activity mc:Ignorable="sap sap2010" x:Class="Modules_03_AI_SynthesizePortfolio" VisualBasic.Settings="{x:Null}" sap2010:WorkflowViewState.IdRef="ActivityBuilder_1" xmlns="http://schemas.microsoft.com/netfx/2009/xaml/activities" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:sap="http://schemas.microsoft.com/netfx/2009/xaml/activities/presentation" xmlns:sap2010="http://schemas.microsoft.com/netfx/2010/xaml/activities/presentation" xmlns:sco="clr-namespace:System.Collections.ObjectModel;assembly=System.Private.CoreLib" xmlns:ui="http://schemas.uipath.com/workflow/activities" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <x:Members>
+    <x:Property Name="in_LinkedInDataJson" Type="InArgument(x:String)" />
+    <x:Property Name="in_GitHubDataJson" Type="InArgument(x:String)" />
+    <x:Property Name="in_TargetJobRole" Type="InArgument(x:String)" />
+    <x:Property Name="out_SynthesizedResumeJson" Type="OutArgument(x:String)" />
+    <x:Property Name="out_AIStatus" Type="OutArgument(x:String)" />
+    <x:Property Name="out_AIWarning" Type="OutArgument(x:String)" />
+  </x:Members>
+  <TextExpression.NamespacesForImplementation>
+    <sco:Collection x:TypeArguments="x:String">
+      <x:String>System</x:String>
+      <x:String>System.Linq</x:String>
+    </sco:Collection>
+  </TextExpression.NamespacesForImplementation>
+  <TextExpression.ReferencesForImplementation>
+    <sco:Collection x:TypeArguments="AssemblyReference">
+      <AssemblyReference>System.Private.CoreLib</AssemblyReference>
+      <AssemblyReference>System.Runtime</AssemblyReference>
+      <AssemblyReference>System.Linq</AssemblyReference>
+      <AssemblyReference>UiPath.System.Activities</AssemblyReference>
+    </sco:Collection>
+  </TextExpression.ReferencesForImplementation>
+  <Sequence DisplayName="AI Synthesize Portfolio" sap2010:WorkflowViewState.IdRef="Sequence_1">
+    <Assign DisplayName="Build mock synthesis contract" sap2010:WorkflowViewState.IdRef="Assign_1">
+      <Assign.To>
+        <OutArgument x:TypeArguments="x:String">[out_SynthesizedResumeJson]</OutArgument>
+      </Assign.To>
+      <Assign.Value>
+        <InArgument x:TypeArguments="x:String">[&quot;{&quot;&quot;schema_version&quot;&quot;:&quot;&quot;2.0&quot;&quot;,&quot;&quot;target_job_role&quot;&quot;:&quot;&quot;&quot; &amp; If(in_TargetJobRole Is Nothing, &quot;&quot;, in_TargetJobRole.Replace(System.Convert.ToChar(34).ToString(), &quot;&quot;)) &amp; &quot;&quot;&quot;,&quot;&quot;linkedin_data&quot;&quot;:&quot; &amp; If(String.IsNullOrWhiteSpace(in_LinkedInDataJson), &quot;{}&quot;, in_LinkedInDataJson) &amp; &quot;,&quot;&quot;github_data&quot;&quot;:&quot; &amp; If(String.IsNullOrWhiteSpace(in_GitHubDataJson), &quot;{}&quot;, in_GitHubDataJson) &amp; &quot;,&quot;&quot;projects&quot;&quot;:[],&quot;&quot;skills&quot;&quot;:{&quot;&quot;languages&quot;&quot;:[],&quot;&quot;frameworks_and_libraries&quot;&quot;:[],&quot;&quot;tools_and_platforms&quot;&quot;:[]},&quot;&quot;pipeline&quot;&quot;:{&quot;&quot;ai&quot;&quot;:&quot;&quot;mock_synthesis&quot;&quot;,&quot;&quot;human_curation&quot;&quot;:&quot;&quot;awaiting&quot;&quot;,&quot;&quot;document&quot;&quot;:&quot;&quot;pending_approval&quot;&quot;}}&quot;]</InArgument>
+      </Assign.Value>
+    </Assign>
+    <Assign DisplayName="Set mock AI status" sap2010:WorkflowViewState.IdRef="Assign_2">
+      <Assign.To>
+        <OutArgument x:TypeArguments="x:String">[out_AIStatus]</OutArgument>
+      </Assign.To>
+      <Assign.Value>
+        <InArgument x:TypeArguments="x:String">[&quot;MOCK_SYNTHESIS&quot;]</InArgument>
+      </Assign.Value>
+    </Assign>
+    <Assign DisplayName="Set mock AI warning" sap2010:WorkflowViewState.IdRef="Assign_3">
+      <Assign.To>
+        <OutArgument x:TypeArguments="x:String">[out_AIWarning]</OutArgument>
+      </Assign.To>
+      <Assign.Value>
+        <InArgument x:TypeArguments="x:String">[&quot;Mock contract only; add JSON normalization, filtering, and UiPath GenAI or Gemini before production.&quot;]</InArgument>
+      </Assign.Value>
+    </Assign>
+    <ui:LogMessage DisplayName="Log mock synthesis" Level="Info" Message="[out_AIStatus &amp; &quot;: draft contract prepared for human curation.&quot;]" sap2010:WorkflowViewState.IdRef="LogMessage_1" />
+  </Sequence>
+</Activity>
