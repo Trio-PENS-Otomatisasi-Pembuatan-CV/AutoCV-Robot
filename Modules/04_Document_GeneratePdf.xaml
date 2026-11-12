@@ -1,4 +1,4 @@
-<Activity mc:Ignorable="sap sap2010" x:Class="_04_Document_GeneratePdf" xmlns="http://schemas.microsoft.com/netfx/2009/xaml/activities" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:s="clr-namespace:System;assembly=System.Private.CoreLib" xmlns:sap="http://schemas.microsoft.com/netfx/2009/xaml/activities/presentation" xmlns:sap2010="http://schemas.microsoft.com/netfx/2010/xaml/activities/presentation" xmlns:scg="clr-namespace:System.Collections.Generic;assembly=System.Private.CoreLib" xmlns:sco="clr-namespace:System.Collections.ObjectModel;assembly=System.Private.CoreLib" xmlns:ui="http://schemas.uipath.com/workflow/activities" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+<Activity mc:Ignorable="sap sap2010" x:Class="_04_Document_GeneratePdf" xmlns="http://schemas.microsoft.com/netfx/2009/xaml/activities" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:s="clr-namespace:System;assembly=System.Private.CoreLib" xmlns:regex="clr-namespace:System.Text.RegularExpressions;assembly=System.Text.RegularExpressions" xmlns:sap="http://schemas.microsoft.com/netfx/2009/xaml/activities/presentation" xmlns:sap2010="http://schemas.microsoft.com/netfx/2010/xaml/activities/presentation" xmlns:scg="clr-namespace:System.Collections.Generic;assembly=System.Private.CoreLib" xmlns:sco="clr-namespace:System.Collections.ObjectModel;assembly=System.Private.CoreLib" xmlns:ui="http://schemas.uipath.com/workflow/activities" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
   <x:Members>
     <x:Property Name="in_CuratedResumeJson" Type="InArgument(x:String)" />
     <x:Property Name="in_TemplatePath" Type="InArgument(x:String)" />
@@ -83,15 +83,15 @@
   </TextExpression.ReferencesForImplementation>
   <Sequence DisplayName="04_Document_GeneratePdf" sap:VirtualizedContainerService.HintSize="688,2900" sap2010:WorkflowViewState.IdRef="Sequence_1">
     <Sequence.Variables>
-      <Variable x:TypeArguments="x:String" Name="str_CuratedResumeJson" />
-      <Variable x:TypeArguments="x:String" Name="str_TemplatePath" />
-      <Variable x:TypeArguments="x:String" Name="str_OutputDir" />
-      <Variable x:TypeArguments="x:String" Name="str_PayloadFilePath" />
-      <Variable x:TypeArguments="x:String" Name="str_ResultFilePath" />
-      <Variable x:TypeArguments="x:String" Name="str_ResultJson" />
-      <Variable x:TypeArguments="x:String" Name="str_ScriptPath" />
-      <Variable x:TypeArguments="x:String" Name="str_RunnerCommand" />
-      <Variable x:TypeArguments="x:Boolean" Name="bool_OutputDirExists" />
+      <Variable x:TypeArguments="x:String" Name="strCuratedResumeJson" />
+      <Variable x:TypeArguments="x:String" Name="strTemplatePath" />
+      <Variable x:TypeArguments="x:String" Name="strOutputDir" />
+      <Variable x:TypeArguments="x:String" Name="strPayloadFilePath" />
+      <Variable x:TypeArguments="x:String" Name="strResultFilePath" />
+      <Variable x:TypeArguments="x:String" Name="strResultJson" />
+      <Variable x:TypeArguments="x:String" Name="strScriptPath" />
+      <Variable x:TypeArguments="x:String" Name="strRunnerCommand" />
+      <Variable x:TypeArguments="x:Boolean" Name="boolOutputDirExists" />
     </Sequence.Variables>
     <sap:WorkflowViewStateService.ViewState>
       <scg:Dictionary x:TypeArguments="x:String, x:Object">
@@ -102,7 +102,7 @@
     <!-- 1. Initialization and Parameter Normalization -->
     <Assign DisplayName="Normalize Curated JSON" sap:VirtualizedContainerService.HintSize="626,113.6" sap2010:WorkflowViewState.IdRef="Assign_1">
       <Assign.To>
-        <OutArgument x:TypeArguments="x:String">[str_CuratedResumeJson]</OutArgument>
+        <OutArgument x:TypeArguments="x:String">[strCuratedResumeJson]</OutArgument>
       </Assign.To>
       <Assign.Value>
         <InArgument x:TypeArguments="x:String">[If(String.IsNullOrWhiteSpace(in_CuratedResumeJson), "{}", in_CuratedResumeJson)]</InArgument>
@@ -111,7 +111,7 @@
 
     <Assign DisplayName="Normalize Template Path" sap:VirtualizedContainerService.HintSize="626,113.6" sap2010:WorkflowViewState.IdRef="Assign_2">
       <Assign.To>
-        <OutArgument x:TypeArguments="x:String">[str_TemplatePath]</OutArgument>
+        <OutArgument x:TypeArguments="x:String">[strTemplatePath]</OutArgument>
       </Assign.To>
       <Assign.Value>
         <InArgument x:TypeArguments="x:String">[If(String.IsNullOrWhiteSpace(in_TemplatePath), "Data\Templates\ATS_Resume_Template.docx", in_TemplatePath)]</InArgument>
@@ -120,7 +120,7 @@
 
     <Assign DisplayName="Normalize Output Dir" sap:VirtualizedContainerService.HintSize="626,113.6" sap2010:WorkflowViewState.IdRef="Assign_3">
       <Assign.To>
-        <OutArgument x:TypeArguments="x:String">[str_OutputDir]</OutArgument>
+        <OutArgument x:TypeArguments="x:String">[strOutputDir]</OutArgument>
       </Assign.To>
       <Assign.Value>
         <InArgument x:TypeArguments="x:String">[If(String.IsNullOrWhiteSpace(in_OutputDir), "Data\Outputs", in_OutputDir)]</InArgument>
@@ -129,42 +129,42 @@
 
     <Assign DisplayName="Set Script Runner Path" sap:VirtualizedContainerService.HintSize="626,113.6" sap2010:WorkflowViewState.IdRef="Assign_4">
       <Assign.To>
-        <OutArgument x:TypeArguments="x:String">[str_ScriptPath]</OutArgument>
+        <OutArgument x:TypeArguments="x:String">[strScriptPath]</OutArgument>
       </Assign.To>
       <Assign.Value>
         <InArgument x:TypeArguments="x:String">["Data\Scripts\RunResumeGeneration.ps1"]</InArgument>
       </Assign.Value>
     </Assign>
 
-    <ui:LogMessage DisplayName="Log Start Document Generation" sap:VirtualizedContainerService.HintSize="626,141" sap2010:WorkflowViewState.IdRef="LogMessage_1" Level="Info" Message="[&quot;[04_Document_GeneratePdf] Starting ATS Word &amp; PDF resume rendering. Output directory: &quot; &amp; str_OutputDir]" />
+    <ui:LogMessage DisplayName="Log Start Document Generation" sap:VirtualizedContainerService.HintSize="626,141" sap2010:WorkflowViewState.IdRef="LogMessage_1" Level="Info" Message="[&quot;[04_Document_GeneratePdf] Starting ATS Word &amp; PDF resume rendering. Output directory: &quot; &amp; strOutputDir]" />
 
     <!-- 2. Ensure Output Directory Exists -->
     <Assign DisplayName="Check Directory Existence" sap:VirtualizedContainerService.HintSize="626,113.6" sap2010:WorkflowViewState.IdRef="Assign_5">
       <Assign.To>
-        <OutArgument x:TypeArguments="x:Boolean">[bool_OutputDirExists]</OutArgument>
+        <OutArgument x:TypeArguments="x:Boolean">[boolOutputDirExists]</OutArgument>
       </Assign.To>
       <Assign.Value>
-        <InArgument x:TypeArguments="x:Boolean">[System.IO.Directory.Exists(str_OutputDir)]</InArgument>
+        <InArgument x:TypeArguments="x:Boolean">[System.IO.Directory.Exists(strOutputDir)]</InArgument>
       </Assign.Value>
     </Assign>
 
-    <If Condition="[Not bool_OutputDirExists]" DisplayName="Create Directory If Missing" sap:VirtualizedContainerService.HintSize="626,260" sap2010:WorkflowViewState.IdRef="If_1">
+    <If Condition="[Not boolOutputDirExists]" DisplayName="Create Directory If Missing" sap:VirtualizedContainerService.HintSize="626,260" sap2010:WorkflowViewState.IdRef="If_1">
       <If.Then>
-        <ui:CreateDirectory ContinueOnError="{x:Null}" Output="{x:Null}" DisplayName="Create Output Directory" sap:VirtualizedContainerService.HintSize="334,80" sap2010:WorkflowViewState.IdRef="CreateDirectory_1" Path="[str_OutputDir]" />
+        <ui:CreateDirectory ContinueOnError="{x:Null}" Output="{x:Null}" DisplayName="Create Output Directory" sap:VirtualizedContainerService.HintSize="334,80" sap2010:WorkflowViewState.IdRef="CreateDirectory_1" Path="[strOutputDir]" />
       </If.Then>
     </If>
 
     <!-- 3. Persist Input Payload File -->
     <Assign DisplayName="Build Temp Payload Path" sap:VirtualizedContainerService.HintSize="626,113.6" sap2010:WorkflowViewState.IdRef="Assign_7">
       <Assign.To>
-        <OutArgument x:TypeArguments="x:String">[str_PayloadFilePath]</OutArgument>
+        <OutArgument x:TypeArguments="x:String">[strPayloadFilePath]</OutArgument>
       </Assign.To>
       <Assign.Value>
-        <InArgument x:TypeArguments="x:String">[System.IO.Path.Combine(str_OutputDir, "curated_payload_" &amp; System.Guid.NewGuid().ToString("N") &amp; ".json")]</InArgument>
+        <InArgument x:TypeArguments="x:String">[System.IO.Path.Combine(strOutputDir, "curated_payload_" &amp; System.Guid.NewGuid().ToString("N") &amp; ".json")]</InArgument>
       </Assign.Value>
     </Assign>
 
-    <ui:WriteTextFile File="{x:Null}" DisplayName="Write Payload to File" Encoding="utf-8" FileName="[str_PayloadFilePath]" sap:VirtualizedContainerService.HintSize="626,156" sap2010:WorkflowViewState.IdRef="WriteTextFile_1" Text="[str_CuratedResumeJson]" />
+    <ui:WriteTextFile File="{x:Null}" DisplayName="Write Payload to File" Encoding="utf-8" FileName="[strPayloadFilePath]" sap:VirtualizedContainerService.HintSize="626,156" sap2010:WorkflowViewState.IdRef="WriteTextFile_1" Text="[strCuratedResumeJson]" />
 
     <!-- 4. Execute Generator Runner in TryCatch -->
     <TryCatch DisplayName="Try Document &amp; PDF Rendering" sap:VirtualizedContainerService.HintSize="626,900" sap2010:WorkflowViewState.IdRef="TryCatch_1">
@@ -178,35 +178,35 @@
 
           <Assign DisplayName="Build Command Line Arguments" sap:VirtualizedContainerService.HintSize="480,113.6" sap2010:WorkflowViewState.IdRef="Assign_8">
             <Assign.To>
-              <OutArgument x:TypeArguments="x:String">[str_RunnerCommand]</OutArgument>
+              <OutArgument x:TypeArguments="x:String">[strRunnerCommand]</OutArgument>
             </Assign.To>
             <Assign.Value>
-              <InArgument x:TypeArguments="x:String">[String.Format("-ExecutionPolicy Bypass -File ""{0}"" -PayloadFile ""{1}"" -TemplatePath ""{2}"" -OutputDir ""{3}""", str_ScriptPath, str_PayloadFilePath, str_TemplatePath, str_OutputDir)]</InArgument>
+              <InArgument x:TypeArguments="x:String">[String.Format("-ExecutionPolicy Bypass -File ""{0}"" -PayloadFile ""{1}"" -TemplatePath ""{2}"" -OutputDir ""{3}""", strScriptPath, strPayloadFilePath, strTemplatePath, strOutputDir)]</InArgument>
             </Assign.Value>
           </Assign>
 
           <Assign DisplayName="Execute PowerShell Runner" sap:VirtualizedContainerService.HintSize="480,113.6" sap2010:WorkflowViewState.IdRef="Assign_9">
             <Assign.To>
-              <OutArgument x:TypeArguments="x:String">[str_ResultJson]</OutArgument>
+              <OutArgument x:TypeArguments="x:String">[strResultJson]</OutArgument>
             </Assign.To>
             <Assign.Value>
-              <InArgument x:TypeArguments="x:String">[System.Diagnostics.Process.Start(New System.Diagnostics.ProcessStartInfo("powershell.exe", str_RunnerCommand) With {.RedirectStandardOutput = True, .UseShellExecute = False, .CreateNoWindow = True}).StandardOutput.ReadToEnd()]</InArgument>
+              <InArgument x:TypeArguments="x:String">[System.Diagnostics.Process.Start(New System.Diagnostics.ProcessStartInfo("powershell.exe", strRunnerCommand) With {.RedirectStandardOutput = True, .UseShellExecute = False, .CreateNoWindow = True}).StandardOutput.ReadToEnd()]</InArgument>
             </Assign.Value>
           </Assign>
 
           <Assign DisplayName="Set Result File Path" sap:VirtualizedContainerService.HintSize="480,113.6" sap2010:WorkflowViewState.IdRef="Assign_10">
             <Assign.To>
-              <OutArgument x:TypeArguments="x:String">[str_ResultFilePath]</OutArgument>
+              <OutArgument x:TypeArguments="x:String">[strResultFilePath]</OutArgument>
             </Assign.To>
             <Assign.Value>
-              <InArgument x:TypeArguments="x:String">[System.IO.Path.Combine(str_OutputDir, "generation_result.json")]</InArgument>
+              <InArgument x:TypeArguments="x:String">[System.IO.Path.Combine(strOutputDir, "generation_result.json")]</InArgument>
             </Assign.Value>
           </Assign>
 
           <!-- Check if generation_result.json exists to supplement output -->
-          <If Condition="[System.IO.File.Exists(str_ResultFilePath) AndAlso (String.IsNullOrWhiteSpace(str_ResultJson) OrElse Not str_ResultJson.Contains(&quot;pdfPath&quot;))]" DisplayName="Check If Result File Should Be Read" sap:VirtualizedContainerService.HintSize="480,270" sap2010:WorkflowViewState.IdRef="If_2">
+          <If Condition="[System.IO.File.Exists(strResultFilePath) AndAlso (String.IsNullOrWhiteSpace(strResultJson) OrElse Not strResultJson.Contains(&quot;pdfPath&quot;))]" DisplayName="Check If Result File Should Be Read" sap:VirtualizedContainerService.HintSize="480,270" sap2010:WorkflowViewState.IdRef="If_2">
             <If.Then>
-              <ui:ReadTextFile File="{x:Null}" Content="[str_ResultJson]" DisplayName="Read Result Status File" Encoding="utf-8" FileName="[str_ResultFilePath]" sap:VirtualizedContainerService.HintSize="334,80" sap2010:WorkflowViewState.IdRef="ReadTextFile_1" />
+              <ui:ReadTextFile File="{x:Null}" Content="[strResultJson]" DisplayName="Read Result Status File" Encoding="utf-8" FileName="[strResultFilePath]" sap:VirtualizedContainerService.HintSize="334,80" sap2010:WorkflowViewState.IdRef="ReadTextFile_1" />
             </If.Then>
           </If>
         </Sequence>
@@ -232,8 +232,8 @@
     <!-- 5. Extract Generated PDF and DOCX Paths -->
     <Sequence DisplayName="Extract Output Paths" sap:VirtualizedContainerService.HintSize="626,450" sap2010:WorkflowViewState.IdRef="Sequence_3">
       <Sequence.Variables>
-        <Variable x:TypeArguments="Match" Name="match_Pdf" />
-        <Variable x:TypeArguments="Match" Name="match_Docx" />
+        <Variable x:TypeArguments="x:String" Name="strPdfPathFromResult" />
+        <Variable x:TypeArguments="x:String" Name="strDocxPathFromResult" />
       </Sequence.Variables>
       <sap:WorkflowViewStateService.ViewState>
         <scg:Dictionary x:TypeArguments="x:String, x:Object">
@@ -243,19 +243,19 @@
 
       <Assign DisplayName="Match PDF Path" sap:VirtualizedContainerService.HintSize="450,113.6" sap2010:WorkflowViewState.IdRef="Assign_11">
         <Assign.To>
-          <OutArgument x:TypeArguments="Match">[match_Pdf]</OutArgument>
+          <OutArgument x:TypeArguments="x:String">[strPdfPathFromResult]</OutArgument>
         </Assign.To>
         <Assign.Value>
-          <InArgument x:TypeArguments="Match">[System.Text.RegularExpressions.Regex.Match(If(str_ResultJson, ""), """pdfPath"":\s*""([^""]+)""")]</InArgument>
+          <InArgument x:TypeArguments="x:String">[""]</InArgument>
         </Assign.Value>
       </Assign>
 
       <Assign DisplayName="Match DOCX Path" sap:VirtualizedContainerService.HintSize="450,113.6" sap2010:WorkflowViewState.IdRef="Assign_12">
         <Assign.To>
-          <OutArgument x:TypeArguments="Match">[match_Docx]</OutArgument>
+          <OutArgument x:TypeArguments="x:String">[strDocxPathFromResult]</OutArgument>
         </Assign.To>
         <Assign.Value>
-          <InArgument x:TypeArguments="Match">[System.Text.RegularExpressions.Regex.Match(If(str_ResultJson, ""), """docxPath"":\s*""([^""]+)""")]</InArgument>
+          <InArgument x:TypeArguments="x:String">[""]</InArgument>
         </Assign.Value>
       </Assign>
 
@@ -264,7 +264,7 @@
           <OutArgument x:TypeArguments="x:String">[out_GeneratedPdfPath]</OutArgument>
         </Assign.To>
         <Assign.Value>
-          <InArgument x:TypeArguments="x:String">[If(match_Pdf.Success, match_Pdf.Groups(1).Value.Replace("\\", "\"), System.IO.Directory.GetFiles(str_OutputDir, "*.pdf").OrderByDescending(Function(f) System.IO.File.GetLastWriteTime(f)).FirstOrDefault())]</InArgument>
+          <InArgument x:TypeArguments="x:String">[If(Not String.IsNullOrWhiteSpace(strPdfPathFromResult), strPdfPathFromResult, System.Linq.Enumerable.FirstOrDefault(System.Linq.Enumerable.OrderByDescending(System.IO.Directory.GetFiles(strOutputDir, "*.pdf"), Function(f) System.IO.File.GetLastWriteTime(f))))]</InArgument>
         </Assign.Value>
       </Assign>
 
@@ -273,15 +273,15 @@
           <OutArgument x:TypeArguments="x:String">[out_GeneratedDocxPath]</OutArgument>
         </Assign.To>
         <Assign.Value>
-          <InArgument x:TypeArguments="x:String">[If(match_Docx.Success, match_Docx.Groups(1).Value.Replace("\\", "\"), System.IO.Directory.GetFiles(str_OutputDir, "*.docx").OrderByDescending(Function(f) System.IO.File.GetLastWriteTime(f)).FirstOrDefault())]</InArgument>
+          <InArgument x:TypeArguments="x:String">[If(Not String.IsNullOrWhiteSpace(strDocxPathFromResult), strDocxPathFromResult, System.Linq.Enumerable.FirstOrDefault(System.Linq.Enumerable.OrderByDescending(System.IO.Directory.GetFiles(strOutputDir, "*.docx"), Function(f) System.IO.File.GetLastWriteTime(f))))]</InArgument>
         </Assign.Value>
       </Assign>
     </Sequence>
 
     <!-- 6. Cleanup and Final Logging -->
-    <If Condition="[System.IO.File.Exists(str_PayloadFilePath)]" DisplayName="Cleanup Temp Payload" sap:VirtualizedContainerService.HintSize="626,260" sap2010:WorkflowViewState.IdRef="If_3">
+    <If Condition="[System.IO.File.Exists(strPayloadFilePath)]" DisplayName="Cleanup Temp Payload" sap:VirtualizedContainerService.HintSize="626,260" sap2010:WorkflowViewState.IdRef="If_3">
       <If.Then>
-        <ui:Delete ContinueOnError="True" DisplayName="Delete Temp Payload File" sap:VirtualizedContainerService.HintSize="334,80" sap2010:WorkflowViewState.IdRef="Delete_1" Path="[str_PayloadFilePath]" />
+        <ui:Delete ContinueOnError="True" DisplayName="Delete Temp Payload File" sap:VirtualizedContainerService.HintSize="334,80" sap2010:WorkflowViewState.IdRef="Delete_1" Path="[strPayloadFilePath]" />
       </If.Then>
     </If>
 

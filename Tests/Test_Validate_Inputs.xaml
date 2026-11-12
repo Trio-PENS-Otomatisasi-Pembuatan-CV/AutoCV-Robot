@@ -71,10 +71,10 @@
   </TextExpression.ReferencesForImplementation>
   <Sequence DisplayName="Test_Validate_Inputs" sap:VirtualizedContainerService.HintSize="892,1000" sap2010:WorkflowViewState.IdRef="Sequence_1">
     <Sequence.Variables>
-      <Variable x:TypeArguments="x:String" Name="str_OutLinkedIn" />
-      <Variable x:TypeArguments="x:String" Name="str_OutGitHub" />
-      <Variable x:TypeArguments="x:String" Name="str_OutRole" />
-      <Variable x:TypeArguments="x:String" Name="str_OutEmail" />
+      <Variable x:TypeArguments="x:String" Name="strOutLinkedIn" />
+      <Variable x:TypeArguments="x:String" Name="strOutGitHub" />
+      <Variable x:TypeArguments="x:String" Name="strOutRole" />
+      <Variable x:TypeArguments="x:String" Name="strOutEmail" />
     </Sequence.Variables>
     <sap:WorkflowViewStateService.ViewState>
       <scg:Dictionary x:TypeArguments="x:String, x:Object">
@@ -88,13 +88,13 @@
         <InArgument x:TypeArguments="x:String" x:Key="in_GitHubUrl">johndoe</InArgument>
         <InArgument x:TypeArguments="x:String" x:Key="in_TargetJobRole">Fullstack Engineer</InArgument>
         <InArgument x:TypeArguments="x:String" x:Key="in_RecipientEmail">john.doe@example.com</InArgument>
-        <OutArgument x:TypeArguments="x:String" x:Key="out_NormalizedLinkedInUrl">[str_OutLinkedIn]</OutArgument>
-        <OutArgument x:TypeArguments="x:String" x:Key="out_NormalizedGitHubUrl">[str_OutGitHub]</OutArgument>
-        <OutArgument x:TypeArguments="x:String" x:Key="out_NormalizedRole">[str_OutRole]</OutArgument>
-        <OutArgument x:TypeArguments="x:String" x:Key="out_NormalizedEmail">[str_OutEmail]</OutArgument>
+        <OutArgument x:TypeArguments="x:String" x:Key="out_NormalizedLinkedInUrl">[strOutLinkedIn]</OutArgument>
+        <OutArgument x:TypeArguments="x:String" x:Key="out_NormalizedGitHubUrl">[strOutGitHub]</OutArgument>
+        <OutArgument x:TypeArguments="x:String" x:Key="out_NormalizedRole">[strOutRole]</OutArgument>
+        <OutArgument x:TypeArguments="x:String" x:Key="out_NormalizedEmail">[strOutEmail]</OutArgument>
       </ui:InvokeWorkflowFile.Arguments>
     </ui:InvokeWorkflowFile>
-    <If Condition="[str_OutGitHub.Equals(&quot;https://github.com/johndoe&quot;) AndAlso str_OutLinkedIn.Equals(&quot;https://www.linkedin.com/in/john-doe&quot;) AndAlso str_OutEmail.Equals(&quot;john.doe@example.com&quot;)]" DisplayName="Assert Correct Normalization" sap:VirtualizedContainerService.HintSize="416,280" sap2010:WorkflowViewState.IdRef="If_1">
+    <If Condition="[strOutGitHub.Equals(&quot;https://github.com/johndoe&quot;) AndAlso strOutLinkedIn.Equals(&quot;https://www.linkedin.com/in/john-doe&quot;) AndAlso strOutEmail.Equals(&quot;john.doe@example.com&quot;)]" DisplayName="Assert Correct Normalization" sap:VirtualizedContainerService.HintSize="416,280" sap2010:WorkflowViewState.IdRef="If_1">
       <If.Then>
         <ui:LogMessage DisplayName="Test Passed" sap:VirtualizedContainerService.HintSize="382.4,141" sap2010:WorkflowViewState.IdRef="LogMessage_2" Level="Info" Message="[&quot;Test_Validate_Inputs Passed! All parameters normalized and validated properly.&quot;]" />
       </If.Then>

@@ -1,0 +1,47 @@
+{
+  "user": {
+    "login": "mfarid",
+    "name": "Muhammad Farid Al Hasan",
+    "bio": "Software engineer and AI automation enthusiast",
+    "public_repos": 3,
+    "avatar_url": "https://avatars.githubusercontent.com/u/mock"
+  },
+  "repositories": [
+    {
+      "name": "autocv-robot",
+      "description": "Intelligent ATS resume builder with UiPath orchestration",
+      "language": "Visual Basic",
+      "stargazers_count": 12,
+      "forks_count": 3,
+      "topics": ["uipath", "automation", "resume", "genai"],
+      "fork": false
+    },
+    {
+      "name": "webgis-analysis",
+      "description": "Web GIS analysis application for education gap mapping",
+      "language": "JavaScript",
+      "stargazers_count": 5,
+      "forks_count": 1,
+      "topics": ["webgis", "javascript", "mapping"],
+      "fork": false
+    },
+    {
+      "name": "forked-template",
+      "description": "Forked sample repository",
+      "language": "Python",
+      "stargazers_count": 20,
+      "forks_count": 2,
+      "topics": ["sample"],
+      "fork": true
+    },
+    {
+      "name": "empty-repo",
+      "description": "",
+      "language": "",
+      "stargazers_count": 0,
+      "forks_count": 0,
+      "topics": [],
+      "fork": false
+    }
+  ]
+}
