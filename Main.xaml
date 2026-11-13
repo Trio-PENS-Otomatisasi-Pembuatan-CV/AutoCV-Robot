@@ -176,7 +176,17 @@
           <InArgument x:TypeArguments="x:String">["{""schema_version"":""2.0"",""personal_info"":{""linkedin_url"":""" &amp; strNormalizedLinkedInUrl.Replace(ChrW(34).ToString(), "") &amp; """,""github_url"":""" &amp; strNormalizedGitHubUrl.Replace(ChrW(34).ToString(), "") &amp; """,""target_job_role"":""" &amp; strNormalizedRole.Replace(ChrW(34).ToString(), "") &amp; """,""recipient_email"":""" &amp; strNormalizedEmail.Replace(ChrW(34).ToString(), "") &amp; """},""experiences"":[],""projects"":[],""skills"":{""languages"":[],""frameworks"":[],""developer_tools"":[]},""education"":[],""pipeline"":{""linkedin"":""completed"",""github"":""pending"",""ai"":""pending"",""human_curation"":""awaiting"",""document"":""pending_approval""},""raw_linkedin_data"":" &amp; If(String.IsNullOrWhiteSpace(strLinkedInDataJson), """{}\""", strLinkedInDataJson) &amp; "}"]</InArgument>
         </Assign.Value>
       </Assign>
-      <ui:ReadTextFile DisplayName="Read mock GitHub payload" FileName="Data\Mocks\mock_github_repos.json" Content="[strGitHubDataJson]" sap2010:WorkflowViewState.IdRef="ReadTextFile_1" />
+            <!-- Invoke 02_GitHub_FetchUserRepos -->
+      <ui:LogMessage DisplayName="Publish GitHub scraping progress" sap:VirtualizedContainerService.HintSize="616,141" sap2010:WorkflowViewState.IdRef="LogMessage_GitHub" Level="Info" Message="[&quot;SCRAPING: Ingesting GitHub profile &amp; non-fork repositories via 02_GitHub_FetchUserRepos module.&quot;]" />
+      <ui:InvokeWorkflowFile ArgumentsVariable="{x:Null}" ContinueOnError="{x:Null}" DisplayName="Invoke 02_GitHub_FetchUserRepos workflow" sap:VirtualizedContainerService.HintSize="616,113.6" sap2010:WorkflowViewState.IdRef="InvokeWorkflowFile_GitHub" UnSafe="False" WorkflowFileName="Modules\02_GitHub_FetchUserRepos.xaml">
+        <ui:InvokeWorkflowFile.Arguments>
+          <InArgument x:TypeArguments="x:String" x:Key="in_GitHubUsername">[strNormalizedGitHubUrl]</InArgument>
+          <InArgument x:TypeArguments="x:String" x:Key="in_GitHubToken" />
+          <InArgument x:TypeArguments="x:Boolean" x:Key="in_UseMockFallback">[True]</InArgument>
+          <OutArgument x:TypeArguments="x:String" x:Key="out_GitHubReposJson">[strGitHubDataJson]</OutArgument>
+          <OutArgument x:TypeArguments="x:String" x:Key="out_FetchStatus" />
+        </ui:InvokeWorkflowFile.Arguments>
+      </ui:InvokeWorkflowFile>
       <ui:InvokeWorkflowFile ArgumentsVariable="{x:Null}" ContinueOnError="{x:Null}" DisplayName="Invoke 03_AI_SynthesizePortfolio workflow" sap:VirtualizedContainerService.HintSize="616,113.6" sap2010:WorkflowViewState.IdRef="InvokeWorkflowFile_AI" UnSafe="False" WorkflowFileName="Modules\03_AI_SynthesizePortfolio.xaml">
         <ui:InvokeWorkflowFile.Arguments>
           <InArgument x:TypeArguments="x:String" x:Key="in_LinkedInDataJson">[strLinkedInDataJson]</InArgument>
