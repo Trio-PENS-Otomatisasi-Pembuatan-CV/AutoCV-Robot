@@ -3,7 +3,7 @@
   "entryPoints": [
     {
       "filePath": "Main.xaml",
-      "uniqueId": "7635ecd4-b760-4df4-8bfc-a6b8dd00693d",
+      "uniqueId": "7f95c83d-fe8a-47ce-966d-a5b02fca88b4",
       "type": "process",
       "input": {
         "type": "object",
@@ -22,6 +22,9 @@
           },
           "in_ApprovedResumePayload": {
             "type": "string"
+          },
+          "in_RequireManualApproval": {
+            "type": "boolean"
           }
         },
         "required": []

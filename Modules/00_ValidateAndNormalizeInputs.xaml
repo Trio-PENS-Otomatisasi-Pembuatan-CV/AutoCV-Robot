@@ -96,7 +96,7 @@
     <ui:LogMessage DisplayName="Log Validation Start" sap:VirtualizedContainerService.HintSize="510,141" sap2010:WorkflowViewState.IdRef="LogMessage_1" Level="Info" Message="[&quot;[00_ValidateAndNormalizeInputs] Starting input parameter validation &amp; normalization.&quot;]" />
     
     <!-- 1. Validate & Normalize LinkedIn URL -->
-    <If Condition="[String.IsNullOrWhiteSpace(in_LinkedInUrl) OrElse Not System.Text.RegularExpressions.Regex.IsMatch(in_LinkedInUrl.Trim(), &quot;^https?:\/\/(www\.)?linkedin\.com\/in\/[A-Za-z0-9_\-\%]+&quot;, System.Text.RegularExpressions.RegexOptions.IgnoreCase)]" DisplayName="Validate LinkedIn URL Format" sap:VirtualizedContainerService.HintSize="510,336" sap2010:WorkflowViewState.IdRef="If_LinkedIn">
+    <If Condition="[String.IsNullOrWhiteSpace(in_LinkedInUrl) OrElse Not System.Text.RegularExpressions.Regex.IsMatch(in_LinkedInUrl.Trim(), &quot;^https?://([a-zA-Z0-9-]+\.)?linkedin\.com/in/[A-Za-z0-9_\-\%]+/?&quot;, System.Text.RegularExpressions.RegexOptions.IgnoreCase)]" DisplayName="Validate LinkedIn URL Format" sap:VirtualizedContainerService.HintSize="510,336" sap2010:WorkflowViewState.IdRef="If_LinkedIn">
       <If.Then>
         <Sequence DisplayName="Invalid LinkedIn URL" sap:VirtualizedContainerService.HintSize="449.6,173.6" sap2010:WorkflowViewState.IdRef="Sequence_InvalidLinkedIn">
           <sap:WorkflowViewStateService.ViewState>

@@ -5,6 +5,7 @@
     <x:Property Name="in_TargetJobRole" Type="InArgument(x:String)" />
     <x:Property Name="in_RecipientEmail" Type="InArgument(x:String)" />
     <x:Property Name="in_ApprovedResumePayload" Type="InArgument(x:String)" />
+    <x:Property Name="in_RequireManualApproval" Type="InArgument(x:Boolean)" />
     <x:Property Name="out_JobStatus" Type="OutArgument(x:String)" />
     <x:Property Name="out_DraftResumePayload" Type="OutArgument(x:String)" />
     <x:Property Name="out_OutputPdfPath" Type="OutArgument(x:String)" />
@@ -124,6 +125,41 @@
         </Assign.Value>
       </Assign>
 
+      <!-- 1b. Apply default arguments when not supplied -->
+      <Assign DisplayName="Default LinkedIn URL if empty" sap:VirtualizedContainerService.HintSize="616,113.6" sap2010:WorkflowViewState.IdRef="Assign_DefaultLinkedIn">
+        <Assign.To>
+          <OutArgument x:TypeArguments="x:String">[in_LinkedInUrl]</OutArgument>
+        </Assign.To>
+        <Assign.Value>
+          <InArgument x:TypeArguments="x:String">[If(String.IsNullOrWhiteSpace(in_LinkedInUrl), "https://www.linkedin.com/in/muhammad-farid-al-hasan-45574b310/", in_LinkedInUrl)]</InArgument>
+        </Assign.Value>
+      </Assign>
+      <Assign DisplayName="Default GitHub URL if empty" sap:VirtualizedContainerService.HintSize="616,113.6" sap2010:WorkflowViewState.IdRef="Assign_DefaultGitHub">
+        <Assign.To>
+          <OutArgument x:TypeArguments="x:String">[in_GitHubUrl]</OutArgument>
+        </Assign.To>
+        <Assign.Value>
+          <InArgument x:TypeArguments="x:String">[If(String.IsNullOrWhiteSpace(in_GitHubUrl), "muhfaridalh", in_GitHubUrl)]</InArgument>
+        </Assign.Value>
+      </Assign>
+      <Assign DisplayName="Default Recipient Email if empty" sap:VirtualizedContainerService.HintSize="616,113.6" sap2010:WorkflowViewState.IdRef="Assign_DefaultEmail">
+        <Assign.To>
+          <OutArgument x:TypeArguments="x:String">[in_RecipientEmail]</OutArgument>
+        </Assign.To>
+        <Assign.Value>
+          <InArgument x:TypeArguments="x:String">[If(String.IsNullOrWhiteSpace(in_RecipientEmail), "farid@example.com", in_RecipientEmail)]</InArgument>
+        </Assign.Value>
+      </Assign>
+      <Assign DisplayName="Default Target Job Role if empty" sap:VirtualizedContainerService.HintSize="616,113.6" sap2010:WorkflowViewState.IdRef="Assign_DefaultRole">
+        <Assign.To>
+          <OutArgument x:TypeArguments="x:String">[in_TargetJobRole]</OutArgument>
+        </Assign.To>
+        <Assign.Value>
+          <InArgument x:TypeArguments="x:String">[If(String.IsNullOrWhiteSpace(in_TargetJobRole), "Fullstack Software Engineer", in_TargetJobRole)]</InArgument>
+        </Assign.Value>
+      </Assign>
+      <ui:LogMessage DisplayName="Log applied defaults" sap:VirtualizedContainerService.HintSize="616,141" sap2010:WorkflowViewState.IdRef="LogMessage_Defaults" Level="Info" Message="[&quot;[Main] Input defaults applied — LinkedIn: &quot; &amp; in_LinkedInUrl &amp; &quot; | GitHub: &quot; &amp; in_GitHubUrl &amp; &quot; | Email: &quot; &amp; in_RecipientEmail]" />
+
       <!-- 2. Invoke 00_ValidateAndNormalizeInputs -->
       <ui:InvokeWorkflowFile ArgumentsVariable="{x:Null}" ContinueOnError="{x:Null}" DisplayName="Invoke 00_ValidateAndNormalizeInputs workflow" sap:VirtualizedContainerService.HintSize="616,113.6" sap2010:WorkflowViewState.IdRef="InvokeWorkflowFile_ValidateInputs" UnSafe="False" WorkflowFileName="Modules\00_ValidateAndNormalizeInputs.xaml">
         <ui:InvokeWorkflowFile.Arguments>
@@ -182,6 +218,7 @@
           <InArgument x:TypeArguments="x:String" x:Key="in_LinkedInDataJson">[strLinkedInDataJson]</InArgument>
           <InArgument x:TypeArguments="x:String" x:Key="in_GitHubDataJson">[strGitHubDataJson]</InArgument>
           <InArgument x:TypeArguments="x:String" x:Key="in_TargetJobRole">[strNormalizedRole]</InArgument>
+          <InArgument x:TypeArguments="x:String" x:Key="in_PersonalInfoJson">["{""recipient_email"":""" &amp; strNormalizedEmail.Replace(ChrW(34).ToString(), "") &amp; """,""linkedin_url"":""" &amp; strNormalizedLinkedInUrl.Replace(ChrW(34).ToString(), "") &amp; """,""github_url"":""" &amp; strNormalizedGitHubUrl.Replace(ChrW(34).ToString(), "") &amp; """}"]</InArgument>
           <OutArgument x:TypeArguments="x:String" x:Key="out_SynthesizedResumeJson">[strDraftPayload]</OutArgument>
           <OutArgument x:TypeArguments="x:String" x:Key="out_AIStatus">[strAIStatus]</OutArgument>
           <OutArgument x:TypeArguments="x:String" x:Key="out_AIWarning">[strAIWarning]</OutArgument>
@@ -232,8 +269,10 @@
       </Assign>
       <ui:LogMessage DisplayName="Publish curation handoff" sap:VirtualizedContainerService.HintSize="616,141" sap2010:WorkflowViewState.IdRef="LogMessage_7" Level="Info" Message="[&quot;CURATING: Draft is ready for project selection and human approval.&quot;]" />
       
+      <ui:LogMessage DisplayName="Publish approval mode" sap2010:WorkflowViewState.IdRef="LogMessage_13" Level="Info" Message="[&quot;APPROVAL MODE: requireManual=&quot; &amp; in_RequireManualApproval &amp; &quot; - &quot; &amp; If(in_RequireManualApproval, &quot;manual gate active, waiting for in_ApprovedResumePayload.&quot;, &quot;auto-approve ON - draft continues to Document_GeneratePdf and SendMail.&quot;)]" />
+
       <!-- 6. Approved Resume Handoff -->
-      <If Condition="[Not String.IsNullOrWhiteSpace(in_ApprovedResumePayload)]" DisplayName="Process human approval when supplied" sap:VirtualizedContainerService.HintSize="616,1085.6" sap2010:WorkflowViewState.IdRef="If_5">
+      <If Condition="[Not String.IsNullOrWhiteSpace(in_ApprovedResumePayload) OrElse Not in_RequireManualApproval]" DisplayName="Process human approval when supplied" sap:VirtualizedContainerService.HintSize="616,1085.6" sap2010:WorkflowViewState.IdRef="If_5">
         <If.Then>
           <Sequence DisplayName="Approved resume handoff" sap:VirtualizedContainerService.HintSize="449.6,923.2" sap2010:WorkflowViewState.IdRef="Sequence_6">
             <sap:WorkflowViewStateService.ViewState>
@@ -254,7 +293,7 @@
                 <OutArgument x:TypeArguments="x:String">[strDraftPayload]</OutArgument>
               </Assign.To>
               <Assign.Value>
-                <InArgument x:TypeArguments="x:String">[in_ApprovedResumePayload]</InArgument>
+                <InArgument x:TypeArguments="x:String">[If(String.IsNullOrWhiteSpace(in_ApprovedResumePayload), strDraftPayload, in_ApprovedResumePayload)]</InArgument>
               </Assign.Value>
             </Assign>
             <Assign DisplayName="Expose approved payload" sap:VirtualizedContainerService.HintSize="416,113.6" sap2010:WorkflowViewState.IdRef="Assign_17">
@@ -323,6 +362,11 @@
             <ui:LogMessage DisplayName="Publish final completion" sap:VirtualizedContainerService.HintSize="416,141" sap2010:WorkflowViewState.IdRef="LogMessage_10" Level="Info" Message="[&quot;COMPLETED: ATS Resume pipeline finished. File: &quot; &amp; strOutputPdfPath]" />
           </Sequence>
         </If.Then>
+        <If.Else>
+          <Sequence DisplayName="Awaiting approval" sap2010:WorkflowViewState.IdRef="Sequence_7">
+            <ui:LogMessage DisplayName="Explain skipped approval branch" sap2010:WorkflowViewState.IdRef="LogMessage_11" Level="Warn" Message="[&quot;APPROVAL REQUIRED: in_ApprovedResumePayload is empty, so modules 04_Document_GeneratePdf and 05_Notification_SendMail were skipped. This is NOT an error and NOT a crash - the run is waiting for human approval of the draft. Set in_ApprovedResumePayload to continue the pipeline.&quot;]" />
+          </Sequence>
+        </If.Else>
       </If>
       <Assign DisplayName="Expose PDF output path" sap:VirtualizedContainerService.HintSize="616,113.6" sap2010:WorkflowViewState.IdRef="Assign_19">
         <Assign.To>
@@ -332,5 +376,6 @@
           <InArgument x:TypeArguments="x:String">[strOutputPdfPath]</InArgument>
         </Assign.Value>
       </Assign>
+      <ui:LogMessage DisplayName="Publish run outcome" sap2010:WorkflowViewState.IdRef="LogMessage_12" Level="Info" Message="[&quot;RUN ENDED NORMALLY: execution finished with status &quot; &amp; strJobStatus &amp; &quot;. This is a normal end of run, not a crash or force exit.&quot;]" />
 </Sequence>
 </Activity>

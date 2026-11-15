@@ -46,10 +46,65 @@ if (-not (Test-Path $resolvedOutputDir)) {
 
 $generatorJs = Join-Path $scriptDir "GenerateResumeDocument.js"
 
-$nodeCmd = "node `"$generatorJs`" `"$resolvedPayload`" `"$resolvedTemplate`" `"$resolvedOutputDir`""
-$output = Invoke-Expression $nodeCmd
+# Run node with stdout/stderr redirected to raw files via Start-Process.
+# Two reasons: UiPath only reads this process's stdout, and PowerShell's own
+# "2>" redirection wraps stderr in NativeCommandError records that bury the real
+# message under position/category noise.
+$runId = [System.Guid]::NewGuid().ToString("N")
+$stdoutFile = Join-Path $resolvedOutputDir ("generation_stdout_" + $runId + ".log")
+$stderrFile = Join-Path $resolvedOutputDir ("generation_stderr_" + $runId + ".log")
+
+$nodeArgs = @(
+    ('"{0}"' -f $generatorJs),
+    ('"{0}"' -f $resolvedPayload),
+    ('"{0}"' -f $resolvedTemplate),
+    ('"{0}"' -f $resolvedOutputDir)
+)
+
+$generationFailed = $false
+$reason = ""
+$output = ""
+$stderrText = ""
+
+try {
+    $nodeProcess = Start-Process -FilePath "node" -ArgumentList $nodeArgs -Wait -PassThru -NoNewWindow `
+        -RedirectStandardOutput $stdoutFile -RedirectStandardError $stderrFile
+    $nodeExitCode = $nodeProcess.ExitCode
+
+    if (Test-Path -LiteralPath $stdoutFile) { $output = [System.IO.File]::ReadAllText($stdoutFile).TrimEnd() }
+    if (Test-Path -LiteralPath $stderrFile) { $stderrText = [System.IO.File]::ReadAllText($stderrFile).Trim() }
+
+    $generationFailed = ($nodeExitCode -ne 0) -or [string]::IsNullOrWhiteSpace($output)
+    if ($generationFailed) {
+        $reason = if ($nodeExitCode -ne 0) { "node exited with code $nodeExitCode" } else { "node produced no output" }
+        if (-not [string]::IsNullOrWhiteSpace($stderrText)) { $reason = "$reason - $stderrText" }
+    }
+}
+catch {
+    $generationFailed = $true
+    $reason = "node could not be started: $($_.Exception.Message)"
+}
+finally {
+    Remove-Item -LiteralPath @($stdoutFile, $stderrFile) -Force -ErrorAction SilentlyContinue
+}
+
+if ($generationFailed) {
+    $failure = [ordered]@{
+        success      = $false
+        error        = $reason
+        docxPath     = ""
+        pdfPath      = ""
+        candidateName = ""
+        timestamp    = (Get-Date).ToString("yyyyMMddHHmmss")
+        pdfGenerated = $false
+    }
+    $output = ($failure | ConvertTo-Json -Compress)
+}
 
 $statusFile = Join-Path $resolvedOutputDir "generation_result.json"
-[System.IO.File]::WriteAllText($statusFile, $output, [System.Text.Encoding]::UTF8)
+# UTF8 without BOM so UiPath's ReadTextFile receives clean JSON.
+[System.IO.File]::WriteAllText($statusFile, $output, (New-Object System.Text.UTF8Encoding($false)))
 
 Write-Output $output
+
+if ($generationFailed) { exit 1 }
