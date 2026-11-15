@@ -1,7 +1,7 @@
 param(
     [Parameter(Mandatory=$true)][string]$GitHubInput,
     [string]$GitHubToken = "",
-    [bool]$UseMockFallback = $true,
+    [string]$UseMockFallback = "true",
     [string]$OutputDir = "Data\Outputs"
 )
 
@@ -30,7 +30,13 @@ if (-not (Test-Path $resolvedOutputDir)) {
 $statusFile = Join-Path $resolvedOutputDir "github_repos_result.json"
 $jsScript = Join-Path $scriptDir "FetchGitHubRepos.js"
 
-$fallbackStr = if ($UseMockFallback) { "true" } else { "false" }
+# powershell.exe -File delivers every argument as a System.String and PowerShell
+# refuses string->Boolean conversion, so this flag must stay a string and be
+# interpreted here. Accept both "true"/"$true" styles so either caller works.
+$normalizedFlag = "$UseMockFallback".Trim().TrimStart([char]'$').ToLower()
+$useMockFallback = @("1", "true", "yes", "y") -contains $normalizedFlag
+
+$fallbackStr = if ($useMockFallback) { "true" } else { "false" }
 
 $psi = New-Object System.Diagnostics.ProcessStartInfo
 $psi.FileName = "node"

@@ -261,7 +261,25 @@
               </Sequence>
             </If.Then>
             <If.Else>
-              <Throw DisplayName="Throw BusinessRuleException on Live Scrape Failure" Exception="[New UiPath.Core.BusinessRuleException(&quot;Failed to ingest LinkedIn profile. Please ensure browser is logged in to LinkedIn without CAPTCHA challenges: &quot; &amp; in_LinkedInUrl)]" sap:VirtualizedContainerService.HintSize="416,113.6" sap2010:WorkflowViewState.IdRef="Throw_1" />
+              <Sequence DisplayName="Fallback to Mock on Live Scrape Failure" sap:VirtualizedContainerService.HintSize="416,280" sap2010:WorkflowViewState.IdRef="Sequence_5">
+                <ui:LogMessage DisplayName="Log Live Scrape Fallback" sap:VirtualizedContainerService.HintSize="416,141" sap2010:WorkflowViewState.IdRef="LogMessage_5" Level="Warn" Message="[&quot;[01_LinkedIn_ScrapeProfile] Live scrape failed or returned no data for &quot; &amp; in_LinkedInUrl &amp; &quot; - falling back to Data/Mocks/LinkedInMock.json. Ensure the browser is logged into LinkedIn without CAPTCHA challenges.&quot;]" />
+                <Assign DisplayName="Set Mock File Path For Fallback" sap:VirtualizedContainerService.HintSize="416,113.6" sap2010:WorkflowViewState.IdRef="Assign_8">
+                  <Assign.To>
+                    <OutArgument x:TypeArguments="x:String">[strMockFilePath]</OutArgument>
+                  </Assign.To>
+                  <Assign.Value>
+                    <InArgument x:TypeArguments="x:String">["Data\Mocks\LinkedInMock.json"]</InArgument>
+                  </Assign.Value>
+                </Assign>
+                <Assign DisplayName="Read Mock JSON As Fallback" sap:VirtualizedContainerService.HintSize="416,113.6" sap2010:WorkflowViewState.IdRef="Assign_9">
+                  <Assign.To>
+                    <OutArgument x:TypeArguments="x:String">[out_LinkedInDataJson]</OutArgument>
+                  </Assign.To>
+                  <Assign.Value>
+                    <InArgument x:TypeArguments="x:String">[If(System.IO.File.Exists(strMockFilePath), System.IO.File.ReadAllText(strMockFilePath), "{""full_name"":""Candidate"",""headline"":""Software Professional"",""about"":"""",""experiences"":[],""education"":[],""certifications"":[],""skills"":[]}")]</InArgument>
+                  </Assign.Value>
+                </Assign>
+              </Sequence>
             </If.Else>
           </If>
         </Sequence>

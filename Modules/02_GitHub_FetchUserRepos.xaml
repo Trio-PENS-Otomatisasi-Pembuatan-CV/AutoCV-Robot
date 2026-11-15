@@ -238,14 +238,32 @@
                 </If.Else>
               </If>
 
-              <Assign DisplayName="Determine Fetch Status" sap:VirtualizedContainerService.HintSize="448,113.6" sap2010:WorkflowViewState.IdRef="Assign_12">
-                <Assign.To>
-                  <OutArgument x:TypeArguments="x:String">[strFetchStatus]</OutArgument>
-                </Assign.To>
-                <Assign.Value>
-                  <InArgument x:TypeArguments="x:String">[If(strReposJson.Contains("""mock_fallback"""), "SUCCESS_MOCK_FALLBACK", "SUCCESS_LIVE")]</InArgument>
-                </Assign.Value>
-              </Assign>
+              <If Condition="[Not (strReposJson IsNot Nothing AndAlso strReposJson.Trim().Trim(System.Convert.ToChar(65279)).Trim().StartsWith(&quot;{&quot;))]" DisplayName="Validate Runner Output Is JSON" sap:VirtualizedContainerService.HintSize="448,360" sap2010:WorkflowViewState.IdRef="If_4">
+                <If.Then>
+                  <Sequence DisplayName="Fallback To Mock On Invalid Output" sap:VirtualizedContainerService.HintSize="416,260" sap2010:WorkflowViewState.IdRef="Sequence_5">
+                    <ui:LogMessage DisplayName="Log Invalid Runner Output" sap:VirtualizedContainerService.HintSize="416,141" sap2010:WorkflowViewState.IdRef="LogMessage_5" Level="Warn" Message="[&quot;[02_GitHub_FetchUserRepos] Runner returned no usable JSON (length=&quot; &amp; If(strReposJson Is Nothing, &quot;0&quot;, strReposJson.Length.ToString()) &amp; &quot;). Falling back to Data/Mocks/mock_github_repos.json - verify node.js is on PATH and that RunGitHubFetch.ps1 completed.&quot;]" />
+                    <ui:ReadTextFile File="{x:Null}" Content="[strReposJson]" DisplayName="Read Mock On Invalid Output" Encoding="utf-8" FileName="Data\Mocks\mock_github_repos.json" sap:VirtualizedContainerService.HintSize="416,80" sap2010:WorkflowViewState.IdRef="ReadTextFile_4" />
+                    <Assign DisplayName="Set Fallback Status On Invalid Output" sap:VirtualizedContainerService.HintSize="416,60" sap2010:WorkflowViewState.IdRef="Assign_16">
+                      <Assign.To>
+                        <OutArgument x:TypeArguments="x:String">[strFetchStatus]</OutArgument>
+                      </Assign.To>
+                      <Assign.Value>
+                        <InArgument x:TypeArguments="x:String">["SUCCESS_MOCK_FALLBACK"]</InArgument>
+                      </Assign.Value>
+                    </Assign>
+                  </Sequence>
+                </If.Then>
+                <If.Else>
+                  <Assign DisplayName="Determine Fetch Status" sap:VirtualizedContainerService.HintSize="448,113.6" sap2010:WorkflowViewState.IdRef="Assign_12">
+                    <Assign.To>
+                      <OutArgument x:TypeArguments="x:String">[strFetchStatus]</OutArgument>
+                    </Assign.To>
+                    <Assign.Value>
+                      <InArgument x:TypeArguments="x:String">[If(strReposJson.Contains("""mock_fallback"""), "SUCCESS_MOCK_FALLBACK", "SUCCESS_LIVE")]</InArgument>
+                    </Assign.Value>
+                  </Assign>
+                </If.Else>
+              </If>
             </Sequence>
           </TryCatch.Try>
           <TryCatch.Catches>
