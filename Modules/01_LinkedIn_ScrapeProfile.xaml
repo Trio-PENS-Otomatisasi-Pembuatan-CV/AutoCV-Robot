@@ -129,133 +129,133 @@
         <InArgument x:TypeArguments="x:String">[""]</InArgument>
       </Assign.Value>
     </Assign>
-    <TryCatch DisplayName="Try Catch Live Profile Scraping" sap:VirtualizedContainerService.HintSize="656,1350" sap2010:WorkflowViewState.IdRef="TryCatch_1">
-      <TryCatch.Try>
-        <Sequence DisplayName="Browser Automation Sequence" sap:VirtualizedContainerService.HintSize="510,950" sap2010:WorkflowViewState.IdRef="Sequence_2">
-          <sap:WorkflowViewStateService.ViewState>
-            <scg:Dictionary x:TypeArguments="x:String, x:Object">
-              <x:Boolean x:Key="IsExpanded">True</x:Boolean>
-            </scg:Dictionary>
-          </sap:WorkflowViewStateService.ViewState>
-          <ui:OpenBrowser AutomaticallyDownloadWebDriver="{x:Null}" CommunicationMethod="{x:Null}" Hidden="{x:Null}" Private="{x:Null}" UiBrowser="{x:Null}" BrowserType="[If(strBrowserName.ToLower().Equals(&quot;edge&quot;), UiPath.Core.BrowserType.Edge, UiPath.Core.BrowserType.Chrome)]" DisplayName="Open Browser with Existing User Session" sap:VirtualizedContainerService.HintSize="476,750" sap2010:WorkflowViewState.IdRef="OpenBrowser_1" NewSession="False" Url="[in_LinkedInUrl]">
-            <ui:OpenBrowser.Body>
-              <ActivityAction x:TypeArguments="x:Object">
-                <ActivityAction.Argument>
-                  <DelegateInArgument x:TypeArguments="x:Object" Name="ContextTarget" />
-                </ActivityAction.Argument>
-                <Sequence DisplayName="Execute DOM Extraction" sap:VirtualizedContainerService.HintSize="442,625" sap2010:WorkflowViewState.IdRef="Sequence_3">
-                  <sap:WorkflowViewStateService.ViewState>
-                    <scg:Dictionary x:TypeArguments="x:String, x:Object">
-                      <x:Boolean x:Key="IsExpanded">True</x:Boolean>
-                    </scg:Dictionary>
-                  </sap:WorkflowViewStateService.ViewState>
-                  <Assign DisplayName="Set JS Extractor File Path" sap:VirtualizedContainerService.HintSize="408,113.6" sap2010:WorkflowViewState.IdRef="Assign_SetJsPath">
-                    <Assign.To>
-                      <OutArgument x:TypeArguments="x:String">[strJsFilePath]</OutArgument>
-                    </Assign.To>
-                    <Assign.Value>
-                      <InArgument x:TypeArguments="x:String">["Data\Scripts\LinkedInDomExtractor.js"]</InArgument>
-                    </Assign.Value>
-                  </Assign>
-                  <Assign DisplayName="Load Extractor Script from File" sap:VirtualizedContainerService.HintSize="408,113.6" sap2010:WorkflowViewState.IdRef="Assign_LoadJs">
-                    <Assign.To>
-                      <OutArgument x:TypeArguments="x:String">[strJsScriptCode]</OutArgument>
-                    </Assign.To>
-                    <Assign.Value>
-                      <InArgument x:TypeArguments="x:String">[If(System.IO.File.Exists(strJsFilePath), System.IO.File.ReadAllText(strJsFilePath), "function(e){return JSON.stringify({full_name:'',experiences:[],education:[],skills:[]});}")]</InArgument>
-                    </Assign.Value>
-                  </Assign>
-                  <ui:InjectJsScript InputParameter="{x:Null}" DisplayName="Inject Resilient Profile Scraper" sap:VirtualizedContainerService.HintSize="408,135" sap2010:WorkflowViewState.IdRef="InjectJsScript_1" ScriptCode="[strJsScriptCode]">
-                    <ui:InjectJsScript.ScriptOutput>
-                      <OutArgument x:TypeArguments="x:String">[strScrapedJsonRaw]</OutArgument>
-                    </ui:InjectJsScript.ScriptOutput>
-                    <ui:InjectJsScript.Target>
-                      <ui:Target ClippingRegion="{x:Null}" Element="{x:Null}" Selector="&lt;webctrl tag='body' /&gt;" TimeoutMS="[intInjectJsTimeoutMs]" WaitForReady="COMPLETE" />
-                    </ui:InjectJsScript.Target>
-                  </ui:InjectJsScript>
-                  <If Condition="[Not String.IsNullOrWhiteSpace(strScrapedJsonRaw) AndAlso Not strScrapedJsonRaw.Contains(&quot;&quot;&quot;full_name&quot;&quot;:&quot;&quot;&quot;&quot;&quot;) AndAlso Not strScrapedJsonRaw.Contains(&quot;&quot;&quot;error&quot;&quot;:&quot;)]" DisplayName="Verify Non-Empty Extraction" sap:VirtualizedContainerService.HintSize="408,208" sap2010:WorkflowViewState.IdRef="If_1">
-                    <If.Then>
-                      <Assign DisplayName="Mark Success" sap:VirtualizedContainerService.HintSize="262,60" sap2010:WorkflowViewState.IdRef="Assign_4">
-                        <Assign.To>
-                          <OutArgument x:TypeArguments="x:Boolean">[boolExtractionSuccessful]</OutArgument>
-                        </Assign.To>
-                        <Assign.Value>
-                          <InArgument x:TypeArguments="x:Boolean">[True]</InArgument>
-                        </Assign.Value>
-                      </Assign>
-                    </If.Then>
-                  </If>
-                </Sequence>
-              </ActivityAction>
-            </ui:OpenBrowser.Body>
-          </ui:OpenBrowser>
-        </Sequence>
-      </TryCatch.Try>
-      <TryCatch.Catches>
-        <Catch x:TypeArguments="s:Exception" sap:VirtualizedContainerService.HintSize="514,22" sap2010:WorkflowViewState.IdRef="Catch`1_1">
-          <sap:WorkflowViewStateService.ViewState>
-            <scg:Dictionary x:TypeArguments="x:String, x:Object">
-              <x:Boolean x:Key="IsExpanded">False</x:Boolean>
-              <x:Boolean x:Key="IsPinned">False</x:Boolean>
-            </scg:Dictionary>
-          </sap:WorkflowViewStateService.ViewState>
-          <ActivityAction x:TypeArguments="s:Exception">
-            <ActivityAction.Argument>
-              <DelegateInArgument x:TypeArguments="s:Exception" Name="exception" />
-            </ActivityAction.Argument>
-            <ui:LogMessage DisplayName="Log Scraping Exception" sap:VirtualizedContainerService.HintSize="334,141" sap2010:WorkflowViewState.IdRef="LogMessage_2" Level="Warn" Message="[&quot;[01_LinkedIn_ScrapeProfile] Live browser scraping encountered issue: &quot; &amp; exception.Message]" />
-          </ActivityAction>
-        </Catch>
-      </TryCatch.Catches>
-    </TryCatch>
-    <If Condition="[boolExtractionSuccessful]" DisplayName="Check If Data Was Extracted Successfully" sap:VirtualizedContainerService.HintSize="656,580" sap2010:WorkflowViewState.IdRef="If_2">
+    <If Condition="[in_UseMockFallback]" DisplayName="Route: Mock Fallback or Live Browser" sap:VirtualizedContainerService.HintSize="656,1800" sap2010:WorkflowViewState.IdRef="If_MockOrLive">
       <If.Then>
-        <Sequence DisplayName="Assign Live Result" sap:VirtualizedContainerService.HintSize="449.6,173.6" sap2010:WorkflowViewState.IdRef="Sequence_4">
+        <Sequence DisplayName="Load Mock Data Directly" sap:VirtualizedContainerService.HintSize="449.6,280" sap2010:WorkflowViewState.IdRef="Sequence_MockDirect">
           <sap:WorkflowViewStateService.ViewState>
             <scg:Dictionary x:TypeArguments="x:String, x:Object">
               <x:Boolean x:Key="IsExpanded">True</x:Boolean>
             </scg:Dictionary>
           </sap:WorkflowViewStateService.ViewState>
-          <Assign DisplayName="Output Scraped Data" sap:VirtualizedContainerService.HintSize="416,113.6" sap2010:WorkflowViewState.IdRef="Assign_5">
+          <ui:LogMessage DisplayName="Log Mock Mode" sap:VirtualizedContainerService.HintSize="416,141" sap2010:WorkflowViewState.IdRef="LogMessage_MockDirect" Level="Info" Message="[&quot;[01_LinkedIn_ScrapeProfile] Mock fallback enabled — skipping browser, loading local mock data (Data/Mocks/LinkedInMock.json).&quot;]" />
+          <Assign DisplayName="Set Mock File Path" sap:VirtualizedContainerService.HintSize="416,113.6" sap2010:WorkflowViewState.IdRef="Assign_6">
+            <Assign.To>
+              <OutArgument x:TypeArguments="x:String">[strMockFilePath]</OutArgument>
+            </Assign.To>
+            <Assign.Value>
+              <InArgument x:TypeArguments="x:String">["Data\Mocks\LinkedInMock.json"]</InArgument>
+            </Assign.Value>
+          </Assign>
+          <Assign DisplayName="Read Mock JSON" sap:VirtualizedContainerService.HintSize="416,113.6" sap2010:WorkflowViewState.IdRef="Assign_7">
             <Assign.To>
               <OutArgument x:TypeArguments="x:String">[out_LinkedInDataJson]</OutArgument>
             </Assign.To>
             <Assign.Value>
-              <InArgument x:TypeArguments="x:String">[strScrapedJsonRaw]</InArgument>
+              <InArgument x:TypeArguments="x:String">[If(System.IO.File.Exists(strMockFilePath), System.IO.File.ReadAllText(strMockFilePath), "{""full_name"":""Candidate"",""headline"":""Software Professional"",""about"":"""",""experiences"":[],""education"":[],""certifications"":[],""skills"":[]}")]</InArgument>
             </Assign.Value>
           </Assign>
         </Sequence>
       </If.Then>
       <If.Else>
-        <Sequence DisplayName="Handle Fallback or Failure" sap:VirtualizedContainerService.HintSize="520,380" sap2010:WorkflowViewState.IdRef="Sequence_5">
+        <Sequence DisplayName="Live Browser Scraping Path" sap:VirtualizedContainerService.HintSize="656,1500" sap2010:WorkflowViewState.IdRef="Sequence_LivePath">
           <sap:WorkflowViewStateService.ViewState>
             <scg:Dictionary x:TypeArguments="x:String, x:Object">
               <x:Boolean x:Key="IsExpanded">True</x:Boolean>
             </scg:Dictionary>
           </sap:WorkflowViewStateService.ViewState>
-          <If Condition="[in_UseMockFallback]" DisplayName="Check If Mock Fallback Allowed" sap:VirtualizedContainerService.HintSize="486,320" sap2010:WorkflowViewState.IdRef="If_3">
-            <If.Then>
-              <Sequence DisplayName="Load Mock Data" sap:VirtualizedContainerService.HintSize="449.6,220" sap2010:WorkflowViewState.IdRef="Sequence_6">
+          <TryCatch DisplayName="Try Catch Live Profile Scraping" sap:VirtualizedContainerService.HintSize="656,1350" sap2010:WorkflowViewState.IdRef="TryCatch_1">
+            <TryCatch.Try>
+              <Sequence DisplayName="Browser Automation Sequence" sap:VirtualizedContainerService.HintSize="510,950" sap2010:WorkflowViewState.IdRef="Sequence_2">
                 <sap:WorkflowViewStateService.ViewState>
                   <scg:Dictionary x:TypeArguments="x:String, x:Object">
                     <x:Boolean x:Key="IsExpanded">True</x:Boolean>
                   </scg:Dictionary>
                 </sap:WorkflowViewStateService.ViewState>
-                <ui:LogMessage DisplayName="Log Mock Fallback" sap:VirtualizedContainerService.HintSize="416,141" sap2010:WorkflowViewState.IdRef="LogMessage_3" Level="Info" Message="[&quot;[01_LinkedIn_ScrapeProfile] Using local mock fallback data (Data/Mocks/LinkedInMock.json) per resilience strategy.&quot;]" />
-                <Assign DisplayName="Set Mock File Path" sap:VirtualizedContainerService.HintSize="416,113.6" sap2010:WorkflowViewState.IdRef="Assign_6">
-                  <Assign.To>
-                    <OutArgument x:TypeArguments="x:String">[strMockFilePath]</OutArgument>
-                  </Assign.To>
-                  <Assign.Value>
-                    <InArgument x:TypeArguments="x:String">["Data\Mocks\LinkedInMock.json"]</InArgument>
-                  </Assign.Value>
-                </Assign>
-                <Assign DisplayName="Read Mock JSON" sap:VirtualizedContainerService.HintSize="416,113.6" sap2010:WorkflowViewState.IdRef="Assign_7">
+                <ui:OpenBrowser AutomaticallyDownloadWebDriver="{x:Null}" CommunicationMethod="{x:Null}" Hidden="{x:Null}" Private="{x:Null}" UiBrowser="{x:Null}" BrowserType="[If(strBrowserName.ToLower().Equals(&quot;edge&quot;), UiPath.Core.BrowserType.Edge, UiPath.Core.BrowserType.Chrome)]" DisplayName="Open Browser with Existing User Session" sap:VirtualizedContainerService.HintSize="476,750" sap2010:WorkflowViewState.IdRef="OpenBrowser_1" NewSession="False" Url="[in_LinkedInUrl]">
+                  <ui:OpenBrowser.Body>
+                    <ActivityAction x:TypeArguments="x:Object">
+                      <ActivityAction.Argument>
+                        <DelegateInArgument x:TypeArguments="x:Object" Name="ContextTarget" />
+                      </ActivityAction.Argument>
+                      <Sequence DisplayName="Execute DOM Extraction" sap:VirtualizedContainerService.HintSize="442,625" sap2010:WorkflowViewState.IdRef="Sequence_3">
+                        <sap:WorkflowViewStateService.ViewState>
+                          <scg:Dictionary x:TypeArguments="x:String, x:Object">
+                            <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+                          </scg:Dictionary>
+                        </sap:WorkflowViewStateService.ViewState>
+                        <Assign DisplayName="Set JS Extractor File Path" sap:VirtualizedContainerService.HintSize="408,113.6" sap2010:WorkflowViewState.IdRef="Assign_SetJsPath">
+                          <Assign.To>
+                            <OutArgument x:TypeArguments="x:String">[strJsFilePath]</OutArgument>
+                          </Assign.To>
+                          <Assign.Value>
+                            <InArgument x:TypeArguments="x:String">["Data\Scripts\LinkedInDomExtractor.js"]</InArgument>
+                          </Assign.Value>
+                        </Assign>
+                        <Assign DisplayName="Load Extractor Script from File" sap:VirtualizedContainerService.HintSize="408,113.6" sap2010:WorkflowViewState.IdRef="Assign_LoadJs">
+                          <Assign.To>
+                            <OutArgument x:TypeArguments="x:String">[strJsScriptCode]</OutArgument>
+                          </Assign.To>
+                          <Assign.Value>
+                            <InArgument x:TypeArguments="x:String">[If(System.IO.File.Exists(strJsFilePath), System.IO.File.ReadAllText(strJsFilePath), "function(e){return JSON.stringify({full_name:'',experiences:[],education:[],skills:[]});}")]</InArgument>
+                          </Assign.Value>
+                        </Assign>
+                        <ui:InjectJsScript InputParameter="{x:Null}" DisplayName="Inject Resilient Profile Scraper" sap:VirtualizedContainerService.HintSize="408,135" sap2010:WorkflowViewState.IdRef="InjectJsScript_1" ScriptCode="[strJsScriptCode]">
+                          <ui:InjectJsScript.ScriptOutput>
+                            <OutArgument x:TypeArguments="x:String">[strScrapedJsonRaw]</OutArgument>
+                          </ui:InjectJsScript.ScriptOutput>
+                          <ui:InjectJsScript.Target>
+                            <ui:Target ClippingRegion="{x:Null}" Element="{x:Null}" Selector="&lt;webctrl tag='body' /&gt;" TimeoutMS="[intInjectJsTimeoutMs]" WaitForReady="COMPLETE" />
+                          </ui:InjectJsScript.Target>
+                        </ui:InjectJsScript>
+                        <If Condition="[Not String.IsNullOrWhiteSpace(strScrapedJsonRaw) AndAlso Not strScrapedJsonRaw.Contains(&quot;&quot;&quot;full_name&quot;&quot;:&quot;&quot;&quot;&quot;&quot;) AndAlso Not strScrapedJsonRaw.Contains(&quot;&quot;&quot;error&quot;&quot;:&quot;)]" DisplayName="Verify Non-Empty Extraction" sap:VirtualizedContainerService.HintSize="408,208" sap2010:WorkflowViewState.IdRef="If_1">
+                          <If.Then>
+                            <Assign DisplayName="Mark Success" sap:VirtualizedContainerService.HintSize="262,60" sap2010:WorkflowViewState.IdRef="Assign_4">
+                              <Assign.To>
+                                <OutArgument x:TypeArguments="x:Boolean">[boolExtractionSuccessful]</OutArgument>
+                              </Assign.To>
+                              <Assign.Value>
+                                <InArgument x:TypeArguments="x:Boolean">[True]</InArgument>
+                              </Assign.Value>
+                            </Assign>
+                          </If.Then>
+                        </If>
+                      </Sequence>
+                    </ActivityAction>
+                  </ui:OpenBrowser.Body>
+                </ui:OpenBrowser>
+              </Sequence>
+            </TryCatch.Try>
+            <TryCatch.Catches>
+              <Catch x:TypeArguments="s:Exception" sap:VirtualizedContainerService.HintSize="514,22" sap2010:WorkflowViewState.IdRef="Catch`1_1">
+                <sap:WorkflowViewStateService.ViewState>
+                  <scg:Dictionary x:TypeArguments="x:String, x:Object">
+                    <x:Boolean x:Key="IsExpanded">False</x:Boolean>
+                    <x:Boolean x:Key="IsPinned">False</x:Boolean>
+                  </scg:Dictionary>
+                </sap:WorkflowViewStateService.ViewState>
+                <ActivityAction x:TypeArguments="s:Exception">
+                  <ActivityAction.Argument>
+                    <DelegateInArgument x:TypeArguments="s:Exception" Name="exception" />
+                  </ActivityAction.Argument>
+                  <ui:LogMessage DisplayName="Log Scraping Exception" sap:VirtualizedContainerService.HintSize="334,141" sap2010:WorkflowViewState.IdRef="LogMessage_2" Level="Warn" Message="[&quot;[01_LinkedIn_ScrapeProfile] Live browser scraping encountered issue: &quot; &amp; exception.Message]" />
+                </ActivityAction>
+              </Catch>
+            </TryCatch.Catches>
+          </TryCatch>
+          <If Condition="[boolExtractionSuccessful]" DisplayName="Check If Data Was Extracted Successfully" sap:VirtualizedContainerService.HintSize="656,580" sap2010:WorkflowViewState.IdRef="If_2">
+            <If.Then>
+              <Sequence DisplayName="Assign Live Result" sap:VirtualizedContainerService.HintSize="449.6,173.6" sap2010:WorkflowViewState.IdRef="Sequence_4">
+                <sap:WorkflowViewStateService.ViewState>
+                  <scg:Dictionary x:TypeArguments="x:String, x:Object">
+                    <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+                  </scg:Dictionary>
+                </sap:WorkflowViewStateService.ViewState>
+                <Assign DisplayName="Output Scraped Data" sap:VirtualizedContainerService.HintSize="416,113.6" sap2010:WorkflowViewState.IdRef="Assign_5">
                   <Assign.To>
                     <OutArgument x:TypeArguments="x:String">[out_LinkedInDataJson]</OutArgument>
                   </Assign.To>
                   <Assign.Value>
-                    <InArgument x:TypeArguments="x:String">[If(System.IO.File.Exists(strMockFilePath), System.IO.File.ReadAllText(strMockFilePath), "{""full_name"":""Candidate"",""headline"":""Software Professional"",""about"":"""",""experiences"":[],""education"":[],""certifications"":[],""skills"":[]}")]</InArgument>
+                    <InArgument x:TypeArguments="x:String">[strScrapedJsonRaw]</InArgument>
                   </Assign.Value>
                 </Assign>
               </Sequence>
