@@ -97,7 +97,7 @@
       <Variable x:TypeArguments="x:String" Name="strMockFilePath" />
       <Variable x:TypeArguments="x:String" Name="strJsFilePath" />
       <Variable x:TypeArguments="x:String" Name="strJsScriptCode" />
-      <Variable x:TypeArguments="x:Int32" Name="intInjectJsTimeoutMs" Default="15000" />
+      <Variable x:TypeArguments="x:Int32" Name="intInjectJsTimeoutMs" Default="25000" />
     </Sequence.Variables>
     <sap:WorkflowViewStateService.ViewState>
       <scg:Dictionary x:TypeArguments="x:String, x:Object">
@@ -204,7 +204,7 @@
                             <OutArgument x:TypeArguments="x:String">[strScrapedJsonRaw]</OutArgument>
                           </ui:InjectJsScript.ScriptOutput>
                           <ui:InjectJsScript.Target>
-                            <ui:Target ClippingRegion="{x:Null}" Element="{x:Null}" Selector="&lt;webctrl tag='body' /&gt;" TimeoutMS="[intInjectJsTimeoutMs]" WaitForReady="COMPLETE" />
+                            <ui:Target ClippingRegion="{x:Null}" Element="{x:Null}" Selector="&lt;webctrl tag='h1' class='text-heading-xlarge' /&gt;" TimeoutMS="[intInjectJsTimeoutMs]" WaitForReady="COMPLETE" />
                           </ui:InjectJsScript.Target>
                         </ui:InjectJsScript>
                         <If Condition="[Not String.IsNullOrWhiteSpace(strScrapedJsonRaw) AndAlso Not strScrapedJsonRaw.Contains(&quot;&quot;&quot;full_name&quot;&quot;:&quot;&quot;&quot;&quot;&quot;) AndAlso Not strScrapedJsonRaw.Contains(&quot;&quot;&quot;error&quot;&quot;:&quot;)]" DisplayName="Verify Non-Empty Extraction" sap:VirtualizedContainerService.HintSize="408,208" sap2010:WorkflowViewState.IdRef="If_1">
