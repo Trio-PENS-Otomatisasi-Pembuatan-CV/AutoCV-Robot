@@ -264,7 +264,7 @@
           <OutArgument x:TypeArguments="x:String">[out_GeneratedPdfPath]</OutArgument>
         </Assign.To>
         <Assign.Value>
-          <InArgument x:TypeArguments="x:String">[If(Not String.IsNullOrWhiteSpace(strPdfPathFromResult), strPdfPathFromResult, System.Linq.Enumerable.FirstOrDefault(System.Linq.Enumerable.OrderByDescending(System.IO.Directory.GetFiles(strOutputDir, "*.pdf"), Function(f) System.IO.File.GetLastWriteTime(f))))]</InArgument>
+          <InArgument x:TypeArguments="x:String">[If(Not String.IsNullOrWhiteSpace(strPdfPathFromResult), strPdfPathFromResult, System.Linq.Enumerable.FirstOrDefault(System.Linq.Enumerable.OrderByDescending(System.Linq.Enumerable.Where(System.IO.Directory.GetFiles(strOutputDir, "*.pdf"), Function(f) System.IO.File.GetLastWriteTime(f) &gt;= System.IO.File.GetLastWriteTime(strPayloadFilePath)), Function(f) System.IO.File.GetLastWriteTime(f))))]</InArgument>
         </Assign.Value>
       </Assign>
 
@@ -273,10 +273,19 @@
           <OutArgument x:TypeArguments="x:String">[out_GeneratedDocxPath]</OutArgument>
         </Assign.To>
         <Assign.Value>
-          <InArgument x:TypeArguments="x:String">[If(Not String.IsNullOrWhiteSpace(strDocxPathFromResult), strDocxPathFromResult, System.Linq.Enumerable.FirstOrDefault(System.Linq.Enumerable.OrderByDescending(System.IO.Directory.GetFiles(strOutputDir, "*.docx"), Function(f) System.IO.File.GetLastWriteTime(f))))]</InArgument>
+          <InArgument x:TypeArguments="x:String">[If(Not String.IsNullOrWhiteSpace(strDocxPathFromResult), strDocxPathFromResult, System.Linq.Enumerable.FirstOrDefault(System.Linq.Enumerable.OrderByDescending(System.Linq.Enumerable.Where(System.IO.Directory.GetFiles(strOutputDir, "*.docx"), Function(f) System.IO.File.GetLastWriteTime(f) &gt;= System.IO.File.GetLastWriteTime(strPayloadFilePath)), Function(f) System.IO.File.GetLastWriteTime(f))))]</InArgument>
         </Assign.Value>
       </Assign>
     </Sequence>
+
+    <!-- Report a failed render loudly instead of logging a bare SUCCESS line -->
+    <If Condition="[String.IsNullOrWhiteSpace(out_GeneratedPdfPath)]" DisplayName="Warn When No PDF Produced" sap:VirtualizedContainerService.HintSize="626,260" sap2010:WorkflowViewState.IdRef="If_4">
+      <If.Then>
+        <Sequence DisplayName="Report Generation Failure" sap2010:WorkflowViewState.IdRef="Sequence_4">
+          <ui:LogMessage DisplayName="Log Generation Failure" sap2010:WorkflowViewState.IdRef="LogMessage_4" Level="Warn" Message="[&quot;[04_Document_GeneratePdf] FAILED: no PDF was produced. node result: &quot; &amp; strResultJson]" />
+        </Sequence>
+      </If.Then>
+    </If>
 
     <!-- 6. Cleanup and Final Logging -->
     <If Condition="[System.IO.File.Exists(strPayloadFilePath)]" DisplayName="Cleanup Temp Payload" sap:VirtualizedContainerService.HintSize="626,260" sap2010:WorkflowViewState.IdRef="If_3">
@@ -285,6 +294,6 @@
       </If.Then>
     </If>
 
-    <ui:LogMessage DisplayName="Log Generation Success" sap:VirtualizedContainerService.HintSize="626,141" sap2010:WorkflowViewState.IdRef="LogMessage_3" Level="Info" Message="[&quot;[04_Document_GeneratePdf] SUCCESS: Document generation complete. PDF: &quot; &amp; out_GeneratedPdfPath &amp; &quot; | DOCX: &quot; &amp; out_GeneratedDocxPath]" />
+    <ui:LogMessage DisplayName="Log Generation Success" sap:VirtualizedContainerService.HintSize="626,141" sap2010:WorkflowViewState.IdRef="LogMessage_3" Level="Info" Message="[&quot;[04_Document_GeneratePdf] &quot; &amp; If(String.IsNullOrWhiteSpace(out_GeneratedPdfPath), &quot;RENDER INCOMPLETE - no PDF produced in this run.&quot;, &quot;SUCCESS: Document generation complete. PDF: &quot; &amp; out_GeneratedPdfPath &amp; &quot; | DOCX: &quot; &amp; out_GeneratedDocxPath)]" />
   </Sequence>
 </Activity>

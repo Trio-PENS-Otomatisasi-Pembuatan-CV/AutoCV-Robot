@@ -3,6 +3,7 @@
     <x:Property Name="in_LinkedInDataJson" Type="InArgument(x:String)" />
     <x:Property Name="in_GitHubDataJson" Type="InArgument(x:String)" />
     <x:Property Name="in_TargetJobRole" Type="InArgument(x:String)" />
+    <x:Property Name="in_PersonalInfoJson" Type="InArgument(x:String)" />
     <x:Property Name="out_SynthesizedResumeJson" Type="OutArgument(x:String)" />
     <x:Property Name="out_AIStatus" Type="OutArgument(x:String)" />
     <x:Property Name="out_AIWarning" Type="OutArgument(x:String)" />
@@ -27,7 +28,7 @@
         <OutArgument x:TypeArguments="x:String">[out_SynthesizedResumeJson]</OutArgument>
       </Assign.To>
       <Assign.Value>
-        <InArgument x:TypeArguments="x:String">[&quot;{&quot;&quot;schema_version&quot;&quot;:&quot;&quot;2.0&quot;&quot;,&quot;&quot;target_job_role&quot;&quot;:&quot;&quot;&quot; &amp; If(in_TargetJobRole Is Nothing, &quot;&quot;, in_TargetJobRole.Replace(System.Convert.ToChar(34).ToString(), &quot;&quot;)) &amp; &quot;&quot;&quot;,&quot;&quot;linkedin_data&quot;&quot;:&quot; &amp; If(String.IsNullOrWhiteSpace(in_LinkedInDataJson), &quot;{}&quot;, in_LinkedInDataJson) &amp; &quot;,&quot;&quot;github_data&quot;&quot;:&quot; &amp; If(String.IsNullOrWhiteSpace(in_GitHubDataJson), &quot;{}&quot;, in_GitHubDataJson) &amp; &quot;,&quot;&quot;projects&quot;&quot;:[],&quot;&quot;skills&quot;&quot;:{&quot;&quot;languages&quot;&quot;:[],&quot;&quot;frameworks_and_libraries&quot;&quot;:[],&quot;&quot;tools_and_platforms&quot;&quot;:[]},&quot;&quot;pipeline&quot;&quot;:{&quot;&quot;ai&quot;&quot;:&quot;&quot;mock_synthesis&quot;&quot;,&quot;&quot;human_curation&quot;&quot;:&quot;&quot;awaiting&quot;&quot;,&quot;&quot;document&quot;&quot;:&quot;&quot;pending_approval&quot;&quot;}}&quot;]</InArgument>
+        <InArgument x:TypeArguments="x:String">[&quot;{&quot;&quot;schema_version&quot;&quot;:&quot;&quot;2.0&quot;&quot;,&quot;&quot;target_job_role&quot;&quot;:&quot;&quot;&quot; &amp; If(in_TargetJobRole Is Nothing, &quot;&quot;, in_TargetJobRole.Replace(System.Convert.ToChar(34).ToString(), &quot;&quot;)) &amp; &quot;&quot;&quot;,&quot;&quot;personal_info&quot;&quot;:&quot; &amp; If(String.IsNullOrWhiteSpace(in_PersonalInfoJson), &quot;{}&quot;, in_PersonalInfoJson) &amp; &quot;,&quot;&quot;linkedin_data&quot;&quot;:&quot; &amp; If(String.IsNullOrWhiteSpace(in_LinkedInDataJson), &quot;{}&quot;, in_LinkedInDataJson) &amp; &quot;,&quot;&quot;github_data&quot;&quot;:&quot; &amp; If(String.IsNullOrWhiteSpace(in_GitHubDataJson), &quot;{}&quot;, in_GitHubDataJson) &amp; &quot;,&quot;&quot;projects&quot;&quot;:[],&quot;&quot;skills&quot;&quot;:{&quot;&quot;languages&quot;&quot;:[],&quot;&quot;frameworks_and_libraries&quot;&quot;:[],&quot;&quot;tools_and_platforms&quot;&quot;:[]},&quot;&quot;pipeline&quot;&quot;:{&quot;&quot;ai&quot;&quot;:&quot;&quot;mock_synthesis&quot;&quot;,&quot;&quot;human_curation&quot;&quot;:&quot;&quot;awaiting&quot;&quot;,&quot;&quot;document&quot;&quot;:&quot;&quot;pending_approval&quot;&quot;}}&quot;]</InArgument>
       </Assign.Value>
     </Assign>
     <Assign DisplayName="Set mock AI status" sap2010:WorkflowViewState.IdRef="Assign_2">

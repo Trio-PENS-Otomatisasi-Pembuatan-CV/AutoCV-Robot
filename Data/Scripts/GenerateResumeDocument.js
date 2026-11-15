@@ -18,6 +18,19 @@ function escapeXml(unsafe) {
     .replace(/'/g, '&apos;');
 }
 
+/**
+ * Parse JSON text defensively.
+ * UiPath's WriteTextFile activity with Encoding="utf-8" writes a UTF-8 BOM
+ * (U+FEFF) at the start of the file. JSON.parse rejects that prefix with
+ * "Unexpected token", which used to crash this script before any output was
+ * printed. Strip the BOM before parsing.
+ */
+function parseJson(text) {
+  const value =
+    typeof text === 'string' && text.charCodeAt(0) === 0xFEFF ? text.slice(1) : text;
+  return JSON.parse(value);
+}
+
 function sanitizeFilename(name) {
   return (name || 'Candidate')
     .replace(/[^a-zA-Z0-9_\-]/g, '_')
@@ -31,7 +44,12 @@ function formatExperienceSection(experiences) {
   }
   return experiences
     .map((exp) => {
-      const header = `${exp.role || 'Software Engineer'} — ${exp.company || 'Company'} (${exp.startDate || ''} - ${exp.endDate || 'Present'})`;
+      // The LinkedIn mock carries one combined "period" string, so endDate is
+      // empty; appending a default "Present" produced "(Nov 2026 - Present - Present)".
+      const period = exp.endDate
+        ? `${exp.startDate || ''} - ${exp.endDate}`
+        : exp.startDate || '';
+      const header = `${exp.role || 'Software Engineer'} — ${exp.company || 'Company'}${period ? ` (${period})` : ''}`;
       const bullets = (exp.bulletPoints || []).map((b) => `• ${b}`).join('\n');
       return `${header}\n${bullets}`;
     })
@@ -111,8 +129,114 @@ function convertTextToOpenXmlRuns(text, style = {}) {
     .join('');
 }
 
-function generateResume(payload, templatePath, outputDir) {
-  const profile = payload.profile || payload.personal_info || {};
+const hasItems = (value) => Array.isArray(value) && value.length > 0;
+
+/**
+ * Map a flat LinkedIn skill list, or the grouped object emitted by UiPath
+ * module 03 ({ languages: [], ... }), onto the renderer's [{category, items}] shape.
+ */
+function normalizeSkills(topLevel, linkedInSkills) {
+  if (hasItems(topLevel) && typeof topLevel[0] === 'object' && Array.isArray(topLevel[0].items)) {
+    return topLevel;
+  }
+  if (hasItems(topLevel) && typeof topLevel[0] === 'string') {
+    return [{ category: 'Technical Skills', items: topLevel.slice() }];
+  }
+  if (topLevel && typeof topLevel === 'object' && !Array.isArray(topLevel)) {
+    const grouped = Object.keys(topLevel)
+      .filter((key) => hasItems(topLevel[key]))
+      .map((key) => ({ category: key, items: topLevel[key].slice() }));
+    if (hasItems(grouped)) return grouped;
+  }
+  return hasItems(linkedInSkills)
+    ? [{ category: 'Technical Skills', items: linkedInSkills.slice() }]
+    : [];
+}
+
+/**
+ * Map GitHub repositories onto the renderer's project shape, skipping forks and
+ * repositories that carry neither a description nor a language.
+ */
+function normalizeProjects(repositories, githubUser) {
+  if (!Array.isArray(repositories)) return [];
+  const login = githubUser && githubUser.login;
+  return repositories
+    .filter((repo) => repo && repo.name && repo.fork !== true && (repo.description || repo.language))
+    .map((repo) => ({
+      name: repo.name,
+      description: repo.description || '',
+      techStack: repo.language ? [repo.language].concat(repo.topics || []) : repo.topics || [],
+      stars: repo.stargazers_count || 0,
+      // The mock has no html_url, so rebuild it from the owner's login.
+      repoUrl: repo.html_url || (login ? `https://github.com/${login}/${repo.name}` : ''),
+      isSelected: true
+    }));
+}
+
+/**
+ * Bridge the UiPath draft contract onto the fields this renderer reads.
+ *
+ * UiPath module 03 emits { target_job_role, personal_info, linkedin_data,
+ * github_data, projects, skills, pipeline } while the template sections below
+ * read flat top-level arrays and a profile object. Without this bridge every
+ * section fell back to placeholder text: education rendered as
+ * "Higher education details pending verification.", experience as
+ * "No experience records provided.", and the file was named CV_Candidate_Name_*.
+ */
+function normalizePayload(rawPayload) {
+  const src = rawPayload || {};
+  const linkedIn = src.linkedin_data || src.raw_linkedin_data || {};
+  const github = src.github_data || {};
+  const profile = src.profile || src.personal_info || {};
+
+  const experiences = hasItems(src.experiences)
+    ? src.experiences
+    : (linkedIn.experiences || []).map((exp) => ({
+        role: exp.role || exp.position || '',
+        company: exp.company || '',
+        startDate: exp.startDate || exp.period || '',
+        endDate: exp.endDate || '',
+        bulletPoints: hasItems(exp.bulletPoints)
+          ? exp.bulletPoints
+          : exp.description
+            ? [exp.description]
+            : []
+      }));
+
+  const education = hasItems(src.education)
+    ? src.education
+    : (linkedIn.education || []).map((edu) => ({
+        degree: edu.degree || '',
+        institution: edu.institution || '',
+        graduationYear: edu.graduationYear || edu.year || '',
+        gpa: edu.gpa
+      }));
+
+  const summary = profile.summary || linkedIn.about || '';
+
+  return {
+    ...src,
+    profile: {
+      fullName: profile.fullName || profile.name || linkedIn.full_name || (github.user && github.user.name),
+      headline: profile.headline || linkedIn.headline || src.target_job_role || '',
+      email: profile.email || profile.recipient_email || '',
+      phone: profile.phone,
+      location: profile.location,
+      linkedinUrl: profile.linkedinUrl || profile.linkedin_url || '',
+      githubUrl: profile.githubUrl || profile.github_url || '',
+      summary
+    },
+    summary,
+    experiences,
+    projects: hasItems(src.projects) ? src.projects : normalizeProjects(github.repositories, github.user),
+    skills: normalizeSkills(src.skills, linkedIn.skills),
+    education
+  };
+}
+
+function generateResume(rawPayload, templatePath, outputDir) {
+  const payload = normalizePayload(rawPayload);
+  const profile = payload.profile || {};
   const fullName = profile.fullName || profile.name || 'Candidate Name';
   const headline = profile.headline || profile.target_job_role || 'Software Engineer';
   const email = profile.email || profile.recipient_email || 'candidate@example.com';
@@ -161,23 +285,24 @@ function generateResume(payload, templatePath, outputDir) {
   docXml = docXml.replace(/\{\{CONTACT_LINE\}\}/g, escapeXml(contactLine));
   docXml = docXml.replace(/\{\{SUMMARY\}\}/g, escapeXml(summary));
 
-  // Replace full block placeholders with structured OpenXML paragraphs
-  docXml = docXml.replace(
-    /<w:p>[\s\S]*?<w:t>\{\{EXPERIENCE_SECTION\}\}<\/w:t>[\s\S]*?<\/w:p>/,
-    expXml
-  );
-  docXml = docXml.replace(
-    /<w:p>[\s\S]*?<w:t>\{\{PROJECTS_SECTION\}\}<\/w:t>[\s\S]*?<\/w:p>/,
-    projXml
-  );
-  docXml = docXml.replace(
-    /<w:p>[\s\S]*?<w:t>\{\{SKILLS_SECTION\}\}<\/w:t>[\s\S]*?<\/w:p>/,
-    skillsXml
-  );
-  docXml = docXml.replace(
-    /<w:p>[\s\S]*?<w:t>\{\{EDUCATION_SECTION\}\}<\/w:t>[\s\S]*?<\/w:p>/,
-    eduXml
-  );
+  // Replace each block placeholder's own paragraph with structured OpenXML.
+  // The match has to stop at that paragraph's </w:p>. Anchoring on the first
+  // <w:p> in the document (as the previous /<w:p>[\s\S]*?.../ patterns did)
+  // swallowed every section above the placeholder, and because EXPERIENCE runs
+  // before PROJECTS before SKILLS before EDUCATION each replacement erased the
+  // one before it - leaving a document that contained only the education text.
+  const replaceBlock = (placeholder, replacement) => {
+    const escaped = placeholder.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const pattern = new RegExp(
+      `<w:p(?: [^>]*)?>(?:(?!<\\/w:p>)[\\s\\S])*?<w:t>${escaped}<\\/w:t>(?:(?!<\\/w:p>)[\\s\\S])*?<\\/w:p>`
+    );
+    docXml = docXml.replace(pattern, replacement);
+  };
+
+  replaceBlock('{{EXPERIENCE_SECTION}}', expXml);
+  replaceBlock('{{PROJECTS_SECTION}}', projXml);
+  replaceBlock('{{SKILLS_SECTION}}', skillsXml);
+  replaceBlock('{{EDUCATION_SECTION}}', eduXml);
 
   fs.writeFileSync(docXmlPath, docXml, 'utf8');
 
@@ -307,15 +432,23 @@ if (require.main === module) {
   const templatePath = args[1] || path.resolve(__dirname, '../Templates/ATS_Resume_Template.docx');
   const outputDir = args[2] || path.resolve(__dirname, '../Outputs');
 
-  let payload = {};
-  if (jsonInput.startsWith('{')) {
-    payload = JSON.parse(jsonInput);
-  } else if (fs.existsSync(jsonInput)) {
-    payload = JSON.parse(fs.readFileSync(jsonInput, 'utf8'));
-  }
+  try {
+    let payload = {};
+    if (jsonInput.startsWith('{')) {
+      payload = parseJson(jsonInput);
+    } else if (fs.existsSync(jsonInput)) {
+      payload = parseJson(fs.readFileSync(jsonInput, 'utf8'));
+    }
 
-  const result = generateResume(payload, templatePath, outputDir);
-  console.log(JSON.stringify(result, null, 2));
+    const result = generateResume(payload, templatePath, outputDir);
+    console.log(JSON.stringify(result, null, 2));
+  } catch (err) {
+    // Report the real cause on stderr and exit non-zero.
+    // RunResumeGeneration.ps1 captures stderr and turns it into
+    // generation_result.json so the failure is visible to UiPath.
+    console.error(err && err.stack ? err.stack : String(err));
+    process.exitCode = 1;
+  }
 }
 
 module.exports = { generateResume };

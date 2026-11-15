@@ -1,6 +1,6 @@
 {
-  "Name": "Tes",
+  "Name": "AutoCV",
   "ProjectType": "Process",
-  "Description": "Blank Template",
+  "Description": "Blank Process",
   "MainFile": "Main.xaml"
 }
