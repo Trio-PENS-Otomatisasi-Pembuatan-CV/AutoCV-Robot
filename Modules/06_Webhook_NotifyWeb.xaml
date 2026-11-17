@@ -1,0 +1,200 @@
+<Activity mc:Ignorable="sap sap2010" x:Class="_06_Webhook_NotifyWeb" xmlns="http://schemas.microsoft.com/netfx/2009/xaml/activities" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:s="clr-namespace:System;assembly=System.Private.CoreLib" xmlns:sap="http://schemas.microsoft.com/netfx/2009/xaml/activities/presentation" xmlns:sap2010="http://schemas.microsoft.com/netfx/2010/xaml/activities/presentation" xmlns:scg="clr-namespace:System.Collections.Generic;assembly=System.Private.CoreLib" xmlns:sco="clr-namespace:System.Collections.ObjectModel;assembly=System.Private.CoreLib" xmlns:ui="http://schemas.uipath.com/workflow/activities" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <x:Members>
+    <x:Property Name="in_WebhookBaseUrl" Type="InArgument(x:String)" />
+    <x:Property Name="in_JobId" Type="InArgument(x:String)" />
+    <x:Property Name="in_EndpointType" Type="InArgument(x:String)" />
+    <x:Property Name="in_PayloadJson" Type="InArgument(x:String)" />
+    <x:Property Name="in_PdfFilePath" Type="InArgument(x:String)" />
+    <x:Property Name="out_StatusCode" Type="OutArgument(x:Int32)" />
+    <x:Property Name="out_ResponseContent" Type="OutArgument(x:String)" />
+  </x:Members>
+  <VisualBasic.Settings>
+    <x:Null />
+  </VisualBasic.Settings>
+  <sap2010:WorkflowViewState.IdRef>_06_Webhook_NotifyWeb_1</sap2010:WorkflowViewState.IdRef>
+  <TextExpression.NamespacesForImplementation>
+    <sco:Collection x:TypeArguments="x:String">
+      <x:String>System.Activities</x:String>
+      <x:String>System.Activities.Statements</x:String>
+      <x:String>System.Activities.Expressions</x:String>
+      <x:String>System.Activities.Validation</x:String>
+      <x:String>System.Activities.XamlIntegration</x:String>
+      <x:String>Microsoft.VisualBasic</x:String>
+      <x:String>Microsoft.VisualBasic.Activities</x:String>
+      <x:String>System</x:String>
+      <x:String>System.Collections</x:String>
+      <x:String>System.Collections.Generic</x:String>
+      <x:String>System.Collections.ObjectModel</x:String>
+      <x:String>System.Data</x:String>
+      <x:String>System.Diagnostics</x:String>
+      <x:String>System.IO</x:String>
+      <x:String>System.Linq</x:String>
+      <x:String>System.Net.Http</x:String>
+      <x:String>System.Xml</x:String>
+      <x:String>System.Xml.Linq</x:String>
+      <x:String>UiPath.Core</x:String>
+      <x:String>UiPath.Core.Activities</x:String>
+      <x:String>UiPath.WebAPI.Activities</x:String>
+      <x:String>System.Windows.Markup</x:String>
+      <x:String>GlobalVariablesNamespace</x:String>
+      <x:String>GlobalConstantsNamespace</x:String>
+      <x:String>System.Runtime.Serialization</x:String>
+      <x:String>System.Reflection</x:String>
+      <x:String>System.Linq.Expressions</x:String>
+    </sco:Collection>
+  </TextExpression.NamespacesForImplementation>
+  <TextExpression.ReferencesForImplementation>
+    <sco:Collection x:TypeArguments="AssemblyReference">
+      <AssemblyReference>System.Activities</AssemblyReference>
+      <AssemblyReference>Microsoft.VisualBasic</AssemblyReference>
+      <AssemblyReference>System.Private.CoreLib</AssemblyReference>
+      <AssemblyReference>mscorlib</AssemblyReference>
+      <AssemblyReference>System.Data</AssemblyReference>
+      <AssemblyReference>System</AssemblyReference>
+      <AssemblyReference>System.Linq</AssemblyReference>
+      <AssemblyReference>System.Data.Common</AssemblyReference>
+      <AssemblyReference>System.Drawing</AssemblyReference>
+      <AssemblyReference>System.Core</AssemblyReference>
+      <AssemblyReference>System.Xml</AssemblyReference>
+      <AssemblyReference>System.Xml.Linq</AssemblyReference>
+      <AssemblyReference>PresentationFramework</AssemblyReference>
+      <AssemblyReference>WindowsBase</AssemblyReference>
+      <AssemblyReference>PresentationCore</AssemblyReference>
+      <AssemblyReference>System.Xaml</AssemblyReference>
+      <AssemblyReference>UiPath.System.Activities</AssemblyReference>
+      <AssemblyReference>UiPath.UiAutomation.Activities</AssemblyReference>
+      <AssemblyReference>UiPath.WebAPI.Activities</AssemblyReference>
+      <AssemblyReference>UiPath.Studio.Constants</AssemblyReference>
+      <AssemblyReference>System.Private.ServiceModel</AssemblyReference>
+      <AssemblyReference>System.Runtime.Serialization.Formatters</AssemblyReference>
+      <AssemblyReference>System.Private.DataContractSerialization</AssemblyReference>
+      <AssemblyReference>System.Runtime.Serialization.Primitives</AssemblyReference>
+      <AssemblyReference>System.Reflection.DispatchProxy</AssemblyReference>
+      <AssemblyReference>System.Reflection.TypeExtensions</AssemblyReference>
+      <AssemblyReference>System.Reflection.Metadata</AssemblyReference>
+      <AssemblyReference>System.Linq.Expressions</AssemblyReference>
+      <AssemblyReference>System.Collections</AssemblyReference>
+      <AssemblyReference>System.IO.FileSystem.Watcher</AssemblyReference>
+      <AssemblyReference>System.IO.Packaging</AssemblyReference>
+      <AssemblyReference>System.IO.FileSystem.DriveInfo</AssemblyReference>
+      <AssemblyReference>System.IO.FileSystem.AccessControl</AssemblyReference>
+    </sco:Collection>
+  </TextExpression.ReferencesForImplementation>
+  <Sequence DisplayName="06_Webhook_NotifyWeb Sequence" sap:VirtualizedContainerService.HintSize="672,2100" sap2010:WorkflowViewState.IdRef="Sequence_1">
+    <Sequence.Variables>
+      <Variable x:TypeArguments="x:String" Name="strFullEndpointUrl" />
+      <Variable x:TypeArguments="x:String" Name="strFinalRequestBody" />
+      <Variable x:TypeArguments="x:String" Name="strPdfBase64" />
+      <Variable x:TypeArguments="x:Boolean" Name="boolPdfExists" />
+    </Sequence.Variables>
+    <sap:WorkflowViewStateService.ViewState>
+      <scg:Dictionary x:TypeArguments="x:String, x:Object">
+        <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+      </scg:Dictionary>
+    </sap:WorkflowViewStateService.ViewState>
+
+    <!-- 1. Initialize Outputs -->
+    <Assign DisplayName="Initialize status code" sap:VirtualizedContainerService.HintSize="610,113.6" sap2010:WorkflowViewState.IdRef="Assign_InitCode">
+      <Assign.To>
+        <OutArgument x:TypeArguments="x:Int32">[out_StatusCode]</OutArgument>
+      </Assign.To>
+      <Assign.Value>
+        <InArgument x:TypeArguments="x:Int32">[0]</InArgument>
+      </Assign.Value>
+    </Assign>
+    <Assign DisplayName="Initialize response content" sap:VirtualizedContainerService.HintSize="610,113.6" sap2010:WorkflowViewState.IdRef="Assign_InitResp">
+      <Assign.To>
+        <OutArgument x:TypeArguments="x:String">[out_ResponseContent]</OutArgument>
+      </Assign.To>
+      <Assign.Value>
+        <InArgument x:TypeArguments="x:String">[""]</InArgument>
+      </Assign.Value>
+    </Assign>
+
+    <!-- 2. Validate essential parameters -->
+    <If Condition="[String.IsNullOrWhiteSpace(in_JobId) OrElse String.IsNullOrWhiteSpace(in_WebhookBaseUrl)]" DisplayName="Check if webhook configuration is present" sap:VirtualizedContainerService.HintSize="610,410" sap2010:WorkflowViewState.IdRef="If_CheckConfig">
+      <If.Then>
+        <Sequence DisplayName="Config missing sequence" sap:VirtualizedContainerService.HintSize="416,141" sap2010:WorkflowViewState.IdRef="Sequence_NoConfig">
+          <ui:LogMessage DisplayName="Log missing config warning" sap:VirtualizedContainerService.HintSize="382,141" sap2010:WorkflowViewState.IdRef="LogMessage_ConfigMissing" Level="Warn" Message="[&quot;[Webhook] in_JobId or in_WebhookBaseUrl is not specified. Skipping HTTP webhook callback.&quot;]" />
+        </Sequence>
+      </If.Then>
+      <If.Else>
+        <Sequence DisplayName="Execute Webhook Dispatch" sap:VirtualizedContainerService.HintSize="576,1400" sap2010:WorkflowViewState.IdRef="Sequence_ExecuteWebhook">
+          <!-- Construct Target URL -->
+          <Assign DisplayName="Construct target URL" sap:VirtualizedContainerService.HintSize="542,113.6" sap2010:WorkflowViewState.IdRef="Assign_TargetUrl">
+            <Assign.To>
+              <OutArgument x:TypeArguments="x:String">[strFullEndpointUrl]</OutArgument>
+            </Assign.To>
+            <Assign.Value>
+              <InArgument x:TypeArguments="x:String">[in_WebhookBaseUrl.TrimEnd("/"c) &amp; "/api/cv/jobs/" &amp; in_JobId &amp; "/" &amp; If(String.IsNullOrWhiteSpace(in_EndpointType), "draft", in_EndpointType.Trim().ToLower())]</InArgument>
+            </Assign.Value>
+          </Assign>
+
+          <!-- Format Request Body based on Endpoint Type -->
+          <If Condition="[If(String.IsNullOrWhiteSpace(in_EndpointType), &quot;&quot;, in_EndpointType.Trim().ToLower()) = &quot;complete&quot;]" DisplayName="Check endpoint type" sap:VirtualizedContainerService.HintSize="542,480" sap2010:WorkflowViewState.IdRef="If_EndpointType">
+            <If.Then>
+              <!-- Complete Endpoint: Attach Base64 PDF if file exists -->
+              <Sequence DisplayName="Prepare complete payload" sap:VirtualizedContainerService.HintSize="468,260" sap2010:WorkflowViewState.IdRef="Sequence_PrepareComplete">
+                <Assign DisplayName="Check PDF file exists" sap:VirtualizedContainerService.HintSize="434,113.6" sap2010:WorkflowViewState.IdRef="Assign_CheckPdf">
+                  <Assign.To>
+                    <OutArgument x:TypeArguments="x:Boolean">[boolPdfExists]</OutArgument>
+                  </Assign.To>
+                  <Assign.Value>
+                    <InArgument x:TypeArguments="x:Boolean">[Not String.IsNullOrWhiteSpace(in_PdfFilePath) AndAlso System.IO.File.Exists(in_PdfFilePath)]</InArgument>
+                  </Assign.Value>
+                </Assign>
+                <Assign DisplayName="Build complete payload JSON" sap:VirtualizedContainerService.HintSize="434,113.6" sap2010:WorkflowViewState.IdRef="Assign_BuildCompleteBody">
+                  <Assign.To>
+                    <OutArgument x:TypeArguments="x:String">[strFinalRequestBody]</OutArgument>
+                  </Assign.To>
+                  <Assign.Value>
+                    <InArgument x:TypeArguments="x:String">[If(boolPdfExists, "{""pdfBase64"":""" &amp; Convert.ToBase64String(System.IO.File.ReadAllBytes(in_PdfFilePath)) &amp; """,""downloadUrl"":""/api/cv/jobs/" &amp; in_JobId &amp; "/download"",""emailSent"":true}", "{""downloadUrl"":""/api/cv/jobs/" &amp; in_JobId &amp; "/download"",""emailSent"":true}")]</InArgument>
+                  </Assign.Value>
+                </Assign>
+              </Sequence>
+            </If.Then>
+            <If.Else>
+              <!-- Draft or Other Endpoint -->
+              <Assign DisplayName="Use provided payload JSON" sap:VirtualizedContainerService.HintSize="434,113.6" sap2010:WorkflowViewState.IdRef="Assign_DraftPayload">
+                <Assign.To>
+                  <OutArgument x:TypeArguments="x:String">[strFinalRequestBody]</OutArgument>
+                </Assign.To>
+                <Assign.Value>
+                  <InArgument x:TypeArguments="x:String">[If(String.IsNullOrWhiteSpace(in_PayloadJson), "{}", in_PayloadJson)]</InArgument>
+                </Assign.Value>
+              </Assign>
+            </If.Else>
+          </If>
+
+          <ui:LogMessage DisplayName="Log dispatch start" sap:VirtualizedContainerService.HintSize="542,141" sap2010:WorkflowViewState.IdRef="LogMessage_StartDispatch" Level="Info" Message="[&quot;[Webhook] Dispatching POST to: &quot; &amp; strFullEndpointUrl]" />
+
+          <!-- Try HTTP Client Request with ContinueOnError and TryCatch -->
+          <TryCatch DisplayName="Try Webhook Request" sap:VirtualizedContainerService.HintSize="542,500" sap2010:WorkflowViewState.IdRef="TryCatch_Webhook">
+            <TryCatch.Try>
+              <Sequence DisplayName="Send HTTP Request" sap:VirtualizedContainerService.HintSize="416,230" sap2010:WorkflowViewState.IdRef="Sequence_SendHttp">
+                <ui:HttpClient Body="[strFinalRequestBody]" ClientCertificate="{x:Null}" ClientCertificatePassword="{x:Null}" ConsumerKey="{x:Null}" ConsumerSecret="{x:Null}" ContinueOnError="True" FileAttachments="{x:Null}" OAuth1Token="{x:Null}" OAuth1TokenSecret="{x:Null}" OAuth2Token="{x:Null}" Password="{x:Null}" ResourcePath="{x:Null}" ResponseAttachment="{x:Null}" ResponseHeaders="{x:Null}" SecureClientCertificatePassword="{x:Null}" SecurePassword="{x:Null}" StatusCode="[out_StatusCode]" Username="{x:Null}" AcceptFormat="JSON" AuthenticationType="None" BodyFormat="application/json" DisplayName="HTTP Client Activity" EnableSSLVerification="False" EndPoint="[strFullEndpointUrl]" sap:VirtualizedContainerService.HintSize="382,70" Method="POST" Result="[out_ResponseContent]" TimeoutMS="30000" />
+                <ui:LogMessage DisplayName="Log webhook result" sap:VirtualizedContainerService.HintSize="382,141" sap2010:WorkflowViewState.IdRef="LogMessage_DispatchResult" Level="Info" Message="[&quot;[Webhook] Response received — HTTP Status: &quot; &amp; out_StatusCode.ToString &amp; &quot; | Body: &quot; &amp; If(String.IsNullOrWhiteSpace(out_ResponseContent), &quot;&lt;empty&gt;&quot;, out_ResponseContent.Substring(0, Math.Min(200, out_ResponseContent.Length)))]" />
+              </Sequence>
+            </TryCatch.Try>
+            <TryCatch.Catches>
+              <Catch x:TypeArguments="s:Exception" sap:VirtualizedContainerService.HintSize="420,22" sap2010:WorkflowViewState.IdRef="Catch_1">
+                <sap:WorkflowViewStateService.ViewState>
+                  <scg:Dictionary x:TypeArguments="x:String, x:Object">
+                    <x:Boolean x:Key="IsExpanded">False</x:Boolean>
+                    <x:Boolean x:Key="IsPinned">False</x:Boolean>
+                  </scg:Dictionary>
+                </sap:WorkflowViewStateService.ViewState>
+                <ActivityAction x:TypeArguments="s:Exception">
+                  <ActivityAction.Argument>
+                    <DelegateInArgument x:TypeArguments="s:Exception" Name="exception" />
+                  </ActivityAction.Argument>
+                  <ui:LogMessage DisplayName="Log webhook exception" sap:VirtualizedContainerService.HintSize="334,141" sap2010:WorkflowViewState.IdRef="LogMessage_Exception" Level="Warn" Message="[&quot;[Webhook] Warning: HTTP request threw exception: &quot; &amp; exception.Message &amp; &quot;. Robot execution will continue normally.&quot;]" />
+                </ActivityAction>
+              </Catch>
+            </TryCatch.Catches>
+          </TryCatch>
+        </Sequence>
+      </If.Else>
+    </If>
+  </Sequence>
+</Activity>
