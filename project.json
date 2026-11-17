@@ -1,20 +1,21 @@
 {
   "name": "AutoCV",
   "projectId": "b729b4b4-062b-49b7-80b4-c76bd44a723e",
-  "description": "Blank Process",
+  "description": "AutoCV - UiPath Orchestrator Autonomous Resume Generator & Pipeline",
   "main": "Main.xaml",
   "dependencies": {
     "UiPath.Excel.Activities": "[3.6.1]",
     "UiPath.Mail.Activities": "[2.12.10]",
     "UiPath.System.Activities": "[26.10.0]",
     "UiPath.Testing.Activities": "[25.10.3]",
-    "UiPath.UIAutomation.Activities": "[26.10.7]"
+    "UiPath.UIAutomation.Activities": "[26.10.7]",
+    "UiPath.WebAPI.Activities": "[1.21.1]"
   },
   "webServices": [],
   "entitiesStores": [],
   "schemaVersion": "4.1",
   "studioVersion": "26.10.0.0",
-  "projectVersion": "1.0.1",
+  "projectVersion": "1.0.2",
   "runtimeOptions": {
     "autoDispose": false,
     "netFrameworkLazyLoading": false,
@@ -50,8 +51,58 @@
     {
       "filePath": "Main.xaml",
       "uniqueId": "7f95c83d-fe8a-47ce-966d-a5b02fca88b4",
-      "input": [],
-      "output": []
+      "input": [
+        {
+          "name": "in_JobId",
+          "type": "System.String, System.Private.CoreLib"
+        },
+        {
+          "name": "in_LinkedInUrl",
+          "type": "System.String, System.Private.CoreLib"
+        },
+        {
+          "name": "in_GitHubUrl",
+          "type": "System.String, System.Private.CoreLib"
+        },
+        {
+          "name": "in_TargetJobRole",
+          "type": "System.String, System.Private.CoreLib"
+        },
+        {
+          "name": "in_RecipientEmail",
+          "type": "System.String, System.Private.CoreLib"
+        },
+        {
+          "name": "in_ApprovedResumePayload",
+          "type": "System.String, System.Private.CoreLib"
+        },
+        {
+          "name": "in_WebhookBaseUrl",
+          "type": "System.String, System.Private.CoreLib"
+        },
+        {
+          "name": "in_UseMockFallback",
+          "type": "System.Boolean, System.Private.CoreLib"
+        },
+        {
+          "name": "in_RequireManualApproval",
+          "type": "System.Boolean, System.Private.CoreLib"
+        }
+      ],
+      "output": [
+        {
+          "name": "out_JobStatus",
+          "type": "System.String, System.Private.CoreLib"
+        },
+        {
+          "name": "out_DraftResumePayload",
+          "type": "System.String, System.Private.CoreLib"
+        },
+        {
+          "name": "out_OutputPdfPath",
+          "type": "System.String, System.Private.CoreLib"
+        }
+      ]
     }
   ],
   "isTemplate": false,
