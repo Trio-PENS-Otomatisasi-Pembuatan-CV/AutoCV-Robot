@@ -1,5 +1,5 @@
 {
-  "Name": "AutoCV",
+  "Name": "AutoCV_Process",
   "ProjectType": "Process",
   "Description": "Blank Process",
   "MainFile": "Main.xaml"
