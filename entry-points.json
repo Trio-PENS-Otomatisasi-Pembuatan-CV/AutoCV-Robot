@@ -8,6 +8,9 @@
       "input": {
         "type": "object",
         "properties": {
+          "in_JobId": {
+            "type": "string"
+          },
           "in_LinkedInUrl": {
             "type": "string"
           },
@@ -22,6 +25,12 @@
           },
           "in_ApprovedResumePayload": {
             "type": "string"
+          },
+          "in_WebhookBaseUrl": {
+            "type": "string"
+          },
+          "in_UseMockFallback": {
+            "type": "boolean"
           },
           "in_RequireManualApproval": {
             "type": "boolean"
