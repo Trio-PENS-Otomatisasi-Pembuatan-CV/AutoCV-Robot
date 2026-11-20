@@ -183,7 +183,7 @@
             </Assign.Value>
           </Assign>
 
-          <Assign DisplayName="Default Recipient Email if empty" sap:VirtualizedContainerService.HintSize="542,113.6" sap2010:WorkflowViewState.IdRef="Assign_Job2DefaultEmail">
+          <Assign DisplayName="Default Recipient Email if empty (Job 2)" sap:VirtualizedContainerService.HintSize="542,113.6" sap2010:WorkflowViewState.IdRef="Assign_Job2DefaultEmail">
             <Assign.To>
               <OutArgument x:TypeArguments="x:String">[strNormalizedEmail]</OutArgument>
             </Assign.To>
@@ -195,7 +195,7 @@
           <ui:LogMessage DisplayName="Log starting PDF generation" sap:VirtualizedContainerService.HintSize="542,141" sap2010:WorkflowViewState.IdRef="LogMessage_StartPdf" Level="Info" Message="[&quot;[Job 2] Generating ATS-Compliant PDF document via 04_Document_GeneratePdf.&quot;]" />
 
           <!-- Invoke 04_Document_GeneratePdf -->
-          <ui:InvokeWorkflowFile ArgumentsVariable="{x:Null}" ContinueOnError="{x:Null}" DisplayName="Invoke 04_Document_GeneratePdf workflow" sap:VirtualizedContainerService.HintSize="542,113.6" sap2010:WorkflowViewState.IdRef="Invoke_DocGen_Job2" UnSafe="False" WorkflowFileName="Modules\04_Document_GeneratePdf.xaml">
+          <ui:InvokeWorkflowFile ArgumentsVariable="{x:Null}" ContinueOnError="{x:Null}" DisplayName="Invoke 04_Document_GeneratePdf workflow (Job 2)" sap:VirtualizedContainerService.HintSize="542,113.6" sap2010:WorkflowViewState.IdRef="Invoke_DocGen_Job2" UnSafe="False" WorkflowFileName="Modules\04_Document_GeneratePdf.xaml">
             <ui:InvokeWorkflowFile.Arguments>
               <InArgument x:TypeArguments="x:String" x:Key="in_CuratedResumeJson">[strDraftPayload]</InArgument>
               <InArgument x:TypeArguments="x:String" x:Key="in_TemplatePath">["Data\Templates\ATS_Resume_Template.docx"]</InArgument>
@@ -205,7 +205,7 @@
             </ui:InvokeWorkflowFile.Arguments>
           </ui:InvokeWorkflowFile>
 
-          <Assign DisplayName="Expose PDF output path" sap:VirtualizedContainerService.HintSize="542,113.6" sap2010:WorkflowViewState.IdRef="Assign_Job2OutPdf">
+          <Assign DisplayName="Expose PDF output path (Job 2)" sap:VirtualizedContainerService.HintSize="542,113.6" sap2010:WorkflowViewState.IdRef="Assign_Job2OutPdf">
             <Assign.To>
               <OutArgument x:TypeArguments="x:String">[out_OutputPdfPath]</OutArgument>
             </Assign.To>
@@ -216,7 +216,7 @@
 
           <!-- Invoke 05_Notification_SendMail -->
           <ui:LogMessage DisplayName="Publish email dispatch" sap:VirtualizedContainerService.HintSize="542,141" sap2010:WorkflowViewState.IdRef="LogMessage_MailDispatch" Level="Info" Message="[&quot;[Job 2] Delivering final ATS Resume PDF to &quot; &amp; strNormalizedEmail]" />
-          <ui:InvokeWorkflowFile ArgumentsVariable="{x:Null}" ContinueOnError="{x:Null}" DisplayName="Invoke 05_Notification_SendMail workflow" sap:VirtualizedContainerService.HintSize="542,113.6" sap2010:WorkflowViewState.IdRef="Invoke_SendMail_Job2" UnSafe="False" WorkflowFileName="Modules\05_Notification_SendMail.xaml">
+          <ui:InvokeWorkflowFile ArgumentsVariable="{x:Null}" ContinueOnError="{x:Null}" DisplayName="Invoke 05_Notification_SendMail workflow (Job 2)" sap:VirtualizedContainerService.HintSize="542,113.6" sap2010:WorkflowViewState.IdRef="Invoke_SendMail_Job2" UnSafe="False" WorkflowFileName="Modules\05_Notification_SendMail.xaml">
             <ui:InvokeWorkflowFile.Arguments>
               <InArgument x:TypeArguments="x:String" x:Key="in_RecipientEmail">[strNormalizedEmail]</InArgument>
               <InArgument x:TypeArguments="x:String" x:Key="in_PdfFilePath">[strOutputPdfPath]</InArgument>
@@ -249,7 +249,7 @@
           </If>
 
           <!-- Mark Completed -->
-          <Assign DisplayName="Set completed status" sap:VirtualizedContainerService.HintSize="542,113.6" sap2010:WorkflowViewState.IdRef="Assign_Job2Completed">
+          <Assign DisplayName="Set completed status (Job 2)" sap:VirtualizedContainerService.HintSize="542,113.6" sap2010:WorkflowViewState.IdRef="Assign_Job2Completed">
             <Assign.To>
               <OutArgument x:TypeArguments="x:String">[strJobStatus]</OutArgument>
             </Assign.To>
@@ -257,7 +257,7 @@
               <InArgument x:TypeArguments="x:String">["COMPLETED"]</InArgument>
             </Assign.Value>
           </Assign>
-          <Assign DisplayName="Expose completed status" sap:VirtualizedContainerService.HintSize="542,113.6" sap2010:WorkflowViewState.IdRef="Assign_ExposeJob2Completed">
+          <Assign DisplayName="Expose completed status (Job 2)" sap:VirtualizedContainerService.HintSize="542,113.6" sap2010:WorkflowViewState.IdRef="Assign_ExposeJob2Completed">
             <Assign.To>
               <OutArgument x:TypeArguments="x:String">[out_JobStatus]</OutArgument>
             </Assign.To>
@@ -502,7 +502,7 @@
       </If.Else>
     </If>
 
-    <Assign DisplayName="Expose PDF output path" sap:VirtualizedContainerService.HintSize="616,113.6" sap2010:WorkflowViewState.IdRef="Assign_FinalOutPdf">
+    <Assign DisplayName="Expose final PDF output path" sap:VirtualizedContainerService.HintSize="616,113.6" sap2010:WorkflowViewState.IdRef="Assign_FinalOutPdf">
       <Assign.To>
         <OutArgument x:TypeArguments="x:String">[out_OutputPdfPath]</OutArgument>
       </Assign.To>

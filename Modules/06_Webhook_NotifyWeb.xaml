@@ -84,7 +84,6 @@
     <Sequence.Variables>
       <Variable x:TypeArguments="x:String" Name="strFullEndpointUrl" />
       <Variable x:TypeArguments="x:String" Name="strFinalRequestBody" />
-      <Variable x:TypeArguments="x:String" Name="strPdfBase64" />
       <Variable x:TypeArguments="x:Boolean" Name="boolPdfExists" />
     </Sequence.Variables>
     <sap:WorkflowViewStateService.ViewState>
