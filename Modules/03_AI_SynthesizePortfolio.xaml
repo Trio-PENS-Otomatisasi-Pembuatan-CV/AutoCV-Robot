@@ -1,4 +1,4 @@
-<Activity mc:Ignorable="sap sap2010" x:Class="Modules_03_AI_SynthesizePortfolio" VisualBasic.Settings="{x:Null}" sap2010:WorkflowViewState.IdRef="ActivityBuilder_1" xmlns="http://schemas.microsoft.com/netfx/2009/xaml/activities" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:sap="http://schemas.microsoft.com/netfx/2009/xaml/activities/presentation" xmlns:sap2010="http://schemas.microsoft.com/netfx/2010/xaml/activities/presentation" xmlns:sco="clr-namespace:System.Collections.ObjectModel;assembly=System.Private.CoreLib" xmlns:ui="http://schemas.uipath.com/workflow/activities" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+<Activity mc:Ignorable="sap sap2010" x:Class="Modules_03_AI_SynthesizePortfolio" xmlns="http://schemas.microsoft.com/netfx/2009/xaml/activities" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:s="clr-namespace:System;assembly=System.Private.CoreLib" xmlns:sap="http://schemas.microsoft.com/netfx/2009/xaml/activities/presentation" xmlns:sap2010="http://schemas.microsoft.com/netfx/2010/xaml/activities/presentation" xmlns:scg="clr-namespace:System.Collections.Generic;assembly=System.Private.CoreLib" xmlns:sco="clr-namespace:System.Collections.ObjectModel;assembly=System.Private.CoreLib" xmlns:ui="http://schemas.uipath.com/workflow/activities" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:web="clr-namespace:UiPath.Web.Activities;assembly=UiPath.Web.Activities" xmlns:nhr="clr-namespace:UiPath.Web.Activities.Http;assembly=UiPath.Web.Activities" xmlns:nhrm="clr-namespace:UiPath.Web.Activities.Http.Models;assembly=UiPath.Web.Activities" xmlns:jn="clr-namespace:Newtonsoft.Json.Linq;assembly=Newtonsoft.Json">
   <x:Members>
     <x:Property Name="in_LinkedInDataJson" Type="InArgument(x:String)" />
     <x:Property Name="in_GitHubDataJson" Type="InArgument(x:String)" />
@@ -8,10 +8,21 @@
     <x:Property Name="out_AIStatus" Type="OutArgument(x:String)" />
     <x:Property Name="out_AIWarning" Type="OutArgument(x:String)" />
   </x:Members>
+  <VisualBasic.Settings>
+    <x:Null />
+  </VisualBasic.Settings>
+  <sap2010:WorkflowViewState.IdRef>ActivityBuilder_1</sap2010:WorkflowViewState.IdRef>
   <TextExpression.NamespacesForImplementation>
     <sco:Collection x:TypeArguments="x:String">
+      <x:String>GlobalConstantsNamespace</x:String>
+      <x:String>GlobalVariablesNamespace</x:String>
+      <x:String>Microsoft.VisualBasic</x:String>
       <x:String>System</x:String>
+      <x:String>System.Collections.Generic</x:String>
+      <x:String>System.Collections.ObjectModel</x:String>
       <x:String>System.Linq</x:String>
+      <x:String>UiPath.Core</x:String>
+      <x:String>UiPath.Core.Activities</x:String>
     </sco:Collection>
   </TextExpression.NamespacesForImplementation>
   <TextExpression.ReferencesForImplementation>
@@ -19,34 +30,346 @@
       <AssemblyReference>System.Private.CoreLib</AssemblyReference>
       <AssemblyReference>System.Runtime</AssemblyReference>
       <AssemblyReference>System.Linq</AssemblyReference>
+      <AssemblyReference>Microsoft.VisualBasic</AssemblyReference>
       <AssemblyReference>UiPath.System.Activities</AssemblyReference>
+      <AssemblyReference>UiPath.UiAutomation.Activities</AssemblyReference>
+      <AssemblyReference>System.ObjectModel</AssemblyReference>
+      <AssemblyReference>System.ComponentModel.TypeConverter</AssemblyReference>
+      <AssemblyReference>UiPath.Web.Activities</AssemblyReference>
+      <AssemblyReference>Newtonsoft.Json</AssemblyReference>
+      <AssemblyReference>System.Collections</AssemblyReference>
     </sco:Collection>
   </TextExpression.ReferencesForImplementation>
   <Sequence DisplayName="AI Synthesize Portfolio" sap2010:WorkflowViewState.IdRef="Sequence_1">
-    <Assign DisplayName="Build mock synthesis contract" sap2010:WorkflowViewState.IdRef="Assign_1">
+    <Sequence.Variables>
+      <Variable x:TypeArguments="x:String" Name="strApiKeyFile" />
+      <Variable x:TypeArguments="x:String" Name="strApiKey" />
+      <Variable x:TypeArguments="x:String" Name="strApiKeyRaw" />
+      <Variable x:TypeArguments="x:String" Name="strApiUrl" />
+      <Variable x:TypeArguments="x:String" Name="strSystemPrompt" />
+      <Variable x:TypeArguments="x:String" Name="strSystemEscaped" />
+      <Variable x:TypeArguments="x:String" Name="strPromptText" />
+      <Variable x:TypeArguments="x:String" Name="strPromptEscaped" />
+      <Variable x:TypeArguments="x:String" Name="strRequestBody" />
+      <Variable x:TypeArguments="x:String" Name="strRawAIResponse" />
+      <Variable x:TypeArguments="x:String" Name="strExtractedJson" />
+      <Variable x:TypeArguments="x:String" Name="strErrorDetail" />
+
+      <Variable x:TypeArguments="x:Boolean" Name="boolApiKeyPresent" />
+      <Variable x:TypeArguments="x:Boolean" Name="boolAiSuccess" />
+      <Variable x:TypeArguments="nhrm:HttpResponseSummary" Name="httpResponse" />
+      <Variable x:TypeArguments="jn:JObject" Name="jsonResponse" />
+      <Variable x:TypeArguments="jn:JObject" Name="jsonResume" />
+    </Sequence.Variables>
+    <sap:WorkflowViewStateService.ViewState>
+      <scg:Dictionary x:TypeArguments="x:String, x:Object">
+        <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+      </scg:Dictionary>
+    </sap:WorkflowViewStateService.ViewState>
+
+    <!-- 1. Initialization -->
+    <Assign DisplayName="Initialize AI success flag" sap2010:WorkflowViewState.IdRef="Assign_1">
       <Assign.To>
-        <OutArgument x:TypeArguments="x:String">[out_SynthesizedResumeJson]</OutArgument>
+        <OutArgument x:TypeArguments="x:Boolean">[boolAiSuccess]</OutArgument>
       </Assign.To>
       <Assign.Value>
-        <InArgument x:TypeArguments="x:String">[&quot;{&quot;&quot;schema_version&quot;&quot;:&quot;&quot;2.0&quot;&quot;,&quot;&quot;target_job_role&quot;&quot;:&quot;&quot;&quot; &amp; If(in_TargetJobRole Is Nothing, &quot;&quot;, in_TargetJobRole.Replace(System.Convert.ToChar(34).ToString(), &quot;&quot;)) &amp; &quot;&quot;&quot;,&quot;&quot;personal_info&quot;&quot;:&quot; &amp; If(String.IsNullOrWhiteSpace(in_PersonalInfoJson), &quot;{}&quot;, in_PersonalInfoJson) &amp; &quot;,&quot;&quot;linkedin_data&quot;&quot;:&quot; &amp; If(String.IsNullOrWhiteSpace(in_LinkedInDataJson), &quot;{}&quot;, in_LinkedInDataJson) &amp; &quot;,&quot;&quot;github_data&quot;&quot;:&quot; &amp; If(String.IsNullOrWhiteSpace(in_GitHubDataJson), &quot;{}&quot;, in_GitHubDataJson) &amp; &quot;,&quot;&quot;projects&quot;&quot;:[],&quot;&quot;skills&quot;&quot;:{&quot;&quot;languages&quot;&quot;:[],&quot;&quot;frameworks_and_libraries&quot;&quot;:[],&quot;&quot;tools_and_platforms&quot;&quot;:[]},&quot;&quot;pipeline&quot;&quot;:{&quot;&quot;ai&quot;&quot;:&quot;&quot;mock_synthesis&quot;&quot;,&quot;&quot;human_curation&quot;&quot;:&quot;&quot;awaiting&quot;&quot;,&quot;&quot;document&quot;&quot;:&quot;&quot;pending_approval&quot;&quot;}}&quot;]</InArgument>
+        <InArgument x:TypeArguments="x:Boolean">[False]</InArgument>
       </Assign.Value>
     </Assign>
-    <Assign DisplayName="Set mock AI status" sap2010:WorkflowViewState.IdRef="Assign_2">
+    <Assign DisplayName="Initialize error detail" sap2010:WorkflowViewState.IdRef="Assign_2">
       <Assign.To>
-        <OutArgument x:TypeArguments="x:String">[out_AIStatus]</OutArgument>
+        <OutArgument x:TypeArguments="x:String">[strErrorDetail]</OutArgument>
       </Assign.To>
       <Assign.Value>
-        <InArgument x:TypeArguments="x:String">[&quot;MOCK_SYNTHESIS&quot;]</InArgument>
+        <InArgument x:TypeArguments="x:String">[String.Empty]</InArgument>
       </Assign.Value>
     </Assign>
-    <Assign DisplayName="Set mock AI warning" sap2010:WorkflowViewState.IdRef="Assign_3">
+    <Assign DisplayName="Initialize API key" sap2010:WorkflowViewState.IdRef="Assign_3">
       <Assign.To>
-        <OutArgument x:TypeArguments="x:String">[out_AIWarning]</OutArgument>
+        <OutArgument x:TypeArguments="x:String">[strApiKey]</OutArgument>
       </Assign.To>
       <Assign.Value>
-        <InArgument x:TypeArguments="x:String">[&quot;Mock contract only; add JSON normalization, filtering, and UiPath GenAI or Gemini before production.&quot;]</InArgument>
+        <InArgument x:TypeArguments="x:String">[String.Empty]</InArgument>
       </Assign.Value>
     </Assign>
-    <ui:LogMessage DisplayName="Log mock synthesis" Level="Info" Message="[out_AIStatus &amp; &quot;: draft contract prepared for human curation.&quot;]" sap2010:WorkflowViewState.IdRef="LogMessage_1" />
+    <Assign DisplayName="Set API key file path" sap2010:WorkflowViewState.IdRef="Assign_4">
+      <Assign.To>
+        <OutArgument x:TypeArguments="x:String">[strApiKeyFile]</OutArgument>
+      </Assign.To>
+      <Assign.Value>
+        <InArgument x:TypeArguments="x:String">["Data\Config\gemini_api_key.txt"]</InArgument>
+      </Assign.Value>
+    </Assign>
+    <Assign DisplayName="Check API key file existence" sap2010:WorkflowViewState.IdRef="Assign_5">
+      <Assign.To>
+        <OutArgument x:TypeArguments="x:Boolean">[boolApiKeyPresent]</OutArgument>
+      </Assign.To>
+      <Assign.Value>
+        <InArgument x:TypeArguments="x:Boolean">[System.IO.File.Exists(strApiKeyFile)]</InArgument>
+      </Assign.Value>
+    </Assign>
+    <ui:LogMessage DisplayName="Log start of AI synthesis" sap2010:WorkflowViewState.IdRef="LogMessage_1" Level="Info" Message="[&quot;[03_AI] Starting Gemini synthesis for role: &quot; &amp; in_TargetJobRole]" />
+
+    <!-- 2. Read Gemini API key from local config file -->
+    <If Condition="[boolApiKeyPresent]" DisplayName="Load Gemini API key if file exists" sap2010:WorkflowViewState.IdRef="If_1">
+      <If.Then>
+        <Sequence DisplayName="Read API key file" sap2010:WorkflowViewState.IdRef="Sequence_2">
+          <ui:ReadTextFile DisplayName="Read Gemini API key file" FileName="[strApiKeyFile]" Content="[strApiKeyRaw]" sap2010:WorkflowViewState.IdRef="ReadTextFile_1" />
+          <Assign DisplayName="Normalize API key value" sap2010:WorkflowViewState.IdRef="Assign_6">
+            <Assign.To>
+              <OutArgument x:TypeArguments="x:String">[strApiKey]</OutArgument>
+            </Assign.To>
+            <Assign.Value>
+              <InArgument x:TypeArguments="x:String">[If(strApiKeyRaw Is Nothing, String.Empty, strApiKeyRaw.Trim().Trim(ChrW(65279)).Replace("PASTE_YOUR_GEMINI_API_KEY_HERE", String.Empty))]</InArgument>
+            </Assign.Value>
+          </Assign>
+        </Sequence>
+      </If.Then>
+    </If>
+
+    <!-- 3. Build system prompt for ATS resume synthesis -->
+    <Assign DisplayName="Build Gemini system prompt" sap2010:WorkflowViewState.IdRef="Assign_7">
+      <Assign.To>
+        <OutArgument x:TypeArguments="x:String">[strSystemPrompt]</OutArgument>
+      </Assign.To>
+      <Assign.Value>
+        <InArgument x:TypeArguments="x:String">["You are an expert ATS resume writer and career consultant." &amp; System.Environment.NewLine &amp; "Analyze the LinkedIn and GitHub data provided by the user and return ONE JSON object." &amp; System.Environment.NewLine &amp; "Return ONLY raw JSON with no markdown code fences and no commentary before or after it." &amp; System.Environment.NewLine &amp; "Write every section in English." &amp; System.Environment.NewLine &amp; "Format each experience bullet point using the STAR/XYZ pattern: state the action, the measurable result, and how the result was achieved." &amp; System.Environment.NewLine &amp; "Quantify achievements with concrete numbers wherever the source data supports them." &amp; System.Environment.NewLine &amp; "Include at most 3 non-fork GitHub repositories that best match the target job role and set isSelected to true for each of them." &amp; System.Environment.NewLine &amp; "The JSON must contain exactly these top-level keys." &amp; System.Environment.NewLine &amp; "profile is an object with fullName, headline, email, phone, location, summary, linkedinUrl, githubUrl." &amp; System.Environment.NewLine &amp; "experiences is an array of objects with id, company, role, startDate, endDate, bulletPoints which is an array of strings." &amp; System.Environment.NewLine &amp; "projects is an array of objects with id, name, repoUrl, stars as a number, language, techStack as an array of strings, starSummary, isSelected as a boolean." &amp; System.Environment.NewLine &amp; "skills is an array of objects with category and items which is an array of strings." &amp; System.Environment.NewLine &amp; "education is an array of objects with institution, degree, graduationYear, gpa." &amp; System.Environment.NewLine &amp; "Never invent employers, dates, degrees, or metrics that are absent from the supplied data."]</InArgument>
+      </Assign.Value>
+    </Assign>
+
+    <!-- 4. Build user prompt carrying the scraped profile data -->
+    <Assign DisplayName="Build Gemini user prompt" sap2010:WorkflowViewState.IdRef="Assign_8">
+      <Assign.To>
+        <OutArgument x:TypeArguments="x:String">[strPromptText]</OutArgument>
+      </Assign.To>
+      <Assign.Value>
+        <InArgument x:TypeArguments="x:String">["TARGET JOB ROLE: " &amp; in_TargetJobRole &amp; System.Environment.NewLine &amp; "PERSONAL INFO JSON: " &amp; in_PersonalInfoJson &amp; System.Environment.NewLine &amp; "LINKEDIN DATA JSON: " &amp; in_LinkedInDataJson &amp; System.Environment.NewLine &amp; "GITHUB DATA JSON: " &amp; in_GitHubDataJson &amp; System.Environment.NewLine &amp; "Produce the resume JSON now."]</InArgument>
+      </Assign.Value>
+    </Assign>
+
+    <!-- 5. Escape both prompts so they are safe to embed inside the JSON request body -->
+    <Assign DisplayName="Escape system prompt for JSON" sap2010:WorkflowViewState.IdRef="Assign_9">
+      <Assign.To>
+        <OutArgument x:TypeArguments="x:String">[strSystemEscaped]</OutArgument>
+      </Assign.To>
+      <Assign.Value>
+        <InArgument x:TypeArguments="x:String">[strSystemPrompt.Replace("\", "\\").Replace(ChrW(34).ToString(), "\" &amp; ChrW(34).ToString()).Replace(ChrW(13).ToString(), "\r").Replace(ChrW(10).ToString(), "\n")]</InArgument>
+      </Assign.Value>
+    </Assign>
+    <Assign DisplayName="Escape user prompt for JSON" sap2010:WorkflowViewState.IdRef="Assign_10">
+      <Assign.To>
+        <OutArgument x:TypeArguments="x:String">[strPromptEscaped]</OutArgument>
+      </Assign.To>
+      <Assign.Value>
+        <InArgument x:TypeArguments="x:String">[strPromptText.Replace("\", "\\").Replace(ChrW(34).ToString(), "\" &amp; ChrW(34).ToString()).Replace(ChrW(13).ToString(), "\r").Replace(ChrW(10).ToString(), "\n")]</InArgument>
+      </Assign.Value>
+    </Assign>
+
+    <!-- 6. Assemble the Gemini generateContent request body -->
+    <Assign DisplayName="Build Gemini request body" sap2010:WorkflowViewState.IdRef="Assign_11">
+      <Assign.To>
+        <OutArgument x:TypeArguments="x:String">[strRequestBody]</OutArgument>
+      </Assign.To>
+      <Assign.Value>
+        <InArgument x:TypeArguments="x:String">["{""systemInstruction"":{""parts"":[{""text"":""" &amp; strSystemEscaped &amp; """}]},""contents"":[{""parts"":[{""text"":""" &amp; strPromptEscaped &amp; """}]}],""generationConfig"":{""responseMimeType"":""application/json"",""temperature"":0.4}}"]</InArgument>
+      </Assign.Value>
+    </Assign>
+    <Assign DisplayName="Build Gemini endpoint URL" sap2010:WorkflowViewState.IdRef="Assign_12">
+      <Assign.To>
+        <OutArgument x:TypeArguments="x:String">[strApiUrl]</OutArgument>
+      </Assign.To>
+      <Assign.Value>
+        <InArgument x:TypeArguments="x:String">["https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=" &amp; strApiKey]</InArgument>
+      </Assign.Value>
+    </Assign>
+
+    <!-- 7. Call Gemini only when a usable API key is present -->
+    <If Condition="[String.IsNullOrWhiteSpace(strApiKey)]" DisplayName="Skip AI call when API key is missing" sap2010:WorkflowViewState.IdRef="If_2">
+      <If.Then>
+        <Sequence DisplayName="No API key fallback" sap2010:WorkflowViewState.IdRef="Sequence_3">
+          <Assign DisplayName="Mark AI as skipped" sap2010:WorkflowViewState.IdRef="Assign_13">
+            <Assign.To>
+              <OutArgument x:TypeArguments="x:Boolean">[boolAiSuccess]</OutArgument>
+            </Assign.To>
+            <Assign.Value>
+              <InArgument x:TypeArguments="x:Boolean">[False]</InArgument>
+            </Assign.Value>
+          </Assign>
+          <Assign DisplayName="Record missing key reason" sap2010:WorkflowViewState.IdRef="Assign_14">
+            <Assign.To>
+              <OutArgument x:TypeArguments="x:String">[strErrorDetail]</OutArgument>
+            </Assign.To>
+            <Assign.Value>
+              <InArgument x:TypeArguments="x:String">["Gemini API key missing or still a placeholder in " &amp; strApiKeyFile]</InArgument>
+            </Assign.Value>
+          </Assign>
+          <ui:LogMessage DisplayName="Log missing API key" sap2010:WorkflowViewState.IdRef="LogMessage_2" Level="Warn" Message="[&quot;[03_AI] &quot; &amp; strErrorDetail]" />
+        </Sequence>
+      </If.Then>
+      <If.Else>
+        <Sequence DisplayName="Call Gemini API" sap2010:WorkflowViewState.IdRef="Sequence_4">
+          <TryCatch DisplayName="Try Gemini synthesis" sap2010:WorkflowViewState.IdRef="TryCatch_1">
+            <TryCatch.Try>
+              <Sequence DisplayName="Call and parse Gemini" sap2010:WorkflowViewState.IdRef="Sequence_5">
+                <nhr:NetHttpRequest DisplayName="POST prompt to Gemini" RequestUrl="[strApiUrl]" Method="POST" RequestBodyType="Text" TextPayload="[strRequestBody]" TextPayloadContentType="application/json" TextPayloadEncoding="UTF-8" AuthenticationType="None" RetryPolicyType="ExponentialBackoff" RetryCount="3" InitialDelay="2000" TimeoutInMiliseconds="[90000]" ContinueOnError="True" Result="[httpResponse]" sap2010:WorkflowViewState.IdRef="NetHttpRequest_1" />
+                <Assign DisplayName="Record HTTP status detail" sap2010:WorkflowViewState.IdRef="Assign_15">
+                  <Assign.To>
+                    <OutArgument x:TypeArguments="x:String">[strErrorDetail]</OutArgument>
+                  </Assign.To>
+                  <Assign.Value>
+                    <InArgument x:TypeArguments="x:String">[If(httpResponse Is Nothing, "No response object returned", "Gemini HTTP status " &amp; CInt(httpResponse.StatusCode))]</InArgument>
+                  </Assign.Value>
+                </Assign>
+                <If Condition="[Not httpResponse Is Nothing AndAlso CInt(httpResponse.StatusCode) = 200]" DisplayName="Parse response when HTTP 200" sap2010:WorkflowViewState.IdRef="If_3">
+                  <If.Then>
+                    <Sequence DisplayName="Extract resume JSON" sap2010:WorkflowViewState.IdRef="Sequence_6">
+                      <web:DeserializeJson x:TypeArguments="jn:JObject" DisplayName="Deserialize Gemini envelope" JsonString="[httpResponse.TextContent]" JsonObject="[jsonResponse]" sap2010:WorkflowViewState.IdRef="DeserializeJson`1_1" />
+                      <Assign DisplayName="Extract candidate text" sap2010:WorkflowViewState.IdRef="Assign_16">
+                        <Assign.To>
+                          <OutArgument x:TypeArguments="x:String">[strRawAIResponse]</OutArgument>
+                        </Assign.To>
+                        <Assign.Value>
+                          <InArgument x:TypeArguments="x:String">[If(jsonResponse Is Nothing OrElse jsonResponse.SelectToken("candidates[0].content.parts[0].text") Is Nothing, String.Empty, jsonResponse.SelectToken("candidates[0].content.parts[0].text").ToString())]</InArgument>
+                        </Assign.Value>
+                      </Assign>
+                      <Assign DisplayName="Strip markdown fences from AI text" sap2010:WorkflowViewState.IdRef="Assign_17">
+                        <Assign.To>
+                          <OutArgument x:TypeArguments="x:String">[strExtractedJson]</OutArgument>
+                        </Assign.To>
+                        <Assign.Value>
+                          <InArgument x:TypeArguments="x:String">[strRawAIResponse.Replace("```json", String.Empty).Replace("```", String.Empty).Trim()]</InArgument>
+                        </Assign.Value>
+                      </Assign>
+                      <web:DeserializeJson x:TypeArguments="jn:JObject" DisplayName="Validate resume JSON" JsonString="[strExtractedJson]" JsonObject="[jsonResume]" sap2010:WorkflowViewState.IdRef="DeserializeJson`1_2" />
+                      <Assign DisplayName="Mark AI synthesis successful" sap2010:WorkflowViewState.IdRef="Assign_18">
+                        <Assign.To>
+                          <OutArgument x:TypeArguments="x:Boolean">[boolAiSuccess]</OutArgument>
+                        </Assign.To>
+                        <Assign.Value>
+                          <InArgument x:TypeArguments="x:Boolean">[True]</InArgument>
+                        </Assign.Value>
+                      </Assign>
+                      <Assign DisplayName="Clear error detail on success" sap2010:WorkflowViewState.IdRef="Assign_19">
+                        <Assign.To>
+                          <OutArgument x:TypeArguments="x:String">[strErrorDetail]</OutArgument>
+                        </Assign.To>
+                        <Assign.Value>
+                          <InArgument x:TypeArguments="x:String">[String.Empty]</InArgument>
+                        </Assign.Value>
+                      </Assign>
+                      <ui:LogMessage DisplayName="Log Gemini success" sap2010:WorkflowViewState.IdRef="LogMessage_3" Level="Info" Message="[&quot;[03_AI] Gemini synthesis succeeded. Resume JSON length: &quot; &amp; strExtractedJson.Length]" />
+                    </Sequence>
+                  </If.Then>
+                  <If.Else>
+                    <Sequence DisplayName="Handle non-200 response" sap2010:WorkflowViewState.IdRef="Sequence_7">
+                      <Assign DisplayName="Mark AI as failed" sap2010:WorkflowViewState.IdRef="Assign_20">
+                        <Assign.To>
+                          <OutArgument x:TypeArguments="x:Boolean">[boolAiSuccess]</OutArgument>
+                        </Assign.To>
+                        <Assign.Value>
+                          <InArgument x:TypeArguments="x:Boolean">[False]</InArgument>
+                        </Assign.Value>
+                      </Assign>
+                      <ui:LogMessage DisplayName="Log Gemini HTTP failure" sap2010:WorkflowViewState.IdRef="LogMessage_4" Level="Warn" Message="[&quot;[03_AI] &quot; &amp; strErrorDetail]" />
+                    </Sequence>
+                  </If.Else>
+                </If>
+              </Sequence>
+            </TryCatch.Try>
+            <TryCatch.Catches>
+              <Catch x:TypeArguments="s:Exception" sap2010:WorkflowViewState.IdRef="Catch`1_1">
+                <ActivityAction x:TypeArguments="s:Exception">
+                  <ActivityAction.Argument>
+                    <DelegateInArgument x:TypeArguments="s:Exception" Name="exception" />
+                  </ActivityAction.Argument>
+                  <Sequence DisplayName="Handle Gemini exception" sap2010:WorkflowViewState.IdRef="Sequence_8">
+                    <Assign DisplayName="Mark AI as failed on exception" sap2010:WorkflowViewState.IdRef="Assign_21">
+                      <Assign.To>
+                        <OutArgument x:TypeArguments="x:Boolean">[boolAiSuccess]</OutArgument>
+                      </Assign.To>
+                      <Assign.Value>
+                        <InArgument x:TypeArguments="x:Boolean">[False]</InArgument>
+                      </Assign.Value>
+                    </Assign>
+                    <Assign DisplayName="Record exception detail" sap2010:WorkflowViewState.IdRef="Assign_22">
+                      <Assign.To>
+                        <OutArgument x:TypeArguments="x:String">[strErrorDetail]</OutArgument>
+                      </Assign.To>
+                      <Assign.Value>
+                        <InArgument x:TypeArguments="x:String">["Gemini call failed: " &amp; exception.Message]</InArgument>
+                      </Assign.Value>
+                    </Assign>
+                    <ui:LogMessage DisplayName="Log Gemini exception" sap2010:WorkflowViewState.IdRef="LogMessage_5" Level="Warn" Message="[&quot;[03_AI] &quot; &amp; strErrorDetail]" />
+                  </Sequence>
+                </ActivityAction>
+              </Catch>
+            </TryCatch.Catches>
+          </TryCatch>
+        </Sequence>
+      </If.Else>
+    </If>
+
+    <!-- 8. Publish outputs: Gemini result when AI succeeded, otherwise empty + error -->
+    <If Condition="[boolAiSuccess]" DisplayName="Publish AI result or report failure" sap2010:WorkflowViewState.IdRef="If_4">
+      <If.Then>
+        <Sequence DisplayName="Publish Gemini result" sap2010:WorkflowViewState.IdRef="Sequence_9">
+          <Assign DisplayName="Expose synthesized resume JSON" sap2010:WorkflowViewState.IdRef="Assign_23">
+            <Assign.To>
+              <OutArgument x:TypeArguments="x:String">[out_SynthesizedResumeJson]</OutArgument>
+            </Assign.To>
+            <Assign.Value>
+              <InArgument x:TypeArguments="x:String">[jsonResume.ToString()]</InArgument>
+            </Assign.Value>
+          </Assign>
+          <Assign DisplayName="Set AI status to Gemini" sap2010:WorkflowViewState.IdRef="Assign_24">
+            <Assign.To>
+              <OutArgument x:TypeArguments="x:String">[out_AIStatus]</OutArgument>
+            </Assign.To>
+            <Assign.Value>
+              <InArgument x:TypeArguments="x:String">["GEMINI_SYNTHESIS"]</InArgument>
+            </Assign.Value>
+          </Assign>
+          <Assign DisplayName="Clear AI warning" sap2010:WorkflowViewState.IdRef="Assign_25">
+            <Assign.To>
+              <OutArgument x:TypeArguments="x:String">[out_AIWarning]</OutArgument>
+            </Assign.To>
+            <Assign.Value>
+              <InArgument x:TypeArguments="x:String">[String.Empty]</InArgument>
+            </Assign.Value>
+          </Assign>
+        </Sequence>
+      </If.Then>
+      <If.Else>
+        <Sequence DisplayName="Report AI failure" sap2010:WorkflowViewState.IdRef="Sequence_10">
+          <Assign DisplayName="Set output to empty on AI failure" sap2010:WorkflowViewState.IdRef="Assign_26">
+            <Assign.To>
+              <OutArgument x:TypeArguments="x:String">[out_SynthesizedResumeJson]</OutArgument>
+            </Assign.To>
+            <Assign.Value>
+              <InArgument x:TypeArguments="x:String">[String.Empty]</InArgument>
+            </Assign.Value>
+          </Assign>
+          <Assign DisplayName="Set AI status to failed" sap2010:WorkflowViewState.IdRef="Assign_27">
+            <Assign.To>
+              <OutArgument x:TypeArguments="x:String">[out_AIStatus]</OutArgument>
+            </Assign.To>
+            <Assign.Value>
+              <InArgument x:TypeArguments="x:String">["AI_FAILED"]</InArgument>
+            </Assign.Value>
+          </Assign>
+          <Assign DisplayName="Expose error detail as warning" sap2010:WorkflowViewState.IdRef="Assign_28">
+            <Assign.To>
+              <OutArgument x:TypeArguments="x:String">[out_AIWarning]</OutArgument>
+            </Assign.To>
+            <Assign.Value>
+              <InArgument x:TypeArguments="x:String">[If(String.IsNullOrWhiteSpace(strErrorDetail), "AI synthesis failed with no detail.", strErrorDetail)]</InArgument>
+            </Assign.Value>
+          </Assign>
+          <ui:LogMessage DisplayName="Log AI failure outcome" sap2010:WorkflowViewState.IdRef="LogMessage_7" Level="Error" Message="[&quot;[03_AI] AI synthesis FAILED. No resume produced. Detail: &quot; &amp; out_AIWarning]" />
+        </Sequence>
+      </If.Else>
+    </If>
+
+    <ui:LogMessage DisplayName="Log AI synthesis outcome" sap2010:WorkflowViewState.IdRef="LogMessage_6" Level="Info" Message="[&quot;[03_AI] Synthesis finished with status &quot; &amp; out_AIStatus &amp; &quot;. Output length: &quot; &amp; out_SynthesizedResumeJson.Length]" />
   </Sequence>
 </Activity>

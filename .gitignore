@@ -66,6 +66,10 @@ Data/Outputs/*
 !project.json
 !entry-points.json
 
+# AutoCV local secrets (API keys for AI synthesis)
+Data/Config/*
+!Data/Config/.gitkeep
+
 # ------------------------------------------------------------------------------
 # 6. IDEs & Editors
 # ------------------------------------------------------------------------------
