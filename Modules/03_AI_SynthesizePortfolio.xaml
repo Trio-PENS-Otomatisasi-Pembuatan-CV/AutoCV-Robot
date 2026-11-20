@@ -37,6 +37,7 @@
       <AssemblyReference>System.ComponentModel.TypeConverter</AssemblyReference>
       <AssemblyReference>UiPath.Web.Activities</AssemblyReference>
       <AssemblyReference>Newtonsoft.Json</AssemblyReference>
+      <AssemblyReference>System.Net.Http</AssemblyReference>
       <AssemblyReference>System.Collections</AssemblyReference>
     </sco:Collection>
   </TextExpression.ReferencesForImplementation>
@@ -54,12 +55,10 @@
       <Variable x:TypeArguments="x:String" Name="strRawAIResponse" />
       <Variable x:TypeArguments="x:String" Name="strExtractedJson" />
       <Variable x:TypeArguments="x:String" Name="strErrorDetail" />
+      <Variable x:TypeArguments="x:Int32" Name="intHttpStatus" />
 
       <Variable x:TypeArguments="x:Boolean" Name="boolApiKeyPresent" />
       <Variable x:TypeArguments="x:Boolean" Name="boolAiSuccess" />
-      <Variable x:TypeArguments="nhrm:HttpResponseSummary" Name="httpResponse" />
-      <Variable x:TypeArguments="jn:JObject" Name="jsonResponse" />
-      <Variable x:TypeArguments="jn:JObject" Name="jsonResume" />
     </Sequence.Variables>
     <sap:WorkflowViewStateService.ViewState>
       <scg:Dictionary x:TypeArguments="x:String, x:Object">
@@ -211,36 +210,19 @@
           <TryCatch DisplayName="Try Gemini synthesis" sap2010:WorkflowViewState.IdRef="TryCatch_1">
             <TryCatch.Try>
               <Sequence DisplayName="Call and parse Gemini" sap2010:WorkflowViewState.IdRef="Sequence_5">
-                <nhr:NetHttpRequest DisplayName="POST prompt to Gemini" RequestUrl="[strApiUrl]" Method="POST" RequestBodyType="Text" TextPayload="[strRequestBody]" TextPayloadContentType="application/json" TextPayloadEncoding="UTF-8" AuthenticationType="None" RetryPolicyType="ExponentialBackoff" RetryCount="3" InitialDelay="2000" TimeoutInMiliseconds="[90000]" ContinueOnError="True" Result="[httpResponse]" sap2010:WorkflowViewState.IdRef="NetHttpRequest_1" />
-                <Assign DisplayName="Record HTTP status detail" sap2010:WorkflowViewState.IdRef="Assign_15">
-                  <Assign.To>
-                    <OutArgument x:TypeArguments="x:String">[strErrorDetail]</OutArgument>
-                  </Assign.To>
-                  <Assign.Value>
-                    <InArgument x:TypeArguments="x:String">[If(httpResponse Is Nothing, "No response object returned", "Gemini HTTP status " &amp; CInt(httpResponse.StatusCode))]</InArgument>
-                  </Assign.Value>
-                </Assign>
-                <If Condition="[Not httpResponse Is Nothing AndAlso CInt(httpResponse.StatusCode) = 200]" DisplayName="Parse response when HTTP 200" sap2010:WorkflowViewState.IdRef="If_3">
+                <ui:InvokeCode DisplayName="Call Gemini API directly with API key" Language="VBNet" Code="statusCode = 0&#xA;rawText = &quot;&quot;&#xA;resumeJson = &quot;&quot;&#xA;errorDetail = &quot;&quot;&#xA;Dim attempt As Integer = 0&#xA;Dim lastError As String = &quot;&quot;&#xA;Try&#xA;  While attempt &lt; 3&#xA;    attempt += 1&#xA;    Try&#xA;      Dim handler As New System.Net.Http.HttpClientHandler()&#xA;      handler.UseProxy = True&#xA;      Using client As New System.Net.Http.HttpClient(handler)&#xA;        client.Timeout = System.TimeSpan.FromSeconds(90)&#xA;        Dim content As New System.Net.Http.StringContent(requestBody, System.Text.Encoding.UTF8, &quot;application/json&quot;)&#xA;        Dim response As System.Net.Http.HttpResponseMessage = client.PostAsync(apiUrl, content).GetAwaiter().GetResult()&#xA;        statusCode = CInt(response.StatusCode)&#xA;        rawText = response.Content.ReadAsStringAsync().GetAwaiter().GetResult()&#xA;      End Using&#xA;      If statusCode &gt;= 500 AndAlso attempt &lt; 3 Then&#xA;        lastError = &quot;Gemini HTTP status &quot; &amp; statusCode.ToString()&#xA;        System.Threading.Thread.Sleep(2000)&#xA;      Else&#xA;        Exit While&#xA;      End If&#xA;    Catch ex As Exception&#xA;      lastError = &quot;Gemini call failed: &quot; &amp; ex.Message&#xA;      If attempt &lt; 3 Then&#xA;        System.Threading.Thread.Sleep(2000)&#xA;      End If&#xA;    End Try&#xA;  End While&#xA;  If statusCode = 200 Then&#xA;    Dim envelope As Newtonsoft.Json.Linq.JObject = Newtonsoft.Json.Linq.JObject.Parse(rawText)&#xA;    Dim token As Newtonsoft.Json.Linq.JToken = envelope.SelectToken(&quot;candidates[0].content.parts[0].text&quot;)&#xA;    If token Is Nothing Then&#xA;      errorDetail = &quot;Gemini response did not contain candidate text&quot;&#xA;    Else&#xA;      rawText = token.ToString()&#xA;      resumeJson = rawText.Replace(&quot;```json&quot;, String.Empty).Replace(&quot;```&quot;, String.Empty).Trim()&#xA;      Dim check As Newtonsoft.Json.Linq.JObject = Newtonsoft.Json.Linq.JObject.Parse(resumeJson)&#xA;    End If&#xA;  Else&#xA;    errorDetail = If(String.IsNullOrEmpty(lastError), &quot;Gemini HTTP status &quot; &amp; statusCode.ToString() &amp; &quot;: &quot; &amp; rawText, lastError)&#xA;  End If&#xA;Catch ex As Exception&#xA;  errorDetail = &quot;Gemini call failed: &quot; &amp; ex.Message&#xA;End Try" sap2010:WorkflowViewState.IdRef="InvokeCode_1">
+                  <ui:InvokeCode.Arguments>
+                    <InArgument x:TypeArguments="x:String" x:Key="apiUrl">[strApiUrl]</InArgument>
+                    <InArgument x:TypeArguments="x:String" x:Key="requestBody">[strRequestBody]</InArgument>
+                    <OutArgument x:TypeArguments="x:Int32" x:Key="statusCode">[intHttpStatus]</OutArgument>
+                    <OutArgument x:TypeArguments="x:String" x:Key="rawText">[strRawAIResponse]</OutArgument>
+                    <OutArgument x:TypeArguments="x:String" x:Key="resumeJson">[strExtractedJson]</OutArgument>
+                    <OutArgument x:TypeArguments="x:String" x:Key="errorDetail">[strErrorDetail]</OutArgument>
+                  </ui:InvokeCode.Arguments>
+                </ui:InvokeCode>
+                <If Condition="[intHttpStatus = 200 AndAlso Not String.IsNullOrWhiteSpace(strExtractedJson)]" DisplayName="Use Gemini result when synthesis succeeded" sap2010:WorkflowViewState.IdRef="If_3">
                   <If.Then>
                     <Sequence DisplayName="Extract resume JSON" sap2010:WorkflowViewState.IdRef="Sequence_6">
-                      <web:DeserializeJson x:TypeArguments="jn:JObject" DisplayName="Deserialize Gemini envelope" JsonString="[httpResponse.TextContent]" JsonObject="[jsonResponse]" sap2010:WorkflowViewState.IdRef="DeserializeJson`1_1" />
-                      <Assign DisplayName="Extract candidate text" sap2010:WorkflowViewState.IdRef="Assign_16">
-                        <Assign.To>
-                          <OutArgument x:TypeArguments="x:String">[strRawAIResponse]</OutArgument>
-                        </Assign.To>
-                        <Assign.Value>
-                          <InArgument x:TypeArguments="x:String">[If(jsonResponse Is Nothing OrElse jsonResponse.SelectToken("candidates[0].content.parts[0].text") Is Nothing, String.Empty, jsonResponse.SelectToken("candidates[0].content.parts[0].text").ToString())]</InArgument>
-                        </Assign.Value>
-                      </Assign>
-                      <Assign DisplayName="Strip markdown fences from AI text" sap2010:WorkflowViewState.IdRef="Assign_17">
-                        <Assign.To>
-                          <OutArgument x:TypeArguments="x:String">[strExtractedJson]</OutArgument>
-                        </Assign.To>
-                        <Assign.Value>
-                          <InArgument x:TypeArguments="x:String">[strRawAIResponse.Replace("```json", String.Empty).Replace("```", String.Empty).Trim()]</InArgument>
-                        </Assign.Value>
-                      </Assign>
-                      <web:DeserializeJson x:TypeArguments="jn:JObject" DisplayName="Validate resume JSON" JsonString="[strExtractedJson]" JsonObject="[jsonResume]" sap2010:WorkflowViewState.IdRef="DeserializeJson`1_2" />
                       <Assign DisplayName="Mark AI synthesis successful" sap2010:WorkflowViewState.IdRef="Assign_18">
                         <Assign.To>
                           <OutArgument x:TypeArguments="x:Boolean">[boolAiSuccess]</OutArgument>
@@ -318,7 +300,7 @@
               <OutArgument x:TypeArguments="x:String">[out_SynthesizedResumeJson]</OutArgument>
             </Assign.To>
             <Assign.Value>
-              <InArgument x:TypeArguments="x:String">[jsonResume.ToString()]</InArgument>
+              <InArgument x:TypeArguments="x:String">[strExtractedJson]</InArgument>
             </Assign.Value>
           </Assign>
           <Assign DisplayName="Set AI status to Gemini" sap2010:WorkflowViewState.IdRef="Assign_24">
