@@ -131,7 +131,7 @@
           <OutArgument x:TypeArguments="x:String">[in_LinkedInUrl]</OutArgument>
         </Assign.To>
         <Assign.Value>
-          <InArgument x:TypeArguments="x:String">[If(String.IsNullOrWhiteSpace(in_LinkedInUrl), "https://www.linkedin.com/in/muhammad-farid-al-hasan-45574b310/", in_LinkedInUrl)]</InArgument>
+          <InArgument x:TypeArguments="x:String">[If(String.IsNullOrWhiteSpace(in_LinkedInUrl), String.Empty, in_LinkedInUrl)]</InArgument>
         </Assign.Value>
       </Assign>
       <Assign DisplayName="Default GitHub URL if empty" sap:VirtualizedContainerService.HintSize="616,113.6" sap2010:WorkflowViewState.IdRef="Assign_DefaultGitHub">
@@ -139,7 +139,7 @@
           <OutArgument x:TypeArguments="x:String">[in_GitHubUrl]</OutArgument>
         </Assign.To>
         <Assign.Value>
-          <InArgument x:TypeArguments="x:String">[If(String.IsNullOrWhiteSpace(in_GitHubUrl), "muhammad2341", in_GitHubUrl)]</InArgument>
+          <InArgument x:TypeArguments="x:String">[If(String.IsNullOrWhiteSpace(in_GitHubUrl), String.Empty, in_GitHubUrl)]</InArgument>
         </Assign.Value>
       </Assign>
       <Assign DisplayName="Default Recipient Email if empty" sap:VirtualizedContainerService.HintSize="616,113.6" sap2010:WorkflowViewState.IdRef="Assign_DefaultEmail">
@@ -147,7 +147,7 @@
           <OutArgument x:TypeArguments="x:String">[in_RecipientEmail]</OutArgument>
         </Assign.To>
         <Assign.Value>
-          <InArgument x:TypeArguments="x:String">[If(String.IsNullOrWhiteSpace(in_RecipientEmail), "farid@example.com", in_RecipientEmail)]</InArgument>
+          <InArgument x:TypeArguments="x:String">[If(String.IsNullOrWhiteSpace(in_RecipientEmail), String.Empty, in_RecipientEmail)]</InArgument>
         </Assign.Value>
       </Assign>
       <Assign DisplayName="Default Target Job Role if empty" sap:VirtualizedContainerService.HintSize="616,113.6" sap2010:WorkflowViewState.IdRef="Assign_DefaultRole">
@@ -218,7 +218,7 @@
         <ui:InvokeWorkflowFile.Arguments>
           <InArgument x:TypeArguments="x:String" x:Key="in_GitHubUsername">[strNormalizedGitHubUrl]</InArgument>
           <InArgument x:TypeArguments="x:String" x:Key="in_GitHubToken" />
-          <InArgument x:TypeArguments="x:Boolean" x:Key="in_UseMockFallback">[True]</InArgument>
+          <InArgument x:TypeArguments="x:Boolean" x:Key="in_UseMockFallback">[False]</InArgument>
           <OutArgument x:TypeArguments="x:String" x:Key="out_GitHubReposJson">[strGitHubDataJson]</OutArgument>
           <OutArgument x:TypeArguments="x:String" x:Key="out_FetchStatus" />
         </ui:InvokeWorkflowFile.Arguments>
