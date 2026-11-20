@@ -46,7 +46,7 @@ $stylesXml = @'
         <w:rFonts w:ascii="Calibri" w:hAnsi="Calibri" w:cs="Calibri"/>
         <w:sz w:val="21"/>
         <w:szCs w:val="21"/>
-        <w:color w:val="222222"/>
+        <w:color w:val="334155"/>
       </w:rPr>
     </w:rPrDefault>
   </w:docDefaults>
@@ -57,15 +57,16 @@ $documentXml = @'
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">
   <w:body>
+    <!-- RESUME HEADER -->
     <w:p>
       <w:pPr>
         <w:jc w:val="center"/>
-        <w:spacing w:after="60" w:before="0"/>
+        <w:spacing w:before="0" w:after="30"/>
       </w:pPr>
       <w:r>
         <w:rPr>
           <w:b/>
-          <w:sz w:val="40"/>
+          <w:sz w:val="38"/>
           <w:color w:val="0F172A"/>
         </w:rPr>
         <w:t>{{FULL_NAME}}</w:t>
@@ -74,13 +75,13 @@ $documentXml = @'
     <w:p>
       <w:pPr>
         <w:jc w:val="center"/>
-        <w:spacing w:after="80"/>
+        <w:spacing w:before="0" w:after="40"/>
       </w:pPr>
       <w:r>
         <w:rPr>
-          <w:i/>
-          <w:sz w:val="22"/>
-          <w:color w:val="2563EB"/>
+          <w:b/>
+          <w:sz w:val="21"/>
+          <w:color w:val="1E293B"/>
         </w:rPr>
         <w:t>{{HEADLINE}}</w:t>
       </w:r>
@@ -88,11 +89,11 @@ $documentXml = @'
     <w:p>
       <w:pPr>
         <w:jc w:val="center"/>
-        <w:spacing w:after="200"/>
+        <w:spacing w:before="0" w:after="120"/>
       </w:pPr>
       <w:r>
         <w:rPr>
-          <w:sz w:val="18"/>
+          <w:sz w:val="19"/>
           <w:color w:val="475569"/>
         </w:rPr>
         <w:t>{{CONTACT_LINE}}</w:t>
@@ -102,15 +103,16 @@ $documentXml = @'
     <!-- SECTION: PROFESSIONAL SUMMARY -->
     <w:p>
       <w:pPr>
+        <w:keepNext/>
         <w:pBdr>
-          <w:bottom w:val="single" w:sz="8" w:space="4" w:color="0F172A"/>
+          <w:bottom w:val="single" w:sz="6" w:space="3" w:color="0F172A"/>
         </w:pBdr>
-        <w:spacing w:before="160" w:after="80"/>
+        <w:spacing w:before="120" w:after="50"/>
       </w:pPr>
       <w:r>
         <w:rPr>
           <w:b/>
-          <w:sz w:val="24"/>
+          <w:sz w:val="22"/>
           <w:color w:val="0F172A"/>
         </w:rPr>
         <w:t>PROFESSIONAL SUMMARY</w:t>
@@ -118,11 +120,12 @@ $documentXml = @'
     </w:p>
     <w:p>
       <w:pPr>
-        <w:spacing w:after="160" w:line="276" w:lineRule="auto"/>
+        <w:spacing w:before="20" w:after="80" w:line="260" w:lineRule="auto"/>
       </w:pPr>
       <w:r>
         <w:rPr>
           <w:sz w:val="20"/>
+          <w:color w:val="334155"/>
         </w:rPr>
         <w:t>{{SUMMARY}}</w:t>
       </w:r>
@@ -131,15 +134,16 @@ $documentXml = @'
     <!-- SECTION: WORK EXPERIENCE -->
     <w:p>
       <w:pPr>
+        <w:keepNext/>
         <w:pBdr>
-          <w:bottom w:val="single" w:sz="8" w:space="4" w:color="0F172A"/>
+          <w:bottom w:val="single" w:sz="6" w:space="3" w:color="0F172A"/>
         </w:pBdr>
-        <w:spacing w:before="160" w:after="80"/>
+        <w:spacing w:before="120" w:after="50"/>
       </w:pPr>
       <w:r>
         <w:rPr>
           <w:b/>
-          <w:sz w:val="24"/>
+          <w:sz w:val="22"/>
           <w:color w:val="0F172A"/>
         </w:rPr>
         <w:t>WORK EXPERIENCE</w:t>
@@ -147,12 +151,9 @@ $documentXml = @'
     </w:p>
     <w:p>
       <w:pPr>
-        <w:spacing w:after="160" w:line="276" w:lineRule="auto"/>
+        <w:spacing w:before="0" w:after="0"/>
       </w:pPr>
       <w:r>
-        <w:rPr>
-          <w:sz w:val="20"/>
-        </w:rPr>
         <w:t>{{EXPERIENCE_SECTION}}</w:t>
       </w:r>
     </w:p>
@@ -160,15 +161,16 @@ $documentXml = @'
     <!-- SECTION: TECHNICAL PROJECTS -->
     <w:p>
       <w:pPr>
+        <w:keepNext/>
         <w:pBdr>
-          <w:bottom w:val="single" w:sz="8" w:space="4" w:color="0F172A"/>
+          <w:bottom w:val="single" w:sz="6" w:space="3" w:color="0F172A"/>
         </w:pBdr>
-        <w:spacing w:before="160" w:after="80"/>
+        <w:spacing w:before="120" w:after="50"/>
       </w:pPr>
       <w:r>
         <w:rPr>
           <w:b/>
-          <w:sz w:val="24"/>
+          <w:sz w:val="22"/>
           <w:color w:val="0F172A"/>
         </w:rPr>
         <w:t>FEATURED TECHNICAL PROJECTS</w:t>
@@ -176,12 +178,9 @@ $documentXml = @'
     </w:p>
     <w:p>
       <w:pPr>
-        <w:spacing w:after="160" w:line="276" w:lineRule="auto"/>
+        <w:spacing w:before="0" w:after="0"/>
       </w:pPr>
       <w:r>
-        <w:rPr>
-          <w:sz w:val="20"/>
-        </w:rPr>
         <w:t>{{PROJECTS_SECTION}}</w:t>
       </w:r>
     </w:p>
@@ -189,15 +188,16 @@ $documentXml = @'
     <!-- SECTION: TECHNICAL SKILLS -->
     <w:p>
       <w:pPr>
+        <w:keepNext/>
         <w:pBdr>
-          <w:bottom w:val="single" w:sz="8" w:space="4" w:color="0F172A"/>
+          <w:bottom w:val="single" w:sz="6" w:space="3" w:color="0F172A"/>
         </w:pBdr>
-        <w:spacing w:before="160" w:after="80"/>
+        <w:spacing w:before="120" w:after="50"/>
       </w:pPr>
       <w:r>
         <w:rPr>
           <w:b/>
-          <w:sz w:val="24"/>
+          <w:sz w:val="22"/>
           <w:color w:val="0F172A"/>
         </w:rPr>
         <w:t>TECHNICAL SKILLS</w:t>
@@ -205,12 +205,9 @@ $documentXml = @'
     </w:p>
     <w:p>
       <w:pPr>
-        <w:spacing w:after="160" w:line="276" w:lineRule="auto"/>
+        <w:spacing w:before="0" w:after="0"/>
       </w:pPr>
       <w:r>
-        <w:rPr>
-          <w:sz w:val="20"/>
-        </w:rPr>
         <w:t>{{SKILLS_SECTION}}</w:t>
       </w:r>
     </w:p>
@@ -218,15 +215,16 @@ $documentXml = @'
     <!-- SECTION: EDUCATION -->
     <w:p>
       <w:pPr>
+        <w:keepNext/>
         <w:pBdr>
-          <w:bottom w:val="single" w:sz="8" w:space="4" w:color="0F172A"/>
+          <w:bottom w:val="single" w:sz="6" w:space="3" w:color="0F172A"/>
         </w:pBdr>
-        <w:spacing w:before="160" w:after="80"/>
+        <w:spacing w:before="120" w:after="50"/>
       </w:pPr>
       <w:r>
         <w:rPr>
           <w:b/>
-          <w:sz w:val="24"/>
+          <w:sz w:val="22"/>
           <w:color w:val="0F172A"/>
         </w:rPr>
         <w:t>EDUCATION</w:t>
@@ -234,18 +232,15 @@ $documentXml = @'
     </w:p>
     <w:p>
       <w:pPr>
-        <w:spacing w:after="160" w:line="276" w:lineRule="auto"/>
+        <w:spacing w:before="0" w:after="0"/>
       </w:pPr>
       <w:r>
-        <w:rPr>
-          <w:sz w:val="20"/>
-        </w:rPr>
         <w:t>{{EDUCATION_SECTION}}</w:t>
       </w:r>
     </w:p>
     <w:sectPr>
       <w:pgSz w:w="12240" w:h="15840"/>
-      <w:pgMar w:top="1080" w:right="1080" w:bottom="1080" w:left="1080" w:header="720" w:footer="720" w:gutter="0"/>
+      <w:pgMar w:top="720" w:right="864" w:bottom="720" w:left="864" w:header="720" w:footer="720" w:gutter="0"/>
     </w:sectPr>
   </w:body>
 </w:document>
