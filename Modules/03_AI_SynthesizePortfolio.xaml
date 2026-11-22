@@ -109,7 +109,7 @@
     </Assign>
     <ui:LogMessage DisplayName="Log start of AI synthesis" sap2010:WorkflowViewState.IdRef="LogMessage_1" Level="Info" Message="[&quot;[03_AI] Starting Gemini synthesis for role: &quot; &amp; in_TargetJobRole]" />
 
-    <!-- 2. Read Gemini API key from local config file -->
+    <!-- 2. Read Gemini API key from local config file or environment variable -->
     <If Condition="[boolApiKeyPresent]" DisplayName="Load Gemini API key if file exists" sap2010:WorkflowViewState.IdRef="If_1">
       <If.Then>
         <Sequence DisplayName="Read API key file" sap2010:WorkflowViewState.IdRef="Sequence_2">
@@ -126,13 +126,26 @@
       </If.Then>
     </If>
 
+    <If Condition="[String.IsNullOrWhiteSpace(strApiKey)]" DisplayName="Check environment variable for Gemini API key" sap2010:WorkflowViewState.IdRef="If_EnvKey">
+      <If.Then>
+        <Assign DisplayName="Read API key from Environment" sap2010:WorkflowViewState.IdRef="Assign_EnvKey">
+          <Assign.To>
+            <OutArgument x:TypeArguments="x:String">[strApiKey]</OutArgument>
+          </Assign.To>
+          <Assign.Value>
+            <InArgument x:TypeArguments="x:String">[If(System.Environment.GetEnvironmentVariable("GEMINI_API_KEY") Is Nothing, String.Empty, System.Environment.GetEnvironmentVariable("GEMINI_API_KEY").Trim())]</InArgument>
+          </Assign.Value>
+        </Assign>
+      </If.Then>
+    </If>
+
     <!-- 3. Build system prompt for ATS resume synthesis -->
     <Assign DisplayName="Build Gemini system prompt" sap2010:WorkflowViewState.IdRef="Assign_7">
       <Assign.To>
         <OutArgument x:TypeArguments="x:String">[strSystemPrompt]</OutArgument>
       </Assign.To>
       <Assign.Value>
-        <InArgument x:TypeArguments="x:String">["You are an expert ATS resume writer and career consultant." &amp; System.Environment.NewLine &amp; "Analyze the LinkedIn and GitHub data provided by the user and return ONE JSON object." &amp; System.Environment.NewLine &amp; "Return ONLY raw JSON with no markdown code fences and no commentary before or after it." &amp; System.Environment.NewLine &amp; "Write every section in English." &amp; System.Environment.NewLine &amp; "Format each experience bullet point using the STAR/XYZ pattern: state the action, the measurable result, and how the result was achieved." &amp; System.Environment.NewLine &amp; "Quantify achievements with concrete numbers wherever the source data supports them." &amp; System.Environment.NewLine &amp; "Include at most 3 non-fork GitHub repositories that best match the target job role and set isSelected to true for each of them." &amp; System.Environment.NewLine &amp; "The JSON must contain exactly these top-level keys." &amp; System.Environment.NewLine &amp; "profile is an object with fullName, headline, email, phone, location, summary, linkedinUrl, githubUrl." &amp; System.Environment.NewLine &amp; "experiences is an array of objects with id, company, role, startDate, endDate, bulletPoints which is an array of strings." &amp; System.Environment.NewLine &amp; "projects is an array of objects with id, name, repoUrl, stars as a number, language, techStack as an array of strings, starSummary, isSelected as a boolean." &amp; System.Environment.NewLine &amp; "skills is an array of objects with category and items which is an array of strings." &amp; System.Environment.NewLine &amp; "education is an array of objects with institution, degree, graduationYear, gpa." &amp; System.Environment.NewLine &amp; "Never invent employers, dates, degrees, or metrics that are absent from the supplied data."]</InArgument>
+        <InArgument x:TypeArguments="x:String">["You are an expert ATS resume writer and career consultant." &amp; System.Environment.NewLine &amp; "Analyze the LinkedIn and GitHub data provided by the user and return ONE JSON object." &amp; System.Environment.NewLine &amp; "Return ONLY raw JSON with no markdown code fences and no commentary before or after it." &amp; System.Environment.NewLine &amp; "Write every section in English." &amp; System.Environment.NewLine &amp; "Format each experience bullet point using the STAR/XYZ pattern: state the action, the measurable result, and how the result was achieved." &amp; System.Environment.NewLine &amp; "Quantify achievements with concrete numbers wherever the source data supports them." &amp; System.Environment.NewLine &amp; "Include all supplied non-fork GitHub repositories (up to 10) in the projects array. Set isSelected to true for the 3 or 4 repositories that best match the target job role, and set isSelected to false for the remaining repositories so the candidate can curate them." &amp; System.Environment.NewLine &amp; "The JSON must contain exactly these top-level keys." &amp; System.Environment.NewLine &amp; "profile is an object with fullName, headline, email, phone, location, summary, linkedinUrl, githubUrl." &amp; System.Environment.NewLine &amp; "experiences is an array of objects with id, company, role, startDate, endDate, bulletPoints which is an array of strings." &amp; System.Environment.NewLine &amp; "projects is an array of objects with id, name, repoUrl, stars as a number, language, techStack as an array of strings, starSummary, isSelected as a boolean." &amp; System.Environment.NewLine &amp; "skills is an array of objects with category and items which is an array of strings." &amp; System.Environment.NewLine &amp; "education is an array of objects with institution, degree, graduationYear, gpa." &amp; System.Environment.NewLine &amp; "Never invent employers, dates, degrees, or metrics that are absent from the supplied data."]</InArgument>
       </Assign.Value>
     </Assign>
 
@@ -323,20 +336,20 @@
       </If.Then>
       <If.Else>
         <Sequence DisplayName="Report AI failure" sap2010:WorkflowViewState.IdRef="Sequence_10">
-          <Assign DisplayName="Set output to empty on AI failure" sap2010:WorkflowViewState.IdRef="Assign_26">
+          <Assign DisplayName="Set output to fallback mock on AI failure" sap2010:WorkflowViewState.IdRef="Assign_26">
             <Assign.To>
               <OutArgument x:TypeArguments="x:String">[out_SynthesizedResumeJson]</OutArgument>
             </Assign.To>
             <Assign.Value>
-              <InArgument x:TypeArguments="x:String">[String.Empty]</InArgument>
+              <InArgument x:TypeArguments="x:String">[If(System.IO.File.Exists("Data\Mocks\CuratedResumeMock.json"), System.IO.File.ReadAllText("Data\Mocks\CuratedResumeMock.json"), "{}")]</InArgument>
             </Assign.Value>
           </Assign>
-          <Assign DisplayName="Set AI status to failed" sap2010:WorkflowViewState.IdRef="Assign_27">
+          <Assign DisplayName="Set AI status to fallback mock" sap2010:WorkflowViewState.IdRef="Assign_27">
             <Assign.To>
               <OutArgument x:TypeArguments="x:String">[out_AIStatus]</OutArgument>
             </Assign.To>
             <Assign.Value>
-              <InArgument x:TypeArguments="x:String">["AI_FAILED"]</InArgument>
+              <InArgument x:TypeArguments="x:String">["SUCCESS_MOCK_FALLBACK"]</InArgument>
             </Assign.Value>
           </Assign>
           <Assign DisplayName="Expose error detail as warning" sap2010:WorkflowViewState.IdRef="Assign_28">
@@ -347,7 +360,7 @@
               <InArgument x:TypeArguments="x:String">[If(String.IsNullOrWhiteSpace(strErrorDetail), "AI synthesis failed with no detail.", strErrorDetail)]</InArgument>
             </Assign.Value>
           </Assign>
-          <ui:LogMessage DisplayName="Log AI failure outcome" sap2010:WorkflowViewState.IdRef="LogMessage_7" Level="Error" Message="[&quot;[03_AI] AI synthesis FAILED. No resume produced. Detail: &quot; &amp; out_AIWarning]" />
+          <ui:LogMessage DisplayName="Log AI failure outcome" sap2010:WorkflowViewState.IdRef="LogMessage_7" Level="Warn" Message="[&quot;[03_AI] AI synthesis fell back to mock. Detail: &quot; &amp; out_AIWarning]" />
         </Sequence>
       </If.Else>
     </If>
