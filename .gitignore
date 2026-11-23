@@ -55,6 +55,7 @@ Data/Outputs/*
 # ------------------------------------------------------------------------------
 .env
 .env.*
+!.env.example
 *.credential
 *.credentials
 *secret*
@@ -69,6 +70,7 @@ Data/Outputs/*
 # AutoCV local secrets (API keys for AI synthesis)
 Data/Config/*
 !Data/Config/.gitkeep
+!Data/Config/ai_settings.example.json
 
 # ------------------------------------------------------------------------------
 # 6. IDEs & Editors

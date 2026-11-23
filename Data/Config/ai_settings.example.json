@@ -1,0 +1,29 @@
+{
+  "AI": {
+    "Provider": "Gemini",
+    "FallbackProvider": "OpenAI",
+    "EmbeddingProvider": "Gemini",
+    "OpenAI": {
+      "ApiKey": "<openrouter-api-key>",
+      "Endpoint": "https://openrouter.ai/api/v1",
+      "ChatModel": "openai/gpt-4o-mini",
+      "EmbeddingModel": "text-embedding-3-small"
+    },
+    "Gemini": {
+      "ApiKey": "<gemini-api-key>",
+      "ChatModel": "gemini-3.5-flash-lite",
+      "EmbeddingModel": "gemini-embedding-2"
+    },
+    "Ollama": {
+      "Endpoint": "http://localhost:11434",
+      "ChatModel": "llama3",
+      "EmbeddingModel": "nomic-embed-text"
+    }
+  },
+  "Logging": {
+    "LogLevel": {
+      "Default": "Information",
+      "Microsoft.AspNetCore": "Warning"
+    }
+  }
+}
