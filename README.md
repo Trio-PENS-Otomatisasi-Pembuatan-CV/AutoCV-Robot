@@ -103,7 +103,69 @@ Jalankan dengan `in_UseMockFallback=True` untuk memakai data dari `Data/Mocks/`
 
 ---
 
-## 5. Modul
+## 5. Contoh Input & Output
+
+### 5.1 Input — argumen `Main.xaml`
+
+```json
+{
+  "in_JobId": "9f6c1f0e-0000-4a00-8000-000000000000",
+  "in_LinkedInUrl": "https://www.linkedin.com/in/jane-doe",
+  "in_GitHubUrl": "https://github.com/janedoe",
+  "in_TargetJobRole": "Fullstack Software Engineer",
+  "in_RecipientEmail": "jane.doe@example.com",
+  "in_ApprovedResumePayload": "",
+  "in_WebhookBaseUrl": "http://localhost:3000",
+  "in_UseMockFallback": false,
+  "in_RequireManualApproval": true
+}
+```
+
+- `in_ApprovedResumePayload` kosong ⇒ mode **Job 1** (scrape → sintesis → kirim draf).
+- `in_ApprovedResumePayload` terisi ⇒ mode **Job 2** (render dokumen → email → callback).
+
+### 5.2 Output — `out_DraftResumePayload` (dipotong, data fiktif)
+
+```json
+{
+  "profile": {
+    "fullName": "Jane Doe",
+    "headline": "Fullstack Software Engineer",
+    "email": "jane.doe@example.com",
+    "summary": "Software engineer focused on scalable web applications...",
+    "linkedinUrl": "https://www.linkedin.com/in/jane-doe",
+    "githubUrl": "https://github.com/janedoe"
+  },
+  "projects": [
+    {
+      "id": 1,
+      "name": "inventory-service",
+      "repoUrl": "https://github.com/janedoe/inventory-service",
+      "techStack": ["TypeScript", "Node.js", "PostgreSQL"],
+      "starSummary": "Reduced checkout latency by 35%...",
+      "isSelected": true
+    }
+  ],
+  "experiences": [],
+  "skills": [],
+  "education": []
+}
+```
+
+### 5.3 Output — file & status
+
+| Output | Nilai / Lokasi |
+|---|---|
+| `out_JobStatus` | `PENDING → SCRAPING → SYNTHESIZING → CURATING → COMPLETED` |
+| `out_OutputPdfPath` | Path PDF hasil render |
+| PDF | `Data/Outputs/CV_<Nama>_<timestamp>.pdf` |
+| DOCX | `Data/Outputs/CV_<Nama>_<timestamp>.docx` |
+| Email | Terkirim ke `in_RecipientEmail`, atau log `Mode: SIMULATION` |
+| Log job | UiPath Orchestrator |
+
+---
+
+## 6. Modul
 
 | File | Fungsi |
 |---|---|
@@ -114,14 +176,6 @@ Jalankan dengan `in_UseMockFallback=True` untuk memakai data dari `Data/Mocks/`
 | `Modules/04_Document_GeneratePdf.xaml` | Render DOCX/PDF ATS |
 | `Modules/05_Notification_SendMail.xaml` | Kirim email (live/simulasi) |
 | `Modules/06_Webhook_NotifyWeb.xaml` | Callback status ke web |
-
----
-
-## 6. Output
-
-- `Data/Outputs/CV_<Nama>_<timestamp>.pdf`
-- `Data/Outputs/CV_<Nama>_<timestamp>.docx`
-- Log job di UiPath Orchestrator.
 
 ---
 
