@@ -402,6 +402,36 @@ function normalizeSkills(topLevel, linkedInSkills, linkedInCerts, githubRepos) {
   return result;
 }
 
+function buildCustomSectionsOpenXml(customSections) {
+  if (!customSections || customSections.length === 0) {
+    return '';
+  }
+
+  return customSections.map((section) => {
+    const itemsXml = (section.items || []).map(entry => {
+      const title = entry?.title || '';
+      const description = entry?.description || '';
+      if (title) {
+        return `<w:p><w:r><w:t xml:space="preserve">• </w:t></w:r></w:p>
+<w:p><w:pPr><w:ind w:left="560"/></w:pPr><w:r><w:rPr><w:b/><w:sz w:val="19"/><w:color w:val="0F172A"/></w:rPr><w:t xml:space="preserve">${escapeXml(title)}</w:t></w:r>${description ? `<w:r><w:rPr><w:sz w:val="19"/><w:color w:val="334155"/></w:rPr><w:t xml:space="preserve"> — ${escapeXml(description)}</w:t></w:r>` : ''}</w:p>`;
+      }
+      return `<w:p><w:pPr><w:ind w:left="280"/></w:pPr><w:r><w:t xml:space="preserve">• ${escapeXml(description)}</w:t></w:r></w:p>`;
+    }).join('');
+
+    return `
+      <w:p>
+        <w:pPr>
+          <w:spacing w:before="120" w:after="60"/>
+        </w:pPr>
+        <w:r>
+          <w:rPr><w:b/><w:sz w:val="21"/><w:color w:val="0F172A"/></w:rPr>
+          <w:t xml:space="preserve">${escapeXml(section.title)}</w:t>
+        </w:r>
+      </w:p>
+      ${itemsXml}`;
+  }).join('');
+}
+
 function normalizeProjects(repositories, githubUser) {
   if (!Array.isArray(repositories)) return [];
   const login = githubUser && githubUser.login;
@@ -455,6 +485,29 @@ function normalizePayload(rawPayload) {
 
   const skills = normalizeSkills(src.skills, linkedIn.skills, linkedIn.certifications, github.repositories);
 
+  const customSections = hasItems(src.customSections)
+    ? src.customSections.map((s) => {
+        const rawItems = Array.isArray(s.items) ? s.items : [];
+        const normalizedItems = rawItems.map(item => {
+          if (typeof item === 'string') {
+            return { title: '', description: item };
+          }
+          if (item && typeof item === 'object') {
+            return {
+              title: item.title || item.heading || item.content || '',
+              description: item.description || item.desc || item.content || ''
+            };
+          }
+          return { title: '', description: '' };
+        });
+        return {
+          id: s.id || crypto?.randomUUID?.() || `custom-${Date.now()}`,
+          title: s.title || s.heading || 'Section',
+          items: normalizedItems
+        };
+      })
+    : [];
+
   return {
     ...src,
     profile: {
@@ -471,7 +524,8 @@ function normalizePayload(rawPayload) {
     experiences,
     projects,
     skills,
-    education
+    education,
+    customSections
   };
 }
 
@@ -500,6 +554,7 @@ function generateResume(rawPayload, templatePath, outputDir) {
   const projXml = buildProjectsOpenXml(payload.projects);
   const skillsXml = buildSkillsOpenXml(payload.skills);
   const eduXml = buildEducationOpenXml(payload.education);
+  const customSectionsXml = buildCustomSectionsOpenXml(payload.customSections || []);
 
   const now = new Date();
   const timestamp = now.toISOString().replace(/[-:T]/g, '').slice(0, 14);
@@ -541,7 +596,7 @@ function generateResume(rawPayload, templatePath, outputDir) {
   replaceBlock('{{EXPERIENCE_SECTION}}', expXml);
   replaceBlock('{{PROJECTS_SECTION}}', projXml);
   replaceBlock('{{SKILLS_SECTION}}', skillsXml);
-  replaceBlock('{{EDUCATION_SECTION}}', eduXml);
+  replaceBlock('{{EDUCATION_SECTION}}', eduXml + customSectionsXml);
 
   fs.writeFileSync(docXmlPath, docXml, 'utf8');
 
@@ -666,6 +721,18 @@ function generateResume(rawPayload, templatePath, outputDir) {
     </div>
     ${edu.gpa ? `<div class="entry-location">GPA: ${escapeXml(edu.gpa)}</div>` : ''}
   `).join('')}
+
+  ${(payload.customSections || []).map(section => {
+    const itemsHtml = (section.items || []).map(entry => {
+      const title = entry?.title || '';
+      const description = entry?.description || '';
+      if (title) {
+        return `<li><strong>${escapeXml(title)}</strong>${description ? ' — ' + escapeXml(description) : ''}</li>`;
+      }
+      return `<li>${escapeXml(description)}</li>`;
+    }).join('');
+    return `<div class="section-title">${escapeXml(section.title)}</div><ul>${itemsHtml}</ul>`;
+  }).join('')}
 </body>
 </html>`;
 
