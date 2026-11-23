@@ -411,11 +411,41 @@ function buildCustomSectionsOpenXml(customSections) {
     const itemsXml = (section.items || []).map(entry => {
       const title = entry?.title || '';
       const description = entry?.description || '';
-      if (title) {
-        return `<w:p><w:r><w:t xml:space="preserve">• </w:t></w:r></w:p>
-<w:p><w:pPr><w:ind w:left="560"/></w:pPr><w:r><w:rPr><w:b/><w:sz w:val="19"/><w:color w:val="0F172A"/></w:rPr><w:t xml:space="preserve">${escapeXml(title)}</w:t></w:r>${description ? `<w:r><w:rPr><w:sz w:val="19"/><w:color w:val="334155"/></w:rPr><w:t xml:space="preserve"> — ${escapeXml(description)}</w:t></w:r>` : ''}</w:p>`;
+
+      if (title && description) {
+        return `<w:p>
+        <w:pPr>
+          <w:ind w:left="280" w:hanging="160"/>
+          <w:spacing w:before="12" w:after="20" w:line="240" w:lineRule="auto"/>
+        </w:pPr>
+        <w:r>
+          <w:rPr><w:sz w:val="19"/><w:color w:val="334155"/></w:rPr>
+          <w:t xml:space="preserve">•  </w:t>
+        </w:r>
+        <w:r>
+          <w:rPr><w:b/><w:sz w:val="19"/><w:color w:val="0F172A"/></w:rPr>
+          <w:t xml:space="preserve">${escapeXml(title)}</w:t>
+        </w:r>
+        <w:r>
+          <w:rPr><w:sz w:val="19"/><w:color w:val="334155"/></w:rPr>
+          <w:t xml:space="preserve"> — ${escapeXml(description)}</w:t>
+        </w:r>
+      </w:p>`;
       }
-      return `<w:p><w:pPr><w:ind w:left="280"/></w:pPr><w:r><w:t xml:space="preserve">• ${escapeXml(description)}</w:t></w:r></w:p>`;
+      const text = (title || description).trim();
+      if (!text) {
+        return '';
+      }
+      return `<w:p>
+        <w:pPr>
+          <w:ind w:left="280" w:hanging="160"/>
+          <w:spacing w:before="12" w:after="20" w:line="240" w:lineRule="auto"/>
+        </w:pPr>
+        <w:r>
+          <w:rPr><w:sz w:val="19"/><w:color w:val="334155"/></w:rPr>
+          <w:t xml:space="preserve">•  ${escapeXml(text)}</w:t>
+        </w:r>
+      </w:p>`;
     }).join('');
 
     return `
