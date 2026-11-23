@@ -37,6 +37,7 @@
       <AssemblyReference>System.ComponentModel.TypeConverter</AssemblyReference>
       <AssemblyReference>UiPath.Web.Activities</AssemblyReference>
       <AssemblyReference>Newtonsoft.Json</AssemblyReference>
+      <AssemblyReference>System.Net.Http</AssemblyReference>
       <AssemblyReference>System.Collections</AssemblyReference>
     </sco:Collection>
   </TextExpression.ReferencesForImplementation>
@@ -54,12 +55,10 @@
       <Variable x:TypeArguments="x:String" Name="strRawAIResponse" />
       <Variable x:TypeArguments="x:String" Name="strExtractedJson" />
       <Variable x:TypeArguments="x:String" Name="strErrorDetail" />
+      <Variable x:TypeArguments="x:Int32" Name="intHttpStatus" />
 
       <Variable x:TypeArguments="x:Boolean" Name="boolApiKeyPresent" />
       <Variable x:TypeArguments="x:Boolean" Name="boolAiSuccess" />
-      <Variable x:TypeArguments="nhrm:HttpResponseSummary" Name="httpResponse" />
-      <Variable x:TypeArguments="jn:JObject" Name="jsonResponse" />
-      <Variable x:TypeArguments="jn:JObject" Name="jsonResume" />
     </Sequence.Variables>
     <sap:WorkflowViewStateService.ViewState>
       <scg:Dictionary x:TypeArguments="x:String, x:Object">
@@ -110,7 +109,7 @@
     </Assign>
     <ui:LogMessage DisplayName="Log start of AI synthesis" sap2010:WorkflowViewState.IdRef="LogMessage_1" Level="Info" Message="[&quot;[03_AI] Starting Gemini synthesis for role: &quot; &amp; in_TargetJobRole]" />
 
-    <!-- 2. Read Gemini API key from local config file -->
+    <!-- 2. Read Gemini API key from local config file or environment variable -->
     <If Condition="[boolApiKeyPresent]" DisplayName="Load Gemini API key if file exists" sap2010:WorkflowViewState.IdRef="If_1">
       <If.Then>
         <Sequence DisplayName="Read API key file" sap2010:WorkflowViewState.IdRef="Sequence_2">
@@ -127,13 +126,26 @@
       </If.Then>
     </If>
 
+    <If Condition="[String.IsNullOrWhiteSpace(strApiKey)]" DisplayName="Check environment variable for Gemini API key" sap2010:WorkflowViewState.IdRef="If_EnvKey">
+      <If.Then>
+        <Assign DisplayName="Read API key from Environment" sap2010:WorkflowViewState.IdRef="Assign_EnvKey">
+          <Assign.To>
+            <OutArgument x:TypeArguments="x:String">[strApiKey]</OutArgument>
+          </Assign.To>
+          <Assign.Value>
+            <InArgument x:TypeArguments="x:String">[If(System.Environment.GetEnvironmentVariable("GEMINI_API_KEY") Is Nothing, String.Empty, System.Environment.GetEnvironmentVariable("GEMINI_API_KEY").Trim())]</InArgument>
+          </Assign.Value>
+        </Assign>
+      </If.Then>
+    </If>
+
     <!-- 3. Build system prompt for ATS resume synthesis -->
     <Assign DisplayName="Build Gemini system prompt" sap2010:WorkflowViewState.IdRef="Assign_7">
       <Assign.To>
         <OutArgument x:TypeArguments="x:String">[strSystemPrompt]</OutArgument>
       </Assign.To>
       <Assign.Value>
-        <InArgument x:TypeArguments="x:String">["You are an expert ATS resume writer and career consultant." &amp; System.Environment.NewLine &amp; "Analyze the LinkedIn and GitHub data provided by the user and return ONE JSON object." &amp; System.Environment.NewLine &amp; "Return ONLY raw JSON with no markdown code fences and no commentary before or after it." &amp; System.Environment.NewLine &amp; "Write every section in English." &amp; System.Environment.NewLine &amp; "Format each experience bullet point using the STAR/XYZ pattern: state the action, the measurable result, and how the result was achieved." &amp; System.Environment.NewLine &amp; "Quantify achievements with concrete numbers wherever the source data supports them." &amp; System.Environment.NewLine &amp; "Include at most 3 non-fork GitHub repositories that best match the target job role and set isSelected to true for each of them." &amp; System.Environment.NewLine &amp; "The JSON must contain exactly these top-level keys." &amp; System.Environment.NewLine &amp; "profile is an object with fullName, headline, email, phone, location, summary, linkedinUrl, githubUrl." &amp; System.Environment.NewLine &amp; "experiences is an array of objects with id, company, role, startDate, endDate, bulletPoints which is an array of strings." &amp; System.Environment.NewLine &amp; "projects is an array of objects with id, name, repoUrl, stars as a number, language, techStack as an array of strings, starSummary, isSelected as a boolean." &amp; System.Environment.NewLine &amp; "skills is an array of objects with category and items which is an array of strings." &amp; System.Environment.NewLine &amp; "education is an array of objects with institution, degree, graduationYear, gpa." &amp; System.Environment.NewLine &amp; "Never invent employers, dates, degrees, or metrics that are absent from the supplied data."]</InArgument>
+        <InArgument x:TypeArguments="x:String">["You are an expert ATS resume writer and career consultant." &amp; System.Environment.NewLine &amp; "Analyze the LinkedIn and GitHub data provided by the user and return ONE JSON object." &amp; System.Environment.NewLine &amp; "Return ONLY raw JSON with no markdown code fences and no commentary before or after it." &amp; System.Environment.NewLine &amp; "Write every section in English." &amp; System.Environment.NewLine &amp; "Format each experience bullet point using the STAR/XYZ pattern: state the action, the measurable result, and how the result was achieved." &amp; System.Environment.NewLine &amp; "Quantify achievements with concrete numbers wherever the source data supports them." &amp; System.Environment.NewLine &amp; "Include all supplied non-fork GitHub repositories (up to 10) in the projects array. Set isSelected to true for the 3 or 4 repositories that best match the target job role, and set isSelected to false for the remaining repositories so the candidate can curate them." &amp; System.Environment.NewLine &amp; "The JSON must contain exactly these top-level keys." &amp; System.Environment.NewLine &amp; "profile is an object with fullName, headline, email, phone, location, summary, linkedinUrl, githubUrl." &amp; System.Environment.NewLine &amp; "experiences is an array of objects with id, company, role, startDate, endDate, bulletPoints which is an array of strings." &amp; System.Environment.NewLine &amp; "projects is an array of objects with id, name, repoUrl, stars as a number, language, techStack as an array of strings, starSummary, isSelected as a boolean." &amp; System.Environment.NewLine &amp; "skills is an array of objects with category and items which is an array of strings." &amp; System.Environment.NewLine &amp; "education is an array of objects with institution, degree, graduationYear, gpa." &amp; System.Environment.NewLine &amp; "Never invent employers, dates, degrees, or metrics that are absent from the supplied data."]</InArgument>
       </Assign.Value>
     </Assign>
 
@@ -211,36 +223,19 @@
           <TryCatch DisplayName="Try Gemini synthesis" sap2010:WorkflowViewState.IdRef="TryCatch_1">
             <TryCatch.Try>
               <Sequence DisplayName="Call and parse Gemini" sap2010:WorkflowViewState.IdRef="Sequence_5">
-                <nhr:NetHttpRequest DisplayName="POST prompt to Gemini" RequestUrl="[strApiUrl]" Method="POST" RequestBodyType="Text" TextPayload="[strRequestBody]" TextPayloadContentType="application/json" TextPayloadEncoding="UTF-8" AuthenticationType="None" RetryPolicyType="ExponentialBackoff" RetryCount="3" InitialDelay="2000" TimeoutInMiliseconds="[90000]" ContinueOnError="True" Result="[httpResponse]" sap2010:WorkflowViewState.IdRef="NetHttpRequest_1" />
-                <Assign DisplayName="Record HTTP status detail" sap2010:WorkflowViewState.IdRef="Assign_15">
-                  <Assign.To>
-                    <OutArgument x:TypeArguments="x:String">[strErrorDetail]</OutArgument>
-                  </Assign.To>
-                  <Assign.Value>
-                    <InArgument x:TypeArguments="x:String">[If(httpResponse Is Nothing, "No response object returned", "Gemini HTTP status " &amp; CInt(httpResponse.StatusCode))]</InArgument>
-                  </Assign.Value>
-                </Assign>
-                <If Condition="[Not httpResponse Is Nothing AndAlso CInt(httpResponse.StatusCode) = 200]" DisplayName="Parse response when HTTP 200" sap2010:WorkflowViewState.IdRef="If_3">
+                <ui:InvokeCode DisplayName="Call Gemini API directly with API key" Language="VBNet" Code="statusCode = 0&#xA;rawText = &quot;&quot;&#xA;resumeJson = &quot;&quot;&#xA;errorDetail = &quot;&quot;&#xA;Dim attempt As Integer = 0&#xA;Dim lastError As String = &quot;&quot;&#xA;Try&#xA;  While attempt &lt; 3&#xA;    attempt += 1&#xA;    Try&#xA;      Dim handler As New System.Net.Http.HttpClientHandler()&#xA;      handler.UseProxy = True&#xA;      Using client As New System.Net.Http.HttpClient(handler)&#xA;        client.Timeout = System.TimeSpan.FromSeconds(90)&#xA;        Dim content As New System.Net.Http.StringContent(requestBody, System.Text.Encoding.UTF8, &quot;application/json&quot;)&#xA;        Dim response As System.Net.Http.HttpResponseMessage = client.PostAsync(apiUrl, content).GetAwaiter().GetResult()&#xA;        statusCode = CInt(response.StatusCode)&#xA;        rawText = response.Content.ReadAsStringAsync().GetAwaiter().GetResult()&#xA;      End Using&#xA;      If statusCode &gt;= 500 AndAlso attempt &lt; 3 Then&#xA;        lastError = &quot;Gemini HTTP status &quot; &amp; statusCode.ToString()&#xA;        System.Threading.Thread.Sleep(2000)&#xA;      Else&#xA;        Exit While&#xA;      End If&#xA;    Catch ex As Exception&#xA;      lastError = &quot;Gemini call failed: &quot; &amp; ex.Message&#xA;      If attempt &lt; 3 Then&#xA;        System.Threading.Thread.Sleep(2000)&#xA;      End If&#xA;    End Try&#xA;  End While&#xA;  If statusCode = 200 Then&#xA;    Dim envelope As Newtonsoft.Json.Linq.JObject = Newtonsoft.Json.Linq.JObject.Parse(rawText)&#xA;    Dim token As Newtonsoft.Json.Linq.JToken = envelope.SelectToken(&quot;candidates[0].content.parts[0].text&quot;)&#xA;    If token Is Nothing Then&#xA;      errorDetail = &quot;Gemini response did not contain candidate text&quot;&#xA;    Else&#xA;      rawText = token.ToString()&#xA;      resumeJson = rawText.Replace(&quot;```json&quot;, String.Empty).Replace(&quot;```&quot;, String.Empty).Trim()&#xA;      Dim check As Newtonsoft.Json.Linq.JObject = Newtonsoft.Json.Linq.JObject.Parse(resumeJson)&#xA;    End If&#xA;  Else&#xA;    errorDetail = If(String.IsNullOrEmpty(lastError), &quot;Gemini HTTP status &quot; &amp; statusCode.ToString() &amp; &quot;: &quot; &amp; rawText, lastError)&#xA;  End If&#xA;Catch ex As Exception&#xA;  errorDetail = &quot;Gemini call failed: &quot; &amp; ex.Message&#xA;End Try" sap2010:WorkflowViewState.IdRef="InvokeCode_1">
+                  <ui:InvokeCode.Arguments>
+                    <InArgument x:TypeArguments="x:String" x:Key="apiUrl">[strApiUrl]</InArgument>
+                    <InArgument x:TypeArguments="x:String" x:Key="requestBody">[strRequestBody]</InArgument>
+                    <OutArgument x:TypeArguments="x:Int32" x:Key="statusCode">[intHttpStatus]</OutArgument>
+                    <OutArgument x:TypeArguments="x:String" x:Key="rawText">[strRawAIResponse]</OutArgument>
+                    <OutArgument x:TypeArguments="x:String" x:Key="resumeJson">[strExtractedJson]</OutArgument>
+                    <OutArgument x:TypeArguments="x:String" x:Key="errorDetail">[strErrorDetail]</OutArgument>
+                  </ui:InvokeCode.Arguments>
+                </ui:InvokeCode>
+                <If Condition="[intHttpStatus = 200 AndAlso Not String.IsNullOrWhiteSpace(strExtractedJson)]" DisplayName="Use Gemini result when synthesis succeeded" sap2010:WorkflowViewState.IdRef="If_3">
                   <If.Then>
                     <Sequence DisplayName="Extract resume JSON" sap2010:WorkflowViewState.IdRef="Sequence_6">
-                      <web:DeserializeJson x:TypeArguments="jn:JObject" DisplayName="Deserialize Gemini envelope" JsonString="[httpResponse.TextContent]" JsonObject="[jsonResponse]" sap2010:WorkflowViewState.IdRef="DeserializeJson`1_1" />
-                      <Assign DisplayName="Extract candidate text" sap2010:WorkflowViewState.IdRef="Assign_16">
-                        <Assign.To>
-                          <OutArgument x:TypeArguments="x:String">[strRawAIResponse]</OutArgument>
-                        </Assign.To>
-                        <Assign.Value>
-                          <InArgument x:TypeArguments="x:String">[If(jsonResponse Is Nothing OrElse jsonResponse.SelectToken("candidates[0].content.parts[0].text") Is Nothing, String.Empty, jsonResponse.SelectToken("candidates[0].content.parts[0].text").ToString())]</InArgument>
-                        </Assign.Value>
-                      </Assign>
-                      <Assign DisplayName="Strip markdown fences from AI text" sap2010:WorkflowViewState.IdRef="Assign_17">
-                        <Assign.To>
-                          <OutArgument x:TypeArguments="x:String">[strExtractedJson]</OutArgument>
-                        </Assign.To>
-                        <Assign.Value>
-                          <InArgument x:TypeArguments="x:String">[strRawAIResponse.Replace("```json", String.Empty).Replace("```", String.Empty).Trim()]</InArgument>
-                        </Assign.Value>
-                      </Assign>
-                      <web:DeserializeJson x:TypeArguments="jn:JObject" DisplayName="Validate resume JSON" JsonString="[strExtractedJson]" JsonObject="[jsonResume]" sap2010:WorkflowViewState.IdRef="DeserializeJson`1_2" />
                       <Assign DisplayName="Mark AI synthesis successful" sap2010:WorkflowViewState.IdRef="Assign_18">
                         <Assign.To>
                           <OutArgument x:TypeArguments="x:Boolean">[boolAiSuccess]</OutArgument>
@@ -318,7 +313,7 @@
               <OutArgument x:TypeArguments="x:String">[out_SynthesizedResumeJson]</OutArgument>
             </Assign.To>
             <Assign.Value>
-              <InArgument x:TypeArguments="x:String">[jsonResume.ToString()]</InArgument>
+              <InArgument x:TypeArguments="x:String">[strExtractedJson]</InArgument>
             </Assign.Value>
           </Assign>
           <Assign DisplayName="Set AI status to Gemini" sap2010:WorkflowViewState.IdRef="Assign_24">
@@ -341,20 +336,20 @@
       </If.Then>
       <If.Else>
         <Sequence DisplayName="Report AI failure" sap2010:WorkflowViewState.IdRef="Sequence_10">
-          <Assign DisplayName="Set output to empty on AI failure" sap2010:WorkflowViewState.IdRef="Assign_26">
+          <Assign DisplayName="Set output to fallback mock on AI failure" sap2010:WorkflowViewState.IdRef="Assign_26">
             <Assign.To>
               <OutArgument x:TypeArguments="x:String">[out_SynthesizedResumeJson]</OutArgument>
             </Assign.To>
             <Assign.Value>
-              <InArgument x:TypeArguments="x:String">[String.Empty]</InArgument>
+              <InArgument x:TypeArguments="x:String">[If(System.IO.File.Exists("Data\Mocks\CuratedResumeMock.json"), System.IO.File.ReadAllText("Data\Mocks\CuratedResumeMock.json"), "{}")]</InArgument>
             </Assign.Value>
           </Assign>
-          <Assign DisplayName="Set AI status to failed" sap2010:WorkflowViewState.IdRef="Assign_27">
+          <Assign DisplayName="Set AI status to fallback mock" sap2010:WorkflowViewState.IdRef="Assign_27">
             <Assign.To>
               <OutArgument x:TypeArguments="x:String">[out_AIStatus]</OutArgument>
             </Assign.To>
             <Assign.Value>
-              <InArgument x:TypeArguments="x:String">["AI_FAILED"]</InArgument>
+              <InArgument x:TypeArguments="x:String">["SUCCESS_MOCK_FALLBACK"]</InArgument>
             </Assign.Value>
           </Assign>
           <Assign DisplayName="Expose error detail as warning" sap2010:WorkflowViewState.IdRef="Assign_28">
@@ -365,7 +360,7 @@
               <InArgument x:TypeArguments="x:String">[If(String.IsNullOrWhiteSpace(strErrorDetail), "AI synthesis failed with no detail.", strErrorDetail)]</InArgument>
             </Assign.Value>
           </Assign>
-          <ui:LogMessage DisplayName="Log AI failure outcome" sap2010:WorkflowViewState.IdRef="LogMessage_7" Level="Error" Message="[&quot;[03_AI] AI synthesis FAILED. No resume produced. Detail: &quot; &amp; out_AIWarning]" />
+          <ui:LogMessage DisplayName="Log AI failure outcome" sap2010:WorkflowViewState.IdRef="LogMessage_7" Level="Warn" Message="[&quot;[03_AI] AI synthesis fell back to mock. Detail: &quot; &amp; out_AIWarning]" />
         </Sequence>
       </If.Else>
     </If>

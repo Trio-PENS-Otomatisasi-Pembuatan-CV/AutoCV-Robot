@@ -119,16 +119,14 @@ async function fetchGitHubData(usernameOrUrl, token, useMockFallback = true) {
       throw new Error('GitHub repos response is not an array.');
     }
 
-    // 3. Filter non-fork repositories and sort by stars descending, then updated_at
+    // 3. Filter non-fork repositories and sort by latest activity (updated_at descending)
     const nonForks = reposData.filter(repo => !repo.fork);
 
     nonForks.sort((a, b) => {
-      const starDiff = (b.stargazers_count || 0) - (a.stargazers_count || 0);
-      if (starDiff !== 0) return starDiff;
       return new Date(b.updated_at || 0).getTime() - new Date(a.updated_at || 0).getTime();
     });
 
-    // Take top 10 repositories
+    // Take top 10 latest updated non-fork repositories
     const topRepos = nonForks.slice(0, 10).map(repo => ({
       name: repo.name || '',
       description: repo.description || '',

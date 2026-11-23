@@ -99,6 +99,7 @@
       <Variable x:TypeArguments="x:String" Name="strJsScriptCode" />
       <Variable x:TypeArguments="x:Int32" Name="intInjectJsTimeoutMs" Default="25000" />
       <Variable x:TypeArguments="x:Int32" Name="intScrollStep" Default="0" />
+      <Variable x:TypeArguments="ui:UiBrowser" Name="uiBrowser" />
     </Sequence.Variables>
     <sap:WorkflowViewStateService.ViewState>
       <scg:Dictionary x:TypeArguments="x:String, x:Object">
@@ -172,7 +173,7 @@
                     <x:Boolean x:Key="IsExpanded">True</x:Boolean>
                   </scg:Dictionary>
                 </sap:WorkflowViewStateService.ViewState>
-                <ui:OpenBrowser AutomaticallyDownloadWebDriver="{x:Null}" CommunicationMethod="{x:Null}" Hidden="{x:Null}" Private="{x:Null}" UiBrowser="{x:Null}" BrowserType="[If(strBrowserName.ToLower().Equals(&quot;edge&quot;), UiPath.Core.BrowserType.Edge, UiPath.Core.BrowserType.Chrome)]" DisplayName="Open Browser with Existing User Session" sap:VirtualizedContainerService.HintSize="476,750" sap2010:WorkflowViewState.IdRef="OpenBrowser_1" NewSession="False" Url="[in_LinkedInUrl]">
+                <ui:OpenBrowser AutomaticallyDownloadWebDriver="{x:Null}" CommunicationMethod="{x:Null}" Hidden="True" Private="{x:Null}" UiBrowser="[uiBrowser]" BrowserType="[If(strBrowserName.ToLower().Equals(&quot;edge&quot;), UiPath.Core.BrowserType.Edge, UiPath.Core.BrowserType.Chrome)]" DisplayName="Open Browser with Existing User Session (Hidden)" sap:VirtualizedContainerService.HintSize="476,750" sap2010:WorkflowViewState.IdRef="OpenBrowser_1" NewSession="False" Url="[in_LinkedInUrl]">
                   <ui:OpenBrowser.Body>
                     <ActivityAction x:TypeArguments="x:Object">
                       <ActivityAction.Argument>
@@ -291,6 +292,13 @@
                 </ActivityAction>
               </Catch>
             </TryCatch.Catches>
+            <TryCatch.Finally>
+              <If Condition="[uiBrowser IsNot Nothing]" DisplayName="Ensure Hidden Browser Closed" sap:VirtualizedContainerService.HintSize="484,260" sap2010:WorkflowViewState.IdRef="If_CloseBrowser">
+                <If.Then>
+                  <ui:CloseTab Browser="[uiBrowser]" ContinueOnError="True" DisplayName="Close Hidden Scraping Tab" sap:VirtualizedContainerService.HintSize="334,80" sap2010:WorkflowViewState.IdRef="CloseTab_1" />
+                </If.Then>
+              </If>
+            </TryCatch.Finally>
           </TryCatch>
           <If Condition="[boolExtractionSuccessful]" DisplayName="Check If Data Was Extracted Successfully" sap:VirtualizedContainerService.HintSize="656,580" sap2010:WorkflowViewState.IdRef="If_2">
             <If.Then>

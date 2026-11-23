@@ -266,7 +266,7 @@ function buildProjectsOpenXml(projects) {
     return `<w:p><w:pPr><w:spacing w:before="60" w:after="60"/></w:pPr><w:r><w:rPr><w:sz w:val="20"/><w:color w:val="64748B"/></w:rPr><w:t>Technical projects portfolio available upon request.</w:t></w:r></w:p>`;
   }
 
-  return selected.slice(0, 5).map((proj) => {
+  return selected.map((proj) => {
     const stack = proj.techStack && proj.techStack.length > 0 ? ` [${proj.techStack.join(', ')}]` : (proj.language ? ` [${proj.language}]` : '');
     const cleanRepo = cleanUrl(proj.repoUrl);
     const summary = generateProjectSummary(proj);
@@ -635,7 +635,7 @@ function generateResume(rawPayload, templatePath, outputDir) {
   if (!pdfGenerated) {
     const htmlPath = path.resolve(outputDir, `CV_${safeName}_${timestamp}.html`);
     const cleanedExperiences = cleanExperienceList(payload.experiences);
-    const selectedProjects = (payload.projects || []).filter((p) => p.isSelected !== false).slice(0, 5);
+    const selectedProjects = (payload.projects || []).filter((p) => p.isSelected !== false);
 
     const htmlContent = `<!DOCTYPE html>
 <html lang="en">

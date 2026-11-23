@@ -1,7 +1,7 @@
 {
-  "name": "AutoCV",
-  "projectId": "b729b4b4-062b-49b7-80b4-c76bd44a723e",
-  "description": "AutoCV - UiPath Orchestrator Autonomous Resume Generator & Pipeline",
+  "name": "AutoCV Deployment",
+  "projectId": "666ffdce-2a97-492d-a8ca-5bd19511ed20",
+  "description": "Blank Process",
   "main": "Main.xaml",
   "dependencies": {
     "UiPath.Excel.Activities": "[3.6.1]",
@@ -9,15 +9,13 @@
     "UiPath.System.Activities": "[26.10.0]",
     "UiPath.Testing.Activities": "[25.10.3]",
     "UiPath.UIAutomation.Activities": "[26.10.7]",
-    "UiPath.WebAPI.Activities": "2.5.2"
-    "UiPath.WebAPI.Activities": "[1.21.1]"
+    "UiPath.WebAPI.Activities": "[2.5.2]"
   },
   "webServices": [],
   "entitiesStores": [],
-  "schemaVersion": "4.1",
+  "schemaVersion": "4.2",
   "studioVersion": "26.10.0.0",
-  "projectVersion": "1.0.5",
-  "projectVersion": "1.0.2",
+  "projectVersion": "1.0.6",
   "runtimeOptions": {
     "autoDispose": false,
     "netFrameworkLazyLoading": false,
@@ -31,7 +29,7 @@
       "*password*"
     ],
     "executionType": "Workflow",
-    "readyForPiP": false,
+    "readyForPiP": true,
     "startsInPiP": false,
     "mustRestoreAllDependencies": true,
     "pipType": "ChildSession"
@@ -56,39 +54,57 @@
       "input": [
         {
           "name": "in_JobId",
-          "type": "System.String, System.Private.CoreLib"
+          "type": "System.String, System.Private.CoreLib",
+          "required": false,
+          "hasDefault": false
         },
         {
           "name": "in_LinkedInUrl",
-          "type": "System.String, System.Private.CoreLib"
+          "type": "System.String, System.Private.CoreLib",
+          "required": false,
+          "hasDefault": false
         },
         {
           "name": "in_GitHubUrl",
-          "type": "System.String, System.Private.CoreLib"
+          "type": "System.String, System.Private.CoreLib",
+          "required": false,
+          "hasDefault": false
         },
         {
           "name": "in_TargetJobRole",
-          "type": "System.String, System.Private.CoreLib"
+          "type": "System.String, System.Private.CoreLib",
+          "required": false,
+          "hasDefault": false
         },
         {
           "name": "in_RecipientEmail",
-          "type": "System.String, System.Private.CoreLib"
+          "type": "System.String, System.Private.CoreLib",
+          "required": false,
+          "hasDefault": false
         },
         {
           "name": "in_ApprovedResumePayload",
-          "type": "System.String, System.Private.CoreLib"
+          "type": "System.String, System.Private.CoreLib",
+          "required": false,
+          "hasDefault": false
         },
         {
           "name": "in_WebhookBaseUrl",
-          "type": "System.String, System.Private.CoreLib"
+          "type": "System.String, System.Private.CoreLib",
+          "required": false,
+          "hasDefault": false
         },
         {
           "name": "in_UseMockFallback",
-          "type": "System.Boolean, System.Private.CoreLib"
+          "type": "System.Boolean, System.Private.CoreLib",
+          "required": false,
+          "hasDefault": false
         },
         {
           "name": "in_RequireManualApproval",
-          "type": "System.Boolean, System.Private.CoreLib"
+          "type": "System.Boolean, System.Private.CoreLib",
+          "required": false,
+          "hasDefault": false
         }
       ],
       "output": [
