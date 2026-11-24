@@ -1,0 +1,172 @@
+<Activity mc:Ignorable="sap sap2010" x:Class="Pipeline_RenderAndDeliver" xmlns="http://schemas.microsoft.com/netfx/2009/xaml/activities" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:sap="http://schemas.microsoft.com/netfx/2009/xaml/activities/presentation" xmlns:sap2010="http://schemas.microsoft.com/netfx/2010/xaml/activities/presentation" xmlns:scg="clr-namespace:System.Collections.Generic;assembly=System.Private.CoreLib" xmlns:sco="clr-namespace:System.Collections.ObjectModel;assembly=System.Private.CoreLib" xmlns:ui="http://schemas.uipath.com/workflow/activities" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <x:Members>
+    <x:Property Name="in_JobId" Type="InArgument(x:String)" />
+    <x:Property Name="in_ApprovedResumePayload" Type="InArgument(x:String)" />
+    <x:Property Name="in_RecipientEmail" Type="InArgument(x:String)" />
+    <x:Property Name="in_WebhookBaseUrl" Type="InArgument(x:String)" />
+    <x:Property Name="out_JobStatus" Type="OutArgument(x:String)" />
+    <x:Property Name="out_OutputPdfPath" Type="OutArgument(x:String)" />
+  </x:Members>
+  <VisualBasic.Settings>
+    <x:Null />
+  </VisualBasic.Settings>
+  <sap2010:WorkflowViewState.IdRef>Pipeline_RenderAndDeliver_1</sap2010:WorkflowViewState.IdRef>
+  <TextExpression.NamespacesForImplementation>
+    <sco:Collection x:TypeArguments="x:String">
+      <x:String>System.Activities</x:String>
+      <x:String>System.Activities.Statements</x:String>
+      <x:String>System.Activities.Expressions</x:String>
+      <x:String>System.Activities.Validation</x:String>
+      <x:String>System.Activities.XamlIntegration</x:String>
+      <x:String>Microsoft.VisualBasic</x:String>
+      <x:String>Microsoft.VisualBasic.Activities</x:String>
+      <x:String>System</x:String>
+      <x:String>System.Collections</x:String>
+      <x:String>System.Collections.Generic</x:String>
+      <x:String>System.Collections.ObjectModel</x:String>
+      <x:String>System.Data</x:String>
+      <x:String>System.Diagnostics</x:String>
+      <x:String>System.IO</x:String>
+      <x:String>System.Linq</x:String>
+      <x:String>System.Net.Mail</x:String>
+      <x:String>System.Xml</x:String>
+      <x:String>System.Xml.Linq</x:String>
+      <x:String>UiPath.Core</x:String>
+      <x:String>UiPath.Core.Activities</x:String>
+      <x:String>System.Windows.Markup</x:String>
+      <x:String>GlobalVariablesNamespace</x:String>
+      <x:String>GlobalConstantsNamespace</x:String>
+      <x:String>System.Runtime.Serialization</x:String>
+      <x:String>System.Reflection</x:String>
+      <x:String>System.Linq.Expressions</x:String>
+    </sco:Collection>
+  </TextExpression.NamespacesForImplementation>
+  <TextExpression.ReferencesForImplementation>
+    <sco:Collection x:TypeArguments="AssemblyReference">
+      <AssemblyReference>System.Activities</AssemblyReference>
+      <AssemblyReference>Microsoft.VisualBasic</AssemblyReference>
+      <AssemblyReference>System.Private.CoreLib</AssemblyReference>
+      <AssemblyReference>mscorlib</AssemblyReference>
+      <AssemblyReference>System.Data</AssemblyReference>
+      <AssemblyReference>System</AssemblyReference>
+      <AssemblyReference>System.Linq</AssemblyReference>
+      <AssemblyReference>System.Data.Common</AssemblyReference>
+      <AssemblyReference>System.Drawing</AssemblyReference>
+      <AssemblyReference>System.Drawing.Primitives</AssemblyReference>
+      <AssemblyReference>System.Drawing.Common</AssemblyReference>
+      <AssemblyReference>System.Core</AssemblyReference>
+      <AssemblyReference>System.Xml</AssemblyReference>
+      <AssemblyReference>System.Xml.Linq</AssemblyReference>
+      <AssemblyReference>PresentationFramework</AssemblyReference>
+      <AssemblyReference>WindowsBase</AssemblyReference>
+      <AssemblyReference>PresentationCore</AssemblyReference>
+      <AssemblyReference>System.Xaml</AssemblyReference>
+      <AssemblyReference>UiPath.System.Activities</AssemblyReference>
+      <AssemblyReference>UiPath.UiAutomation.Activities</AssemblyReference>
+      <AssemblyReference>System.Console</AssemblyReference>
+      <AssemblyReference>System.Security.Permissions</AssemblyReference>
+      <AssemblyReference>System.Configuration.ConfigurationManager</AssemblyReference>
+      <AssemblyReference>System.ComponentModel</AssemblyReference>
+      <AssemblyReference>System.Memory</AssemblyReference>
+      <AssemblyReference>System.Private.Uri</AssemblyReference>
+      <AssemblyReference>System.Private.ServiceModel</AssemblyReference>
+      <AssemblyReference>System.Collections</AssemblyReference>
+      <AssemblyReference>System.Collections.NonGeneric</AssemblyReference>
+      <AssemblyReference>System.Linq.Expressions</AssemblyReference>
+      <AssemblyReference>System.Runtime.Serialization.Formatters</AssemblyReference>
+      <AssemblyReference>System.Private.DataContractSerialization</AssemblyReference>
+      <AssemblyReference>System.Runtime.Serialization.Primitives</AssemblyReference>
+    </sco:Collection>
+  </TextExpression.ReferencesForImplementation>
+  <Sequence DisplayName="Pipeline: Render and Deliver" sap:VirtualizedContainerService.HintSize="576,1700" sap2010:WorkflowViewState.IdRef="Sequence_RenderAndDeliver">
+    <Sequence.Variables>
+      <Variable x:TypeArguments="x:String" Name="strNormalizedEmail" />
+      <Variable x:TypeArguments="x:String" Name="strOutputPdfPath" />
+      <Variable x:TypeArguments="x:Int32" Name="intWebhookStatus" />
+      <Variable x:TypeArguments="x:String" Name="strWebhookResp" />
+    </Sequence.Variables>
+    <sap:WorkflowViewStateService.ViewState>
+      <scg:Dictionary x:TypeArguments="x:String, x:Object">
+        <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+      </scg:Dictionary>
+    </sap:WorkflowViewStateService.ViewState>
+
+    <!-- 1. Normalization & Context Setup -->
+    <Assign DisplayName="Default Recipient Email if empty" sap:VirtualizedContainerService.HintSize="542,113.6" sap2010:WorkflowViewState.IdRef="Assign_DeliverEmail">
+      <Assign.To>
+        <OutArgument x:TypeArguments="x:String">[strNormalizedEmail]</OutArgument>
+      </Assign.To>
+      <Assign.Value>
+        <InArgument x:TypeArguments="x:String">[If(String.IsNullOrWhiteSpace(in_RecipientEmail), "farid@example.com", in_RecipientEmail)]</InArgument>
+      </Assign.Value>
+    </Assign>
+
+    <ui:LogMessage DisplayName="Log starting PDF generation" sap:VirtualizedContainerService.HintSize="542,141" sap2010:WorkflowViewState.IdRef="LogMessage_StartPdf" Level="Info" Message="[&quot;[RenderAndDeliver] Generating ATS-Compliant PDF document via 04_Document_GeneratePdf.&quot;]" />
+
+    <!-- 2. Invoke 04_Document_GeneratePdf -->
+    <ui:InvokeWorkflowFile ArgumentsVariable="{x:Null}" ContinueOnError="{x:Null}" DisplayName="Invoke 04_Document_GeneratePdf workflow" sap:VirtualizedContainerService.HintSize="542,113.6" sap2010:WorkflowViewState.IdRef="Invoke_DocGen" UnSafe="False" WorkflowFileName="Modules\Document\04_Document_GeneratePdf.xaml">
+      <ui:InvokeWorkflowFile.Arguments>
+        <InArgument x:TypeArguments="x:String" x:Key="in_CuratedResumeJson">[in_ApprovedResumePayload]</InArgument>
+        <InArgument x:TypeArguments="x:String" x:Key="in_TemplatePath">["Data\Templates\ATS_Resume_Template.docx"]</InArgument>
+        <InArgument x:TypeArguments="x:String" x:Key="in_OutputDir">["Data\Outputs"]</InArgument>
+        <OutArgument x:TypeArguments="x:String" x:Key="out_GeneratedPdfPath">[strOutputPdfPath]</OutArgument>
+        <OutArgument x:TypeArguments="x:String" x:Key="out_GeneratedDocxPath" />
+      </ui:InvokeWorkflowFile.Arguments>
+    </ui:InvokeWorkflowFile>
+
+    <Assign DisplayName="Expose PDF output path" sap:VirtualizedContainerService.HintSize="542,113.6" sap2010:WorkflowViewState.IdRef="Assign_OutPdf">
+      <Assign.To>
+        <OutArgument x:TypeArguments="x:String">[out_OutputPdfPath]</OutArgument>
+      </Assign.To>
+      <Assign.Value>
+        <InArgument x:TypeArguments="x:String">[strOutputPdfPath]</InArgument>
+      </Assign.Value>
+    </Assign>
+
+    <!-- 3. Invoke 05_Notification_SendMail -->
+    <ui:LogMessage DisplayName="Publish email dispatch" sap:VirtualizedContainerService.HintSize="542,141" sap2010:WorkflowViewState.IdRef="LogMessage_MailDispatch" Level="Info" Message="[&quot;[RenderAndDeliver] Delivering final ATS Resume PDF to &quot; &amp; strNormalizedEmail]" />
+    <ui:InvokeWorkflowFile ArgumentsVariable="{x:Null}" ContinueOnError="{x:Null}" DisplayName="Invoke 05_Notification_SendMail workflow" sap:VirtualizedContainerService.HintSize="542,113.6" sap2010:WorkflowViewState.IdRef="Invoke_SendMail" UnSafe="False" WorkflowFileName="Modules\Notification\05_Notification_SendMail.xaml">
+      <ui:InvokeWorkflowFile.Arguments>
+        <InArgument x:TypeArguments="x:String" x:Key="in_RecipientEmail">[strNormalizedEmail]</InArgument>
+        <InArgument x:TypeArguments="x:String" x:Key="in_PdfFilePath">[strOutputPdfPath]</InArgument>
+        <InArgument x:TypeArguments="x:String" x:Key="in_CandidateName">["Candidate"]</InArgument>
+        <InArgument x:TypeArguments="x:String" x:Key="in_SmtpHost" />
+        <InArgument x:TypeArguments="x:Int32" x:Key="in_SmtpPort">[587]</InArgument>
+        <InArgument x:TypeArguments="x:String" x:Key="in_SmtpUser" />
+        <InArgument x:TypeArguments="x:String" x:Key="in_SmtpPassword" />
+        <InArgument x:TypeArguments="x:Boolean" x:Key="in_SimulationMode">[True]</InArgument>
+        <OutArgument x:TypeArguments="x:Boolean" x:Key="out_MailSent" />
+        <OutArgument x:TypeArguments="x:String" x:Key="out_DeliveryStatus" />
+      </ui:InvokeWorkflowFile.Arguments>
+    </ui:InvokeWorkflowFile>
+
+    <!-- 4. Dispatch Complete Webhook to Web App -->
+    <If Condition="[Not String.IsNullOrWhiteSpace(in_JobId) AndAlso Not String.IsNullOrWhiteSpace(in_WebhookBaseUrl)]" DisplayName="Check if complete webhook is configured" sap:VirtualizedContainerService.HintSize="542,400" sap2010:WorkflowViewState.IdRef="If_CompleteWebhook">
+      <If.Then>
+        <ui:InvokeWorkflowFile ArgumentsVariable="{x:Null}" ContinueOnError="True" DisplayName="Invoke 06_Webhook_NotifyWeb for complete" sap:VirtualizedContainerService.HintSize="416,113.6" sap2010:WorkflowViewState.IdRef="Invoke_WebhookComplete" UnSafe="False" WorkflowFileName="Modules\Webhook\06_Webhook_NotifyWeb.xaml">
+          <ui:InvokeWorkflowFile.Arguments>
+            <InArgument x:TypeArguments="x:String" x:Key="in_WebhookBaseUrl">[in_WebhookBaseUrl]</InArgument>
+            <InArgument x:TypeArguments="x:String" x:Key="in_JobId">[in_JobId]</InArgument>
+            <InArgument x:TypeArguments="x:String" x:Key="in_EndpointType">["complete"]</InArgument>
+            <InArgument x:TypeArguments="x:String" x:Key="in_PayloadJson" />
+            <InArgument x:TypeArguments="x:String" x:Key="in_PdfFilePath">[strOutputPdfPath]</InArgument>
+            <OutArgument x:TypeArguments="x:Int32" x:Key="out_StatusCode">[intWebhookStatus]</OutArgument>
+            <OutArgument x:TypeArguments="x:String" x:Key="out_ResponseContent">[strWebhookResp]</OutArgument>
+          </ui:InvokeWorkflowFile.Arguments>
+        </ui:InvokeWorkflowFile>
+      </If.Then>
+    </If>
+
+    <!-- 5. Mark Completed -->
+    <Assign DisplayName="Set completed status" sap:VirtualizedContainerService.HintSize="542,113.6" sap2010:WorkflowViewState.IdRef="Assign_DeliverCompleted">
+      <Assign.To>
+        <OutArgument x:TypeArguments="x:String">[out_JobStatus]</OutArgument>
+      </Assign.To>
+      <Assign.Value>
+        <InArgument x:TypeArguments="x:String">["COMPLETED"]</InArgument>
+      </Assign.Value>
+    </Assign>
+
+    <ui:LogMessage DisplayName="Log Delivery finish" sap:VirtualizedContainerService.HintSize="542,141" sap2010:WorkflowViewState.IdRef="LogMessage_DeliverDone" Level="Info" Message="[&quot;[RenderAndDeliver] COMPLETED successfully. PDF generated, delivered, and Web App notified: &quot; &amp; strOutputPdfPath]" />
+  </Sequence>
+</Activity>

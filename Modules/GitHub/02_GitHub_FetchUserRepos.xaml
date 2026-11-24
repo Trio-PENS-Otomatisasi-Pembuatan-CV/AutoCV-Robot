@@ -132,7 +132,7 @@
         <OutArgument x:TypeArguments="x:String">[strScriptPath]</OutArgument>
       </Assign.To>
       <Assign.Value>
-        <InArgument x:TypeArguments="x:String">["Data\Scripts\RunGitHubFetch.ps1"]</InArgument>
+        <InArgument x:TypeArguments="x:String">["Data\Scripts\GitHub\RunGitHubFetch.ps1"]</InArgument>
       </Assign.Value>
     </Assign>
 

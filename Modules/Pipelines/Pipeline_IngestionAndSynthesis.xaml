@@ -1,0 +1,293 @@
+<Activity mc:Ignorable="sap sap2010" x:Class="Pipeline_IngestionAndSynthesis" xmlns="http://schemas.microsoft.com/netfx/2009/xaml/activities" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:sap="http://schemas.microsoft.com/netfx/2009/xaml/activities/presentation" xmlns:sap2010="http://schemas.microsoft.com/netfx/2010/xaml/activities/presentation" xmlns:scg="clr-namespace:System.Collections.Generic;assembly=System.Private.CoreLib" xmlns:sco="clr-namespace:System.Collections.ObjectModel;assembly=System.Private.CoreLib" xmlns:ui="http://schemas.uipath.com/workflow/activities" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <x:Members>
+    <x:Property Name="in_JobId" Type="InArgument(x:String)" />
+    <x:Property Name="in_LinkedInUrl" Type="InArgument(x:String)" />
+    <x:Property Name="in_GitHubUrl" Type="InArgument(x:String)" />
+    <x:Property Name="in_TargetJobRole" Type="InArgument(x:String)" />
+    <x:Property Name="in_RecipientEmail" Type="InArgument(x:String)" />
+    <x:Property Name="in_WebhookBaseUrl" Type="InArgument(x:String)" />
+    <x:Property Name="in_UseMockFallback" Type="InArgument(x:Boolean)" />
+    <x:Property Name="in_RequireManualApproval" Type="InArgument(x:Boolean)" />
+    <x:Property Name="out_JobStatus" Type="OutArgument(x:String)" />
+    <x:Property Name="out_DraftResumePayload" Type="OutArgument(x:String)" />
+    <x:Property Name="out_NormalizedEmail" Type="OutArgument(x:String)" />
+    <x:Property Name="out_ShouldProceedToDelivery" Type="OutArgument(x:Boolean)" />
+  </x:Members>
+  <VisualBasic.Settings>
+    <x:Null />
+  </VisualBasic.Settings>
+  <sap2010:WorkflowViewState.IdRef>Pipeline_IngestionAndSynthesis_1</sap2010:WorkflowViewState.IdRef>
+  <TextExpression.NamespacesForImplementation>
+    <sco:Collection x:TypeArguments="x:String">
+      <x:String>System.Activities</x:String>
+      <x:String>System.Activities.Statements</x:String>
+      <x:String>System.Activities.Expressions</x:String>
+      <x:String>System.Activities.Validation</x:String>
+      <x:String>System.Activities.XamlIntegration</x:String>
+      <x:String>Microsoft.VisualBasic</x:String>
+      <x:String>Microsoft.VisualBasic.Activities</x:String>
+      <x:String>System</x:String>
+      <x:String>System.Collections</x:String>
+      <x:String>System.Collections.Generic</x:String>
+      <x:String>System.Collections.ObjectModel</x:String>
+      <x:String>System.Data</x:String>
+      <x:String>System.Diagnostics</x:String>
+      <x:String>System.IO</x:String>
+      <x:String>System.Linq</x:String>
+      <x:String>System.Net.Mail</x:String>
+      <x:String>System.Xml</x:String>
+      <x:String>System.Xml.Linq</x:String>
+      <x:String>UiPath.Core</x:String>
+      <x:String>UiPath.Core.Activities</x:String>
+      <x:String>System.Windows.Markup</x:String>
+      <x:String>GlobalVariablesNamespace</x:String>
+      <x:String>GlobalConstantsNamespace</x:String>
+      <x:String>System.Runtime.Serialization</x:String>
+      <x:String>System.Reflection</x:String>
+      <x:String>System.Linq.Expressions</x:String>
+    </sco:Collection>
+  </TextExpression.NamespacesForImplementation>
+  <TextExpression.ReferencesForImplementation>
+    <sco:Collection x:TypeArguments="AssemblyReference">
+      <AssemblyReference>System.Activities</AssemblyReference>
+      <AssemblyReference>Microsoft.VisualBasic</AssemblyReference>
+      <AssemblyReference>System.Private.CoreLib</AssemblyReference>
+      <AssemblyReference>mscorlib</AssemblyReference>
+      <AssemblyReference>System.Data</AssemblyReference>
+      <AssemblyReference>System</AssemblyReference>
+      <AssemblyReference>System.Linq</AssemblyReference>
+      <AssemblyReference>System.Data.Common</AssemblyReference>
+      <AssemblyReference>System.Drawing</AssemblyReference>
+      <AssemblyReference>System.Drawing.Primitives</AssemblyReference>
+      <AssemblyReference>System.Drawing.Common</AssemblyReference>
+      <AssemblyReference>System.Core</AssemblyReference>
+      <AssemblyReference>System.Xml</AssemblyReference>
+      <AssemblyReference>System.Xml.Linq</AssemblyReference>
+      <AssemblyReference>PresentationFramework</AssemblyReference>
+      <AssemblyReference>WindowsBase</AssemblyReference>
+      <AssemblyReference>PresentationCore</AssemblyReference>
+      <AssemblyReference>System.Xaml</AssemblyReference>
+      <AssemblyReference>UiPath.System.Activities</AssemblyReference>
+      <AssemblyReference>UiPath.UiAutomation.Activities</AssemblyReference>
+      <AssemblyReference>System.Console</AssemblyReference>
+      <AssemblyReference>System.Security.Permissions</AssemblyReference>
+      <AssemblyReference>System.Configuration.ConfigurationManager</AssemblyReference>
+      <AssemblyReference>System.ComponentModel</AssemblyReference>
+      <AssemblyReference>System.Memory</AssemblyReference>
+      <AssemblyReference>System.Private.Uri</AssemblyReference>
+      <AssemblyReference>System.Private.ServiceModel</AssemblyReference>
+      <AssemblyReference>System.Collections</AssemblyReference>
+      <AssemblyReference>System.Collections.NonGeneric</AssemblyReference>
+      <AssemblyReference>System.Linq.Expressions</AssemblyReference>
+      <AssemblyReference>System.Runtime.Serialization.Formatters</AssemblyReference>
+      <AssemblyReference>System.Private.DataContractSerialization</AssemblyReference>
+      <AssemblyReference>System.Runtime.Serialization.Primitives</AssemblyReference>
+    </sco:Collection>
+  </TextExpression.ReferencesForImplementation>
+  <Sequence DisplayName="Pipeline: Ingestion and Synthesis" sap:VirtualizedContainerService.HintSize="576,2600" sap2010:WorkflowViewState.IdRef="Sequence_IngestionAndSynthesis">
+    <Sequence.Variables>
+      <Variable x:TypeArguments="x:String" Name="strJobStatus" />
+      <Variable x:TypeArguments="x:String" Name="strDraftPayload" />
+      <Variable x:TypeArguments="x:String" Name="strNormalizedLinkedInUrl" />
+      <Variable x:TypeArguments="x:String" Name="strNormalizedGitHubUrl" />
+      <Variable x:TypeArguments="x:String" Name="strNormalizedEmail" />
+      <Variable x:TypeArguments="x:String" Name="strNormalizedRole" />
+      <Variable x:TypeArguments="x:String" Name="strLinkedInDataJson" />
+      <Variable x:TypeArguments="x:String" Name="strGitHubDataJson" />
+      <Variable x:TypeArguments="x:String" Name="strAIStatus" />
+      <Variable x:TypeArguments="x:String" Name="strAIWarning" />
+      <Variable x:TypeArguments="x:Int32" Name="intWebhookStatus" />
+      <Variable x:TypeArguments="x:String" Name="strWebhookResp" />
+    </Sequence.Variables>
+    <sap:WorkflowViewStateService.ViewState>
+      <scg:Dictionary x:TypeArguments="x:String, x:Object">
+        <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+      </scg:Dictionary>
+    </sap:WorkflowViewStateService.ViewState>
+
+    <!-- 1. Apply default arguments if not supplied -->
+    <Assign DisplayName="Default LinkedIn URL if empty" sap:VirtualizedContainerService.HintSize="542,113.6" sap2010:WorkflowViewState.IdRef="Assign_DefaultLinkedIn">
+      <Assign.To>
+        <OutArgument x:TypeArguments="x:String">[in_LinkedInUrl]</OutArgument>
+      </Assign.To>
+      <Assign.Value>
+        <InArgument x:TypeArguments="x:String">[If(String.IsNullOrWhiteSpace(in_LinkedInUrl), "https://www.linkedin.com/in/muhammad-farid-al-hasan-45574b310/", in_LinkedInUrl)]</InArgument>
+      </Assign.Value>
+    </Assign>
+    <Assign DisplayName="Default GitHub URL if empty" sap:VirtualizedContainerService.HintSize="542,113.6" sap2010:WorkflowViewState.IdRef="Assign_DefaultGitHub">
+      <Assign.To>
+        <OutArgument x:TypeArguments="x:String">[in_GitHubUrl]</OutArgument>
+      </Assign.To>
+      <Assign.Value>
+        <InArgument x:TypeArguments="x:String">[If(String.IsNullOrWhiteSpace(in_GitHubUrl), "muhammad2341", in_GitHubUrl)]</InArgument>
+      </Assign.Value>
+    </Assign>
+    <Assign DisplayName="Default Recipient Email if empty" sap:VirtualizedContainerService.HintSize="542,113.6" sap2010:WorkflowViewState.IdRef="Assign_DefaultEmail">
+      <Assign.To>
+        <OutArgument x:TypeArguments="x:String">[in_RecipientEmail]</OutArgument>
+      </Assign.To>
+      <Assign.Value>
+        <InArgument x:TypeArguments="x:String">[If(String.IsNullOrWhiteSpace(in_RecipientEmail), "farid@example.com", in_RecipientEmail)]</InArgument>
+      </Assign.Value>
+    </Assign>
+    <Assign DisplayName="Default Target Job Role if empty" sap:VirtualizedContainerService.HintSize="542,113.6" sap2010:WorkflowViewState.IdRef="Assign_DefaultRole">
+      <Assign.To>
+        <OutArgument x:TypeArguments="x:String">[in_TargetJobRole]</OutArgument>
+      </Assign.To>
+      <Assign.Value>
+        <InArgument x:TypeArguments="x:String">[If(String.IsNullOrWhiteSpace(in_TargetJobRole), "Fullstack Software Engineer", in_TargetJobRole)]</InArgument>
+      </Assign.Value>
+    </Assign>
+    <ui:LogMessage DisplayName="Log applied defaults" sap:VirtualizedContainerService.HintSize="542,141" sap2010:WorkflowViewState.IdRef="LogMessage_Defaults" Level="Info" Message="[&quot;[IngestionAndSynthesis] Input defaults applied — LinkedIn: &quot; &amp; in_LinkedInUrl &amp; &quot; | GitHub: &quot; &amp; in_GitHubUrl &amp; &quot; | Email: &quot; &amp; in_RecipientEmail]" />
+
+    <!-- 2. Invoke 00_ValidateAndNormalizeInputs -->
+    <ui:InvokeWorkflowFile ArgumentsVariable="{x:Null}" ContinueOnError="{x:Null}" DisplayName="Invoke 00_ValidateAndNormalizeInputs workflow" sap:VirtualizedContainerService.HintSize="542,113.6" sap2010:WorkflowViewState.IdRef="Invoke_ValidateInputs" UnSafe="False" WorkflowFileName="Modules\Validation\00_ValidateAndNormalizeInputs.xaml">
+      <ui:InvokeWorkflowFile.Arguments>
+        <InArgument x:TypeArguments="x:String" x:Key="in_LinkedInUrl">[in_LinkedInUrl]</InArgument>
+        <InArgument x:TypeArguments="x:String" x:Key="in_GitHubUrl">[in_GitHubUrl]</InArgument>
+        <InArgument x:TypeArguments="x:String" x:Key="in_TargetJobRole">[in_TargetJobRole]</InArgument>
+        <InArgument x:TypeArguments="x:String" x:Key="in_RecipientEmail">[in_RecipientEmail]</InArgument>
+        <OutArgument x:TypeArguments="x:String" x:Key="out_NormalizedLinkedInUrl">[strNormalizedLinkedInUrl]</OutArgument>
+        <OutArgument x:TypeArguments="x:String" x:Key="out_NormalizedGitHubUrl">[strNormalizedGitHubUrl]</OutArgument>
+        <OutArgument x:TypeArguments="x:String" x:Key="out_NormalizedRole">[strNormalizedRole]</OutArgument>
+        <OutArgument x:TypeArguments="x:String" x:Key="out_NormalizedEmail">[strNormalizedEmail]</OutArgument>
+      </ui:InvokeWorkflowFile.Arguments>
+    </ui:InvokeWorkflowFile>
+
+    <Assign DisplayName="Expose normalized email" sap:VirtualizedContainerService.HintSize="542,113.6" sap2010:WorkflowViewState.IdRef="Assign_ExposeNormEmail">
+      <Assign.To>
+        <OutArgument x:TypeArguments="x:String">[out_NormalizedEmail]</OutArgument>
+      </Assign.To>
+      <Assign.Value>
+        <InArgument x:TypeArguments="x:String">[strNormalizedEmail]</InArgument>
+      </Assign.Value>
+    </Assign>
+
+    <!-- 3. Ingestion Phase: LinkedIn & GitHub -->
+    <Assign DisplayName="Set scraping status" sap:VirtualizedContainerService.HintSize="542,113.6" sap2010:WorkflowViewState.IdRef="Assign_StatusScraping">
+      <Assign.To>
+        <OutArgument x:TypeArguments="x:String">[strJobStatus]</OutArgument>
+      </Assign.To>
+      <Assign.Value>
+        <InArgument x:TypeArguments="x:String">["SCRAPING"]</InArgument>
+      </Assign.Value>
+    </Assign>
+    <Assign DisplayName="Expose scraping status" sap:VirtualizedContainerService.HintSize="542,113.6" sap2010:WorkflowViewState.IdRef="Assign_ExposeScraping">
+      <Assign.To>
+        <OutArgument x:TypeArguments="x:String">[out_JobStatus]</OutArgument>
+      </Assign.To>
+      <Assign.Value>
+        <InArgument x:TypeArguments="x:String">[strJobStatus]</InArgument>
+      </Assign.Value>
+    </Assign>
+    <ui:LogMessage DisplayName="Publish scraping progress" sap:VirtualizedContainerService.HintSize="542,141" sap2010:WorkflowViewState.IdRef="LogMessage_Scraping" Level="Info" Message="[&quot;SCRAPING: Ingesting LinkedIn profile via 01_LinkedIn_ScrapeProfile module.&quot;]" />
+
+    <!-- Invoke 01_LinkedIn_ScrapeProfile -->
+    <ui:InvokeWorkflowFile ArgumentsVariable="{x:Null}" ContinueOnError="{x:Null}" DisplayName="Invoke 01_LinkedIn_ScrapeProfile workflow" sap:VirtualizedContainerService.HintSize="542,113.6" sap2010:WorkflowViewState.IdRef="Invoke_ScrapeLinkedIn" UnSafe="False" WorkflowFileName="Modules\LinkedIn\01_LinkedIn_ScrapeProfile.xaml">
+      <ui:InvokeWorkflowFile.Arguments>
+        <InArgument x:TypeArguments="x:String" x:Key="in_LinkedInUrl">[strNormalizedLinkedInUrl]</InArgument>
+        <InArgument x:TypeArguments="x:String" x:Key="in_BrowserType">["Chrome"]</InArgument>
+        <InArgument x:TypeArguments="x:Boolean" x:Key="in_UseMockFallback">[If(in_UseMockFallback, True, True)]</InArgument>
+        <OutArgument x:TypeArguments="x:String" x:Key="out_LinkedInDataJson">[strLinkedInDataJson]</OutArgument>
+      </ui:InvokeWorkflowFile.Arguments>
+    </ui:InvokeWorkflowFile>
+
+    <!-- Invoke 02_GitHub_FetchUserRepos -->
+    <ui:LogMessage DisplayName="Publish GitHub scraping progress" sap:VirtualizedContainerService.HintSize="542,141" sap2010:WorkflowViewState.IdRef="LogMessage_GitHub" Level="Info" Message="[&quot;SCRAPING: Ingesting GitHub profile &amp; non-fork repositories via 02_GitHub_FetchUserRepos module.&quot;]" />
+    <ui:InvokeWorkflowFile ArgumentsVariable="{x:Null}" ContinueOnError="{x:Null}" DisplayName="Invoke 02_GitHub_FetchUserRepos workflow" sap:VirtualizedContainerService.HintSize="542,113.6" sap2010:WorkflowViewState.IdRef="Invoke_FetchGitHub" UnSafe="False" WorkflowFileName="Modules\GitHub\02_GitHub_FetchUserRepos.xaml">
+      <ui:InvokeWorkflowFile.Arguments>
+        <InArgument x:TypeArguments="x:String" x:Key="in_GitHubUsername">[strNormalizedGitHubUrl]</InArgument>
+        <InArgument x:TypeArguments="x:String" x:Key="in_GitHubToken" />
+        <InArgument x:TypeArguments="x:Boolean" x:Key="in_UseMockFallback">[If(in_UseMockFallback, True, True)]</InArgument>
+        <OutArgument x:TypeArguments="x:String" x:Key="out_GitHubReposJson">[strGitHubDataJson]</OutArgument>
+        <OutArgument x:TypeArguments="x:String" x:Key="out_FetchStatus" />
+      </ui:InvokeWorkflowFile.Arguments>
+    </ui:InvokeWorkflowFile>
+
+    <!-- 4. Synthesis Phase -->
+    <Assign DisplayName="Set synthesis status" sap:VirtualizedContainerService.HintSize="542,113.6" sap2010:WorkflowViewState.IdRef="Assign_StatusSynthesis">
+      <Assign.To>
+        <OutArgument x:TypeArguments="x:String">[strJobStatus]</OutArgument>
+      </Assign.To>
+      <Assign.Value>
+        <InArgument x:TypeArguments="x:String">["SYNTHESIZING"]</InArgument>
+      </Assign.Value>
+    </Assign>
+    <Assign DisplayName="Expose synthesis status" sap:VirtualizedContainerService.HintSize="542,113.6" sap2010:WorkflowViewState.IdRef="Assign_ExposeSynthesis">
+      <Assign.To>
+        <OutArgument x:TypeArguments="x:String">[out_JobStatus]</OutArgument>
+      </Assign.To>
+      <Assign.Value>
+        <InArgument x:TypeArguments="x:String">[strJobStatus]</InArgument>
+      </Assign.Value>
+    </Assign>
+    <ui:LogMessage DisplayName="Publish AI synthesis progress" sap:VirtualizedContainerService.HintSize="542,141" sap2010:WorkflowViewState.IdRef="LogMessage_Synthesis" Level="Info" Message="[&quot;SYNTHESIZING: Invoking 03_AI_SynthesizePortfolio module.&quot;]" />
+
+    <!-- Invoke 03_AI_SynthesizePortfolio -->
+    <ui:InvokeWorkflowFile ArgumentsVariable="{x:Null}" ContinueOnError="{x:Null}" DisplayName="Invoke 03_AI_SynthesizePortfolio workflow" sap:VirtualizedContainerService.HintSize="542,113.6" sap2010:WorkflowViewState.IdRef="Invoke_SynthesizeAI" UnSafe="False" WorkflowFileName="Modules\AI\03_AI_SynthesizePortfolio.xaml">
+      <ui:InvokeWorkflowFile.Arguments>
+        <InArgument x:TypeArguments="x:String" x:Key="in_LinkedInDataJson">[strLinkedInDataJson]</InArgument>
+        <InArgument x:TypeArguments="x:String" x:Key="in_GitHubDataJson">[strGitHubDataJson]</InArgument>
+        <InArgument x:TypeArguments="x:String" x:Key="in_TargetJobRole">[strNormalizedRole]</InArgument>
+        <InArgument x:TypeArguments="x:String" x:Key="in_PersonalInfoJson">["{""recipient_email"":""" &amp; strNormalizedEmail.Replace(ChrW(34).ToString(), "") &amp; """,""linkedin_url"":""" &amp; strNormalizedLinkedInUrl.Replace(ChrW(34).ToString(), "") &amp; """,""github_url"":""" &amp; strNormalizedGitHubUrl.Replace(ChrW(34).ToString(), "") &amp; """}"]</InArgument>
+        <OutArgument x:TypeArguments="x:String" x:Key="out_SynthesizedResumeJson">[strDraftPayload]</OutArgument>
+        <OutArgument x:TypeArguments="x:String" x:Key="out_AIStatus">[strAIStatus]</OutArgument>
+        <OutArgument x:TypeArguments="x:String" x:Key="out_AIWarning">[strAIWarning]</OutArgument>
+      </ui:InvokeWorkflowFile.Arguments>
+    </ui:InvokeWorkflowFile>
+
+    <!-- 5. Curation Phase (#HumanInTheLead) -->
+    <Assign DisplayName="Set curation status" sap:VirtualizedContainerService.HintSize="542,113.6" sap2010:WorkflowViewState.IdRef="Assign_StatusCurating">
+      <Assign.To>
+        <OutArgument x:TypeArguments="x:String">[strJobStatus]</OutArgument>
+      </Assign.To>
+      <Assign.Value>
+        <InArgument x:TypeArguments="x:String">["CURATING"]</InArgument>
+      </Assign.Value>
+    </Assign>
+    <Assign DisplayName="Expose draft for dashboard" sap:VirtualizedContainerService.HintSize="542,113.6" sap2010:WorkflowViewState.IdRef="Assign_DraftPayload">
+      <Assign.To>
+        <OutArgument x:TypeArguments="x:String">[out_DraftResumePayload]</OutArgument>
+      </Assign.To>
+      <Assign.Value>
+        <InArgument x:TypeArguments="x:String">[strDraftPayload]</InArgument>
+      </Assign.Value>
+    </Assign>
+    <Assign DisplayName="Expose curation status" sap:VirtualizedContainerService.HintSize="542,113.6" sap2010:WorkflowViewState.IdRef="Assign_ExposeCurating">
+      <Assign.To>
+        <OutArgument x:TypeArguments="x:String">[out_JobStatus]</OutArgument>
+      </Assign.To>
+      <Assign.Value>
+        <InArgument x:TypeArguments="x:String">[strJobStatus]</InArgument>
+      </Assign.Value>
+    </Assign>
+    <ui:LogMessage DisplayName="Publish curation handoff" sap:VirtualizedContainerService.HintSize="542,141" sap2010:WorkflowViewState.IdRef="LogMessage_CurationReady" Level="Info" Message="[&quot;CURATING: Draft is ready for project selection and human approval.&quot;]" />
+
+    <!-- Webhook Callback to Web Application: /draft -->
+    <If Condition="[Not String.IsNullOrWhiteSpace(in_JobId) AndAlso Not String.IsNullOrWhiteSpace(in_WebhookBaseUrl)]" DisplayName="Check if draft webhook is configured" sap:VirtualizedContainerService.HintSize="542,400" sap2010:WorkflowViewState.IdRef="If_DraftWebhook">
+      <If.Then>
+        <ui:InvokeWorkflowFile ArgumentsVariable="{x:Null}" ContinueOnError="True" DisplayName="Invoke 06_Webhook_NotifyWeb for draft" sap:VirtualizedContainerService.HintSize="416,113.6" sap2010:WorkflowViewState.IdRef="Invoke_WebhookDraft" UnSafe="False" WorkflowFileName="Modules\Webhook\06_Webhook_NotifyWeb.xaml">
+          <ui:InvokeWorkflowFile.Arguments>
+            <InArgument x:TypeArguments="x:String" x:Key="in_WebhookBaseUrl">[in_WebhookBaseUrl]</InArgument>
+            <InArgument x:TypeArguments="x:String" x:Key="in_JobId">[in_JobId]</InArgument>
+            <InArgument x:TypeArguments="x:String" x:Key="in_EndpointType">["draft"]</InArgument>
+            <InArgument x:TypeArguments="x:String" x:Key="in_PayloadJson">[strDraftPayload]</InArgument>
+            <InArgument x:TypeArguments="x:String" x:Key="in_PdfFilePath" />
+            <OutArgument x:TypeArguments="x:Int32" x:Key="out_StatusCode">[intWebhookStatus]</OutArgument>
+            <OutArgument x:TypeArguments="x:String" x:Key="out_ResponseContent">[strWebhookResp]</OutArgument>
+          </ui:InvokeWorkflowFile.Arguments>
+        </ui:InvokeWorkflowFile>
+      </If.Then>
+    </If>
+
+    <!-- Signal whether run should continue immediately (Auto-Approve mode) -->
+    <Assign DisplayName="Determine if auto-delivery should proceed" sap:VirtualizedContainerService.HintSize="542,113.6" sap2010:WorkflowViewState.IdRef="Assign_CheckAutoDelivery">
+      <Assign.To>
+        <OutArgument x:TypeArguments="x:Boolean">[out_ShouldProceedToDelivery]</OutArgument>
+      </Assign.To>
+      <Assign.Value>
+        <InArgument x:TypeArguments="x:Boolean">[Not in_RequireManualApproval]</InArgument>
+      </Assign.Value>
+    </Assign>
+  </Sequence>
+</Activity>
