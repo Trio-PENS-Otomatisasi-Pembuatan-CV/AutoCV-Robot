@@ -73,7 +73,7 @@
       <AssemblyReference>System.Reflection.Metadata</AssemblyReference>
     </sco:Collection>
   </TextExpression.ReferencesForImplementation>
-  <Sequence DisplayName="Test_LinkedIn_Scraper" sap:VirtualizedContainerService.HintSize="892,1000" sap2010:WorkflowViewState.IdRef="Sequence_1">
+  <Sequence sap2010:Annotation.AnnotationText="[UNIT TEST] Menguji modul 01_LinkedIn_ScrapeProfile.xaml dengan URL profil pengujian untuk memverifikasi ekstraksi profil dan integritas skema JSON keluaran." DisplayName="Test_LinkedIn_Scraper" sap:VirtualizedContainerService.HintSize="892,1000" sap2010:WorkflowViewState.IdRef="Sequence_1">
     <Sequence.Variables>
       <Variable x:TypeArguments="x:String" Name="strTestResultJson" />
       <Variable x:TypeArguments="x:String" Name="strTestUrl" Default="https://www.linkedin.com/in/muhammad-farid-al-hasan-45574b310/" />

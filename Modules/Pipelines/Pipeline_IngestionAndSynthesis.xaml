@@ -84,7 +84,7 @@
       <AssemblyReference>System.Runtime.Serialization.Primitives</AssemblyReference>
     </sco:Collection>
   </TextExpression.ReferencesForImplementation>
-  <Sequence DisplayName="Pipeline: Ingestion and Synthesis" sap:VirtualizedContainerService.HintSize="576,2600" sap2010:WorkflowViewState.IdRef="Sequence_IngestionAndSynthesis">
+  <Sequence sap2010:Annotation.AnnotationText="[SINGLE RESPONSIBILITY] Pipeline Orkestrasi Fase 1 (Ingestion &amp; AI Synthesis). Bertanggung jawab memvalidasi masukan kandidat, mengekstrak profil LinkedIn dan portofolio GitHub, menyintesis draf resume menggunakan GenAI (STAR/XYZ formula), serta mengirimkan draf ke Webhook backend /draft.&#xA;&#xA;[KONTRAK ARGUMEN]&#xA;- in_JobId (String): ID unik pekerjaan dari Web Portal (contoh: &quot;job-123&quot;).&#xA;- in_LinkedInUrl (String): URL profil publik LinkedIn (format &quot;https://www.linkedin.com/in/...&quot;).&#xA;- in_GitHubUrl (String): URL atau username GitHub (contoh: &quot;octocat&quot;).&#xA;- in_TargetJobRole (String): Target posisi kerja untuk pembobotan kata kunci AI (contoh: &quot;Fullstack Engineer&quot;).&#xA;- in_RecipientEmail (String): Alamat email kandidat.&#xA;- in_WebhookBaseUrl (String): Base URL backend untuk notifikasi webhook.&#xA;- in_UseMockFallback (Boolean): True = gunakan fixture deterministik lokal jika sesi eksternal offline.&#xA;- in_RequireManualApproval (Boolean): True = tahan pada status CURATING (#HumanInTheLead); False = auto-deliver.&#xA;- out_JobStatus (String): Status fase (&quot;CURATING&quot;).&#xA;- out_DraftResumePayload (String): Objek JSON draf resume hasil AI.&#xA;- out_NormalizedEmail (String): Alamat email yang telah divalidasi dan dinormalisasi.&#xA;- out_ShouldProceedToDelivery (Boolean): Flag sinyal ke Main apakah harus langsung memicu Fase 2." DisplayName="Pipeline: Ingestion and Synthesis" sap:VirtualizedContainerService.HintSize="576,2600" sap2010:WorkflowViewState.IdRef="Sequence_IngestionAndSynthesis">
     <Sequence.Variables>
       <Variable x:TypeArguments="x:String" Name="strJobStatus" />
       <Variable x:TypeArguments="x:String" Name="strDraftPayload" />
@@ -141,7 +141,7 @@
     <ui:LogMessage DisplayName="Log applied defaults" sap:VirtualizedContainerService.HintSize="542,141" sap2010:WorkflowViewState.IdRef="LogMessage_Defaults" Level="Info" Message="[&quot;[IngestionAndSynthesis] Input defaults applied — LinkedIn: &quot; &amp; in_LinkedInUrl &amp; &quot; | GitHub: &quot; &amp; in_GitHubUrl &amp; &quot; | Email: &quot; &amp; in_RecipientEmail]" />
 
     <!-- 2. Invoke 00_ValidateAndNormalizeInputs -->
-    <ui:InvokeWorkflowFile ArgumentsVariable="{x:Null}" ContinueOnError="{x:Null}" DisplayName="Invoke 00_ValidateAndNormalizeInputs workflow" sap:VirtualizedContainerService.HintSize="542,113.6" sap2010:WorkflowViewState.IdRef="Invoke_ValidateInputs" UnSafe="False" WorkflowFileName="Modules\Validation\00_ValidateAndNormalizeInputs.xaml">
+    <ui:InvokeWorkflowFile ArgumentsVariable="{x:Null}" ContinueOnError="{x:Null}" sap2010:Annotation.AnnotationText="[SUB-WORKFLOW] Memvalidasi regex URL LinkedIn, GitHub, dan format email serta membersihkan karakter tidak standar." DisplayName="Invoke 00_ValidateAndNormalizeInputs workflow" sap:VirtualizedContainerService.HintSize="542,113.6" sap2010:WorkflowViewState.IdRef="Invoke_ValidateInputs" UnSafe="False" WorkflowFileName="Modules\Validation\00_ValidateAndNormalizeInputs.xaml">
       <ui:InvokeWorkflowFile.Arguments>
         <InArgument x:TypeArguments="x:String" x:Key="in_LinkedInUrl">[in_LinkedInUrl]</InArgument>
         <InArgument x:TypeArguments="x:String" x:Key="in_GitHubUrl">[in_GitHubUrl]</InArgument>
@@ -183,7 +183,7 @@
     <ui:LogMessage DisplayName="Publish scraping progress" sap:VirtualizedContainerService.HintSize="542,141" sap2010:WorkflowViewState.IdRef="LogMessage_Scraping" Level="Info" Message="[&quot;SCRAPING: Ingesting LinkedIn profile via 01_LinkedIn_ScrapeProfile module.&quot;]" />
 
     <!-- Invoke 01_LinkedIn_ScrapeProfile -->
-    <ui:InvokeWorkflowFile ArgumentsVariable="{x:Null}" ContinueOnError="{x:Null}" DisplayName="Invoke 01_LinkedIn_ScrapeProfile workflow" sap:VirtualizedContainerService.HintSize="542,113.6" sap2010:WorkflowViewState.IdRef="Invoke_ScrapeLinkedIn" UnSafe="False" WorkflowFileName="Modules\LinkedIn\01_LinkedIn_ScrapeProfile.xaml">
+    <ui:InvokeWorkflowFile ArgumentsVariable="{x:Null}" ContinueOnError="{x:Null}" sap2010:Annotation.AnnotationText="[SUB-WORKFLOW] Mengekstrak riwayat pengalaman, pendidikan, dan skills dari profil publik LinkedIn dengan fallback mock otomatis." DisplayName="Invoke 01_LinkedIn_ScrapeProfile workflow" sap:VirtualizedContainerService.HintSize="542,113.6" sap2010:WorkflowViewState.IdRef="Invoke_ScrapeLinkedIn" UnSafe="False" WorkflowFileName="Modules\LinkedIn\01_LinkedIn_ScrapeProfile.xaml">
       <ui:InvokeWorkflowFile.Arguments>
         <InArgument x:TypeArguments="x:String" x:Key="in_LinkedInUrl">[strNormalizedLinkedInUrl]</InArgument>
         <InArgument x:TypeArguments="x:String" x:Key="in_BrowserType">["Chrome"]</InArgument>
@@ -194,7 +194,7 @@
 
     <!-- Invoke 02_GitHub_FetchUserRepos -->
     <ui:LogMessage DisplayName="Publish GitHub scraping progress" sap:VirtualizedContainerService.HintSize="542,141" sap2010:WorkflowViewState.IdRef="LogMessage_GitHub" Level="Info" Message="[&quot;SCRAPING: Ingesting GitHub profile &amp; non-fork repositories via 02_GitHub_FetchUserRepos module.&quot;]" />
-    <ui:InvokeWorkflowFile ArgumentsVariable="{x:Null}" ContinueOnError="{x:Null}" DisplayName="Invoke 02_GitHub_FetchUserRepos workflow" sap:VirtualizedContainerService.HintSize="542,113.6" sap2010:WorkflowViewState.IdRef="Invoke_FetchGitHub" UnSafe="False" WorkflowFileName="Modules\GitHub\02_GitHub_FetchUserRepos.xaml">
+    <ui:InvokeWorkflowFile ArgumentsVariable="{x:Null}" ContinueOnError="{x:Null}" sap2010:Annotation.AnnotationText="[SUB-WORKFLOW] Mengambil profil dan repositori publik GitHub beserta metrik stars, fork, bahasa pemrograman, dan topik." DisplayName="Invoke 02_GitHub_FetchUserRepos workflow" sap:VirtualizedContainerService.HintSize="542,113.6" sap2010:WorkflowViewState.IdRef="Invoke_FetchGitHub" UnSafe="False" WorkflowFileName="Modules\GitHub\02_GitHub_FetchUserRepos.xaml">
       <ui:InvokeWorkflowFile.Arguments>
         <InArgument x:TypeArguments="x:String" x:Key="in_GitHubUsername">[strNormalizedGitHubUrl]</InArgument>
         <InArgument x:TypeArguments="x:String" x:Key="in_GitHubToken" />
@@ -224,7 +224,7 @@
     <ui:LogMessage DisplayName="Publish AI synthesis progress" sap:VirtualizedContainerService.HintSize="542,141" sap2010:WorkflowViewState.IdRef="LogMessage_Synthesis" Level="Info" Message="[&quot;SYNTHESIZING: Invoking 03_AI_SynthesizePortfolio module.&quot;]" />
 
     <!-- Invoke 03_AI_SynthesizePortfolio -->
-    <ui:InvokeWorkflowFile ArgumentsVariable="{x:Null}" ContinueOnError="{x:Null}" DisplayName="Invoke 03_AI_SynthesizePortfolio workflow" sap:VirtualizedContainerService.HintSize="542,113.6" sap2010:WorkflowViewState.IdRef="Invoke_SynthesizeAI" UnSafe="False" WorkflowFileName="Modules\AI\03_AI_SynthesizePortfolio.xaml">
+    <ui:InvokeWorkflowFile ArgumentsVariable="{x:Null}" ContinueOnError="{x:Null}" sap2010:Annotation.AnnotationText="[SUB-WORKFLOW] Menyintesis portofolio kandidat dengan GenAI multi-provider (Gemini / OpenRouter) menggunakan formula STAR dan XYZ terstruktur." DisplayName="Invoke 03_AI_SynthesizePortfolio workflow" sap:VirtualizedContainerService.HintSize="542,113.6" sap2010:WorkflowViewState.IdRef="Invoke_SynthesizeAI" UnSafe="False" WorkflowFileName="Modules\AI\03_AI_SynthesizePortfolio.xaml">
       <ui:InvokeWorkflowFile.Arguments>
         <InArgument x:TypeArguments="x:String" x:Key="in_LinkedInDataJson">[strLinkedInDataJson]</InArgument>
         <InArgument x:TypeArguments="x:String" x:Key="in_GitHubDataJson">[strGitHubDataJson]</InArgument>
@@ -264,9 +264,9 @@
     <ui:LogMessage DisplayName="Publish curation handoff" sap:VirtualizedContainerService.HintSize="542,141" sap2010:WorkflowViewState.IdRef="LogMessage_CurationReady" Level="Info" Message="[&quot;CURATING: Draft is ready for project selection and human approval.&quot;]" />
 
     <!-- Webhook Callback to Web Application: /draft -->
-    <If Condition="[Not String.IsNullOrWhiteSpace(in_JobId) AndAlso Not String.IsNullOrWhiteSpace(in_WebhookBaseUrl)]" DisplayName="Check if draft webhook is configured" sap:VirtualizedContainerService.HintSize="542,400" sap2010:WorkflowViewState.IdRef="If_DraftWebhook">
+    <If Condition="[Not String.IsNullOrWhiteSpace(in_JobId) AndAlso Not String.IsNullOrWhiteSpace(in_WebhookBaseUrl)]" sap2010:Annotation.AnnotationText="[PERCABANGAN LOGIKA] Memeriksa ketersediaan in_JobId dan in_WebhookBaseUrl. Jika keduanya terisi, panggil modul Webhook 06 dengan endpoint /draft untuk menyerahkan draf resume ke Web Portal." DisplayName="Check if draft webhook is configured" sap:VirtualizedContainerService.HintSize="542,400" sap2010:WorkflowViewState.IdRef="If_DraftWebhook">
       <If.Then>
-        <ui:InvokeWorkflowFile ArgumentsVariable="{x:Null}" ContinueOnError="True" DisplayName="Invoke 06_Webhook_NotifyWeb for draft" sap:VirtualizedContainerService.HintSize="416,113.6" sap2010:WorkflowViewState.IdRef="Invoke_WebhookDraft" UnSafe="False" WorkflowFileName="Modules\Webhook\06_Webhook_NotifyWeb.xaml">
+        <ui:InvokeWorkflowFile ArgumentsVariable="{x:Null}" ContinueOnError="True" sap2010:Annotation.AnnotationText="[SUB-WORKFLOW] Mengirimkan POST payload JSON draf resume ke Webhook backend /draft." DisplayName="Invoke 06_Webhook_NotifyWeb for draft" sap:VirtualizedContainerService.HintSize="416,113.6" sap2010:WorkflowViewState.IdRef="Invoke_WebhookDraft" UnSafe="False" WorkflowFileName="Modules\Webhook\06_Webhook_NotifyWeb.xaml">
           <ui:InvokeWorkflowFile.Arguments>
             <InArgument x:TypeArguments="x:String" x:Key="in_WebhookBaseUrl">[in_WebhookBaseUrl]</InArgument>
             <InArgument x:TypeArguments="x:String" x:Key="in_JobId">[in_JobId]</InArgument>
@@ -281,7 +281,7 @@
     </If>
 
     <!-- Signal whether run should continue immediately (Auto-Approve mode) -->
-    <Assign DisplayName="Determine if auto-delivery should proceed" sap:VirtualizedContainerService.HintSize="542,113.6" sap2010:WorkflowViewState.IdRef="Assign_CheckAutoDelivery">
+    <Assign sap2010:Annotation.AnnotationText="[LOGIKA BISNIS] Menetapkan sinyal out_ShouldProceedToDelivery. Bernilai True jika in_RequireManualApproval=False, memberi tahu Main Dispatcher untuk langsung lanjut mencetak dokumen tanpa menunggu approval manusia." DisplayName="Determine if auto-delivery should proceed" sap:VirtualizedContainerService.HintSize="542,113.6" sap2010:WorkflowViewState.IdRef="Assign_CheckAutoDelivery">
       <Assign.To>
         <OutArgument x:TypeArguments="x:Boolean">[out_ShouldProceedToDelivery]</OutArgument>
       </Assign.To>

@@ -55,7 +55,7 @@
       <AssemblyReference>System.ObjectModel</AssemblyReference>
     </sco:Collection>
   </TextExpression.ReferencesForImplementation>
-  <Sequence DisplayName="Test_Webhook_NotifyWeb" sap:VirtualizedContainerService.HintSize="892,1200" sap2010:WorkflowViewState.IdRef="Sequence_1">
+  <Sequence sap2010:Annotation.AnnotationText="[UNIT TEST] Menguji modul 06_Webhook_NotifyWeb.xaml untuk memvalidasi penanganan konfigurasi kosong (skips cleanly) serta pemanggilan webhook endpoint draf." DisplayName="Test_Webhook_NotifyWeb" sap:VirtualizedContainerService.HintSize="892,1200" sap2010:WorkflowViewState.IdRef="Sequence_1">
     <Sequence.Variables>
       <Variable x:TypeArguments="x:Int32" Name="intStatusCode" />
       <Variable x:TypeArguments="x:String" Name="strResponse" />

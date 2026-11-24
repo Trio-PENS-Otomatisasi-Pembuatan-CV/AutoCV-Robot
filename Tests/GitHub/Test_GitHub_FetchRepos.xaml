@@ -57,7 +57,7 @@
       <AssemblyReference>System.Collections.NonGeneric</AssemblyReference>
     </sco:Collection>
   </TextExpression.ReferencesForImplementation>
-  <Sequence DisplayName="Test_GitHub_FetchRepos" sap:VirtualizedContainerService.HintSize="892,1200" sap2010:WorkflowViewState.IdRef="Sequence_1">
+  <Sequence sap2010:Annotation.AnnotationText="[UNIT TEST] Menguji modul 02_GitHub_FetchUserRepos.xaml untuk mengambil repositori akun GitHub (misal: octocat) dan memverifikasi array repositori serta status pengambilan." DisplayName="Test_GitHub_FetchRepos" sap:VirtualizedContainerService.HintSize="892,1200" sap2010:WorkflowViewState.IdRef="Sequence_1">
     <Sequence.Variables>
       <Variable x:TypeArguments="x:String" Name="strReposJson" />
       <Variable x:TypeArguments="x:String" Name="strFetchStatus" />

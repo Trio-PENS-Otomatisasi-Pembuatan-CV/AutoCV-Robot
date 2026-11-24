@@ -41,7 +41,7 @@
       <AssemblyReference>System.Collections</AssemblyReference>
     </sco:Collection>
   </TextExpression.ReferencesForImplementation>
-  <Sequence DisplayName="AI Synthesize Portfolio" sap2010:WorkflowViewState.IdRef="Sequence_1">
+  <Sequence sap2010:Annotation.AnnotationText="[SINGLE RESPONSIBILITY] Menyintesis data mentah dari profil LinkedIn dan repositori GitHub menjadi draf resume terstruktur berstandar ATS menggunakan Generative AI (Google Gemini API). Merumuskan butir pengalaman dengan pola STAR (Situation, Task, Action, Result) dan Google XYZ. Dilengkapi retry dan toleransi kesalahan otomatis ke mock data lokal.&#xA;&#xA;[KONTRAK ARGUMEN]&#xA;- in_LinkedInDataJson (String): Objek JSON riwayat LinkedIn.&#xA;- in_GitHubDataJson (String): Objek JSON daftar repositori publik GitHub.&#xA;- in_TargetJobRole (String): Target posisi pekerjaan untuk penyesuaian kata kunci.&#xA;- in_PersonalInfoJson (String): Objek JSON informasi kontak kandidat.&#xA;- out_SynthesizedResumeJson (String): Objek JSON draf resume final (profile, experiences, projects, skills, education).&#xA;- out_AIStatus (String): Status eksekusi (&quot;GEMINI_SYNTHESIS&quot; atau &quot;SUCCESS_MOCK_FALLBACK&quot;).&#xA;- out_AIWarning (String): Pesan peringatan atau diagnostik jika terjadi fallback." DisplayName="AI Synthesize Portfolio" sap2010:WorkflowViewState.IdRef="Sequence_1">
     <Sequence.Variables>
       <Variable x:TypeArguments="x:String" Name="strApiKeyFile" />
       <Variable x:TypeArguments="x:String" Name="strApiKey" />
@@ -196,7 +196,7 @@
     </Assign>
 
     <!-- 7. Call Gemini only when a usable API key is present -->
-    <If Condition="[String.IsNullOrWhiteSpace(strApiKey)]" DisplayName="Skip AI call when API key is missing" sap2010:WorkflowViewState.IdRef="If_2">
+    <If Condition="[String.IsNullOrWhiteSpace(strApiKey)]" sap2010:Annotation.AnnotationText="[PERCABANGAN LOGIKA] Memeriksa keberadaan API key Gemini. Jika kosong, lewati panggilan network dan tandai AI sebagai skipped untuk memicu fallback lokal." DisplayName="Skip AI call when API key is missing" sap2010:WorkflowViewState.IdRef="If_2">
       <If.Then>
         <Sequence DisplayName="No API key fallback" sap2010:WorkflowViewState.IdRef="Sequence_3">
           <Assign DisplayName="Mark AI as skipped" sap2010:WorkflowViewState.IdRef="Assign_13">
@@ -220,7 +220,7 @@
       </If.Then>
       <If.Else>
         <Sequence DisplayName="Call Gemini API" sap2010:WorkflowViewState.IdRef="Sequence_4">
-          <TryCatch DisplayName="Try Gemini synthesis" sap2010:WorkflowViewState.IdRef="TryCatch_1">
+          <TryCatch sap2010:Annotation.AnnotationText="[PENANGANAN ERROR] Mencoba request ke Google Gemini API dengan retry 3 kali. Jika terkena limit (429), server error (500), atau jaringan putus, blok Catch menangkap exception dan mengarahkan ke fallback mock tanpa menghentikan alur." DisplayName="Try Gemini synthesis" sap2010:WorkflowViewState.IdRef="TryCatch_1">
             <TryCatch.Try>
               <Sequence DisplayName="Call and parse Gemini" sap2010:WorkflowViewState.IdRef="Sequence_5">
                 <ui:InvokeCode DisplayName="Call Gemini API directly with API key" Language="VBNet" Code="statusCode = 0&#xA;rawText = &quot;&quot;&#xA;resumeJson = &quot;&quot;&#xA;errorDetail = &quot;&quot;&#xA;Dim attempt As Integer = 0&#xA;Dim lastError As String = &quot;&quot;&#xA;Try&#xA;  While attempt &lt; 3&#xA;    attempt += 1&#xA;    Try&#xA;      Dim handler As New System.Net.Http.HttpClientHandler()&#xA;      handler.UseProxy = True&#xA;      Using client As New System.Net.Http.HttpClient(handler)&#xA;        client.Timeout = System.TimeSpan.FromSeconds(90)&#xA;        Dim content As New System.Net.Http.StringContent(requestBody, System.Text.Encoding.UTF8, &quot;application/json&quot;)&#xA;        Dim response As System.Net.Http.HttpResponseMessage = client.PostAsync(apiUrl, content).GetAwaiter().GetResult()&#xA;        statusCode = CInt(response.StatusCode)&#xA;        rawText = response.Content.ReadAsStringAsync().GetAwaiter().GetResult()&#xA;      End Using&#xA;      If statusCode &gt;= 500 AndAlso attempt &lt; 3 Then&#xA;        lastError = &quot;Gemini HTTP status &quot; &amp; statusCode.ToString()&#xA;        System.Threading.Thread.Sleep(2000)&#xA;      Else&#xA;        Exit While&#xA;      End If&#xA;    Catch ex As Exception&#xA;      lastError = &quot;Gemini call failed: &quot; &amp; ex.Message&#xA;      If attempt &lt; 3 Then&#xA;        System.Threading.Thread.Sleep(2000)&#xA;      End If&#xA;    End Try&#xA;  End While&#xA;  If statusCode = 200 Then&#xA;    Dim envelope As Newtonsoft.Json.Linq.JObject = Newtonsoft.Json.Linq.JObject.Parse(rawText)&#xA;    Dim token As Newtonsoft.Json.Linq.JToken = envelope.SelectToken(&quot;candidates[0].content.parts[0].text&quot;)&#xA;    If token Is Nothing Then&#xA;      errorDetail = &quot;Gemini response did not contain candidate text&quot;&#xA;    Else&#xA;      rawText = token.ToString()&#xA;      resumeJson = rawText.Replace(&quot;```json&quot;, String.Empty).Replace(&quot;```&quot;, String.Empty).Trim()&#xA;      Dim check As Newtonsoft.Json.Linq.JObject = Newtonsoft.Json.Linq.JObject.Parse(resumeJson)&#xA;    End If&#xA;  Else&#xA;    errorDetail = If(String.IsNullOrEmpty(lastError), &quot;Gemini HTTP status &quot; &amp; statusCode.ToString() &amp; &quot;: &quot; &amp; rawText, lastError)&#xA;  End If&#xA;Catch ex As Exception&#xA;  errorDetail = &quot;Gemini call failed: &quot; &amp; ex.Message&#xA;End Try" sap2010:WorkflowViewState.IdRef="InvokeCode_1">
@@ -233,7 +233,7 @@
                     <OutArgument x:TypeArguments="x:String" x:Key="errorDetail">[strErrorDetail]</OutArgument>
                   </ui:InvokeCode.Arguments>
                 </ui:InvokeCode>
-                <If Condition="[intHttpStatus = 200 AndAlso Not String.IsNullOrWhiteSpace(strExtractedJson)]" DisplayName="Use Gemini result when synthesis succeeded" sap2010:WorkflowViewState.IdRef="If_3">
+                <If Condition="[intHttpStatus = 200 AndAlso Not String.IsNullOrWhiteSpace(strExtractedJson)]" sap2010:Annotation.AnnotationText="[PERCABANGAN LOGIKA] Mengecek apakah HTTP status bernilai 200 OK dan JSON hasil sintesis berhasil di-parse. Jika sukses, tandai boolAiSuccess=True." DisplayName="Use Gemini result when synthesis succeeded" sap2010:WorkflowViewState.IdRef="If_3">
                   <If.Then>
                     <Sequence DisplayName="Extract resume JSON" sap2010:WorkflowViewState.IdRef="Sequence_6">
                       <Assign DisplayName="Mark AI synthesis successful" sap2010:WorkflowViewState.IdRef="Assign_18">
@@ -305,7 +305,7 @@
     </If>
 
     <!-- 8. Publish outputs: Gemini result when AI succeeded, otherwise empty + error -->
-    <If Condition="[boolAiSuccess]" DisplayName="Publish AI result or report failure" sap2010:WorkflowViewState.IdRef="If_4">
+    <If Condition="[boolAiSuccess]" sap2010:Annotation.AnnotationText="[PERCABANGAN LOGIKA] Pemilihan Output: Jika boolAiSuccess=True, publikasikan JSON hasil Gemini. Jika False, muat Data/Mocks/CuratedResumeMock.json sebagai fallback deterministik agar alur tetap berjalan lancar." DisplayName="Publish AI result or report failure" sap2010:WorkflowViewState.IdRef="If_4">
       <If.Then>
         <Sequence DisplayName="Publish Gemini result" sap2010:WorkflowViewState.IdRef="Sequence_9">
           <Assign DisplayName="Expose synthesized resume JSON" sap2010:WorkflowViewState.IdRef="Assign_23">

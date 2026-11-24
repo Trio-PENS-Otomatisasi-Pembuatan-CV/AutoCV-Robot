@@ -69,7 +69,7 @@
       <AssemblyReference>System.Runtime.Serialization.Primitives</AssemblyReference>
     </sco:Collection>
   </TextExpression.ReferencesForImplementation>
-  <Sequence DisplayName="Test_Validate_Inputs" sap:VirtualizedContainerService.HintSize="892,1000" sap2010:WorkflowViewState.IdRef="Sequence_1">
+  <Sequence sap2010:Annotation.AnnotationText="[UNIT TEST] Menguji modul 00_ValidateAndNormalizeInputs.xaml untuk memastikan masukan URL LinkedIn, username GitHub, target role, dan email berhasil dinormalisasi dan divalidasi sesuai ekspektasi." DisplayName="Test_Validate_Inputs" sap:VirtualizedContainerService.HintSize="892,1000" sap2010:WorkflowViewState.IdRef="Sequence_1">
     <Sequence.Variables>
       <Variable x:TypeArguments="x:String" Name="strOutLinkedIn" />
       <Variable x:TypeArguments="x:String" Name="strOutGitHub" />
