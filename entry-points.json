@@ -8,9 +8,6 @@
       "input": {
         "type": "object",
         "properties": {
-          "in_Language": {
-            "type": "string"
-          },
           "in_JobId": {
             "type": "string"
           },

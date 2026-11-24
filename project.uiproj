@@ -1,5 +1,5 @@
 {
-  "Name": "AutoCVDeploymentTemplate",
+  "Name": "AutoCV Deployment",
   "ProjectType": "Process",
   "Description": "Blank Process",
   "MainFile": "Main.xaml"

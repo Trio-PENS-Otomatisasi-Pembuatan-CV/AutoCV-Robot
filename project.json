@@ -1,5 +1,5 @@
 {
-  "name": "AutoCVDeploymentTemplate",
+  "name": "AutoCV Deployment",
   "projectId": "47585024-7fc3-471b-b1da-28849805ccc2",
   "description": "Blank Process",
   "main": "Main.xaml",
@@ -15,7 +15,7 @@
   "entitiesStores": [],
   "schemaVersion": "4.2",
   "studioVersion": "26.10.0.0",
-  "projectVersion": "1.0.9",
+  "projectVersion": "1.0.10",
   "runtimeOptions": {
     "autoDispose": false,
     "netFrameworkLazyLoading": false,
@@ -29,7 +29,7 @@
       "*password*"
     ],
     "executionType": "Workflow",
-    "readyForPiP": false,
+    "readyForPiP": true,
     "startsInPiP": false,
     "mustRestoreAllDependencies": true,
     "pipType": "ChildSession"
@@ -123,7 +123,7 @@
       ]
     }
   ],
-  "isTemplate": true,
+  "isTemplate": false,
   "templateProjectData": {},
   "publishData": {},
   "targetFramework": "Windows",

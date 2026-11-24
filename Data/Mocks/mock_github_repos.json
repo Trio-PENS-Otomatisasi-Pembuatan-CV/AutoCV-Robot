@@ -3,7 +3,7 @@
     "login": "mfarid",
     "name": "Muhammad Farid Al Hasan",
     "bio": "Software engineer and AI automation enthusiast",
-    "public_repos": 3,
+    "public_repos": 10,
     "avatar_url": "https://avatars.githubusercontent.com/u/mock"
   },
   "repositories": [
@@ -26,21 +26,75 @@
       "fork": false
     },
     {
-      "name": "forked-template",
-      "description": "Forked sample repository",
-      "language": "Python",
-      "stargazers_count": 20,
-      "forks_count": 2,
-      "topics": ["sample"],
-      "fork": true
+      "name": "distributed-scheduler",
+      "description": "Distributed task scheduling engine with Redis distributed locks",
+      "language": "TypeScript",
+      "stargazers_count": 99,
+      "forks_count": 14,
+      "topics": ["typescript", "redis", "docker"],
+      "fork": false
     },
     {
-      "name": "empty-repo",
-      "description": "",
-      "language": "",
-      "stargazers_count": 0,
-      "forks_count": 0,
-      "topics": [],
+      "name": "astro-resume-cv",
+      "description": "Modern resume builder generator with responsive PDF export",
+      "language": "Astro",
+      "stargazers_count": 62,
+      "forks_count": 8,
+      "topics": ["astro", "react", "resume"],
+      "fork": false
+    },
+    {
+      "name": "cv-report-batch",
+      "description": "High-throughput batch export pipeline for candidate dossiers",
+      "language": "Go",
+      "stargazers_count": 19,
+      "forks_count": 2,
+      "topics": ["golang", "batch", "postgresql"],
+      "fork": false
+    },
+    {
+      "name": "uipath-orchestrator-ci",
+      "description": "CI/CD automation pipelines for UiPath package deployment",
+      "language": "PowerShell",
+      "stargazers_count": 31,
+      "forks_count": 4,
+      "topics": ["uipath", "powershell", "devops"],
+      "fork": false
+    },
+    {
+      "name": "ai-agent-rag-pipeline",
+      "description": "Retrieval Augmented Generation pipeline with vector database",
+      "language": "Python",
+      "stargazers_count": 78,
+      "forks_count": 11,
+      "topics": ["python", "langchain", "qdrant"],
+      "fork": false
+    },
+    {
+      "name": "clean-architecture-nextjs",
+      "description": "Next.js enterprise boilerplate implementing Clean Architecture",
+      "language": "TypeScript",
+      "stargazers_count": 42,
+      "forks_count": 6,
+      "topics": ["nextjs", "clean-architecture", "typescript"],
+      "fork": false
+    },
+    {
+      "name": "redis-event-bus",
+      "description": "Lightweight event bus using Redis streams and consumer groups",
+      "language": "Go",
+      "stargazers_count": 28,
+      "forks_count": 3,
+      "topics": ["golang", "redis", "pubsub"],
+      "fork": false
+    },
+    {
+      "name": "graphql-microservices-gateway",
+      "description": "Federated GraphQL API gateway aggregating backend services",
+      "language": "TypeScript",
+      "stargazers_count": 53,
+      "forks_count": 7,
+      "topics": ["graphql", "apollo", "microservices"],
       "fork": false
     }
   ]
