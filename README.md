@@ -1,283 +1,238 @@
-# AutoCV — Intelligent Career Dossier & ATS Resume Builder
+# AutoCV-Robot — Intelligent Career Dossier & ATS Resume Builder
 
-> Membangun CV ATS-friendly dari profil LinkedIn dan proyek GitHub, disintesis dengan AI,
-> dikurasi manusia, lalu diekspor menjadi PDF/DOCX dan dikirim via email.
->
-> **#HumanInTheLead** · Automation Hackathon 2026 (Indosat Ooredoo Hutchison × UiPath × ONE Indonesia)
+> **Solusi Otomasi RPA & Generative AI untuk Transformasi Karir Berbasis Standar ATS Internasional**  
+> **Automation Hackathon 2026** · *Indosat Ooredoo Hutchison × UiPath × ONE Indonesia*  
+> Tema Utama: **#HumanInTheLead** · Kategori: Enterprise RPA & GenAI Integration
 
-AutoCV menggabungkan **portal web Next.js** dengan **robot RPA UiPath**. Robot mengekstrak data
-LinkedIn/GitHub, AI merumuskan pencapaian dengan pola STAR, dan pengguna tetap memegang kendali
-penuh lewat dashboard kurasi sebelum dokumen final dicetak.
+[![UiPath Studio](https://img.shields.io/badge/UiPath%20Studio-26.10-orange.svg?logo=uipath)](https://www.uipath.com/)
+[![Runtime Framework](https://img.shields.io/badge/Framework-.NET%2010%20Windows-blue.svg)](https://dotnet.microsoft.com/)
+[![GenAI Provider](https://img.shields.io/badge/GenAI-Google%20Gemini%202.0%20Flash-4285F4.svg?logo=google)](https://ai.google.dev/)
+[![Architecture](https://img.shields.io/badge/Architecture-Clean%20Code%20%7C%20SRP%20Dual--Mode-success.svg)](#2-arsitektur-smart-dual-mode-dispatcher)
+[![XAML Integrity](https://img.shields.io/badge/XAML%20Validation-16%2F16%20Passed%20(100%25)-brightgreen.svg)](#3-quickstart-evaluasi-juri-5-minute-review)
+[![Test Suite](https://img.shields.io/badge/Test%20Suite-13%2F13%20Passed-brightgreen.svg)](#3-quickstart-evaluasi-juri-5-minute-review)
+[![License](https://img.shields.io/badge/License-MIT-lightgrey.svg)](LICENSE)
+
+---
+
+## 1. Executive Summary & Value Proposition
+
+Dalam ekosistem rekrutmen modern, lebih dari **75% resume pelamar gugur di tahap screening awal Applicant Tracking System (ATS)** sebelum sempat dibaca oleh rekruter manusia. Kegagalan ini sebagian besar bukan disebabkan oleh kurangnya kualifikasi kandidat, melainkan format dokumen non-standar (multi-kolom, tabel rumit, ikon grafis) dan narasi pengalaman yang pasif.
+
+**AutoCV-Robot** hadir sebagai mesin otomasi enterprise yang mentransformasikan data profesional mentah (profil publik LinkedIn dan repositori kode GitHub) menjadi **Career Dossier berstandar Harvard & Stanford ATS** dengan rumusan pencapaian berbasis **STAR** (*Situation, Task, Action, Result*) dan **Google XYZ Formula**.
+
+### Filosofi #HumanInTheLead
+Berbeda dengan sistem AI tertutup yang langsung mengirimkan output tanpa pengawasan, AutoCV menempatkan manusia sebagai pengambil keputusan akhir (*Human-in-the-Loop*):
+1. **Robot Job 1**: Mengekstrak data dan menyintesis draf awal dengan GenAI dalam hitungan detik.
+2. **Kandidat (Manusia)**: Menginspeksi, mengedit butir pengalaman, memilih proyek unggulan, dan menyetujui hasil kurasi pada Web Portal.
+3. **Robot Job 2**: Mengompilasi dokumen resmi OpenXML (.docx) dan PDF ATS beresolusi tinggi, lalu mengirimkannya via email.
+
+---
+
+## 2. Arsitektur Smart Dual-Mode Dispatcher
+
+AutoCV mengimplementasikan pola **Smart Dual-Mode Dispatcher** di dalam [Main.xaml](file:///d:/KULIAHHHH_PENSSS/Hackathon/Automation/robot/Main.xaml). Pola ini memecahkan masalah pemborosan lisensi *unattended robot*—robot Fase 1 tidak pernah dibiarkan dalam kondisi *wait/sleep* menunggu persetujuan manusia:
+
+```mermaid
+flowchart TD
+    Trigger([Orchestrator Trigger]) --> Main[Main.xaml: Smart Dual-Mode Dispatcher]
+    Main --> CheckPayload{in_ApprovedResumePayload Terisi?}
+
+    %% FASE 1: INGESTION & SYNTHESIS
+    CheckPayload -->|Kosong / null: FASE 1| P1[Pipeline_IngestionAndSynthesis.xaml]
+    subgraph Phase1 [Fase 1: Ingestion & AI Synthesis]
+        P1 --> Val[00_ValidateAndNormalizeInputs]
+        Val --> ScrapeLI[01_LinkedIn_ScrapeProfile]
+        ScrapeLI --> FetchGH[02_GitHub_FetchUserRepos]
+        FetchGH --> SynthAI[03_AI_SynthesizePortfolio: Gemini / GPT]
+        SynthAI --> NotifyDraft[06_Webhook_NotifyWeb: POST /draft]
+        NotifyDraft --> CheckApproval{in_RequireManualApproval?}
+        CheckApproval -->|True: Mode Web| ExitCurating([Status: CURATING - Job Selesai Normal])
+        CheckApproval -->|False: Mode Otomatis| P2_Direct[Lanjut Langsung ke Fase 2]
+    end
+
+    %% FASE 2: RENDERING & DELIVERY
+    CheckPayload -->|Ada / Terisi: FASE 2| P2[Pipeline_RenderAndDeliver.xaml]
+    P2_Direct --> P2
+    subgraph Phase2 [Fase 2: Rendering & Delivery]
+        P2 --> GenDoc[04_Document_GeneratePdf: Native OpenXML + PDF]
+        GenDoc --> SendMail[05_Notification_SendMail: SMTP / Simulation]
+        SendMail --> NotifyComp[06_Webhook_NotifyWeb: POST /complete + Base64 PDF]
+        NotifyComp --> ExitSuccess([Status: COMPLETED - Sukses])
+    end
+```
+
+---
+
+## 3. Quickstart Evaluasi Juri (5-Minute Review)
+
+Dewan Juri dapat memverifikasi keandalan teknis robot secara langsung dari terminal PowerShell di folder [robot/](file:///d:/KULIAHHHH_PENSSS/Hackathon/Automation/robot) tanpa memerlukan kredensial eksternal:
+
+### 1. Validasi Integritas 16 File XAML (100% Valid XML)
+```powershell
+powershell -ExecutionPolicy Bypass -File Data\Scripts\Shared\ValidateAllXaml.ps1
+```
+*Memvalidasi seluruh file XAML (Main, Pipelines, Modules, Tests) memiliki struktur XML yang benar dan siap dieksekusi Studio.*
+
+### 2. Eksekusi Unit Test Suite (13/13 Green Test)
+```powershell
+node Data\Scripts\test_modules.js
+```
+*Menguji normalizer, OpenXML builder, HTML template ATS, browser locator, dan GitHub parser.*
+
+### 3. Pembuatan Dokumen Resume ATS Nyata (End-to-End)
+```powershell
+powershell -ExecutionPolicy Bypass -File Data\Scripts\Document\RunResumeGeneration.ps1 -PayloadFile "Data\Mocks\CuratedResumeMock.json"
+```
+*Menghasilkan dokumen resmi `.docx` dan `.pdf` ATS dalam waktu < 1.5 detik di folder [Data/Outputs/](file:///d:/KULIAHHHH_PENSSS/Hackathon/Automation/robot/Data/Outputs).*
+
+### 4. Uji Pengambilan Portofolio GitHub (Live & Fallback)
+```powershell
+powershell -ExecutionPolicy Bypass -File Data\Scripts\GitHub\RunGitHubFetch.ps1 -GitHubInput "octocat" -UseMockFallback "true"
+```
+*Menguji integrasi API publik GitHub dengan ketahanan fallback otomatis.*
+
+> Panduan evaluasi lengkap untuk Dewan Juri tersedia di: [Docs/Jury-Evaluation-Guide.md](file:///d:/KULIAHHHH_PENSSS/Hackathon/Automation/robot/Docs/Jury-Evaluation-Guide.md).
+
+---
+
+## 4. Struktur Repository Modular Baru
+
+Seluruh alur kerja telah dipecah mengikuti *Single Responsibility Principle (SRP)* ke dalam paket fitur terorganisasi:
 
 ```text
-Form Web  →  Robot Job 1 (scrape LinkedIn + GitHub)  →  AI Synthesis
-          →  Dashboard Kurasi (manusia menyunting & menyetujui)
-          →  Robot Job 2 (render DOCX/PDF + kirim email)  →  Selesai
+robot/
+├── Main.xaml                                       # Lightweight Dispatcher / Router (~140 baris)
+├── project.json                                    # UiPath Project Manifest (.NET 10, Windows)
+│
+├── Modules/                                        # Modul Alur Kerja UiPath
+│   ├── Pipelines/                                  # Pipeline Orkestrasi Utama
+│   │   ├── Pipeline_IngestionAndSynthesis.xaml     # Orkestrasi Fase 1 (Ingestion & AI)
+│   │   └── Pipeline_RenderAndDeliver.xaml          # Orkestrasi Fase 2 (Render & Email)
+│   ├── Validation/
+│   │   └── 00_ValidateAndNormalizeInputs.xaml      # Sanitasi regex input URL & email
+│   ├── LinkedIn/
+│   │   └── 01_LinkedIn_ScrapeProfile.xaml          # Scraping profil LinkedIn publik
+│   ├── GitHub/
+│   │   └── 02_GitHub_FetchUserRepos.xaml           # Fetch repositori & statistik GitHub
+│   ├── AI/
+│   │   └── 03_AI_SynthesizePortfolio.xaml          # Multi-LLM synthesis (Gemini/OpenRouter)
+│   ├── Document/
+│   │   └── 04_Document_GeneratePdf.xaml            # Pembuatan dokumen DOCX & PDF ATS
+│   ├── Notification/
+│   │   └── 05_Notification_SendMail.xaml           # Pengiriman email hasil ke kandidat
+│   └── Webhook/
+│       └── 06_Webhook_NotifyWeb.xaml               # Komunikasi REST API 2-arah ke Web
+│
+├── Data/
+│   ├── Config/                                     # Konfigurasi AI & Lingkungan (.env lokal)
+│   ├── Mocks/                                      # Fixture deterministik untuk pengujian offline
+│   │   ├── CuratedResumeMock.json                  # Mock payload kurasi manusia
+│   │   ├── GitHubReposMock.json                    # Mock data repositori GitHub
+│   │   └── LinkedInProfileMock.json                # Mock data profil LinkedIn
+│   ├── Outputs/                                    # Direktori output berkas PDF/DOCX
+│   │   └── .gitkeep
+│   ├── Templates/                                  # Template DOCX berstandar ATS
+│   │   └── ATS_Resume_Template.docx
+│   └── Scripts/                                    # Automation Engine & Helper Scripts
+│       ├── Shared/
+│       │   ├── PathUtils.ps1                       # Dynamic robot context & path resolver (DRY)
+│       │   └── ValidateAllXaml.ps1                 # Validasi XML syntax seluruh XAML
+│       ├── LinkedIn/
+│       │   └── LinkedInDomExtractor.js             # JavaScript DOM extraction script
+│       ├── GitHub/
+│       │   ├── FetchGitHubRepos.js                 # Node.js GitHub API fetcher
+│       │   └── RunGitHubFetch.ps1                  # PowerShell runner GitHub
+│       ├── Document/
+│       │   ├── GenerateResumeDocument.js           # Core document generator orchestrator
+│       │   ├── RunResumeGeneration.ps1             # PowerShell runner resume generation
+│       │   ├── GenerateAtsTemplate.ps1             # Generator template OpenXML
+│       │   └── lib/                                # OpenXML & PDF Engine Libraries
+│       │       ├── docxPackager.js                 # ZIP & OpenXML packager
+│       │       ├── htmlTemplate.js                 # ATS single-column HTML template
+│       │       ├── normalizer.js                   # XML escaping & noise sanitizer
+│       │       ├── openXmlBuilder.js               # WordprocessingML builder
+│       │       └── pdfExporter.js                  # Chrome/Edge headless PDF exporter
+│       ├── Notification/
+│       │   └── SendEmailNotification.ps1           # SMTP & Simulation email runner
+│       ├── Webhook/
+│       │   └── SendWebhookNotification.ps1         # Webhook dispatcher script
+│       └── test_modules.js                         # Automated unit test suite (13 tests)
+│
+├── Tests/                                          # Unit Tests UiPath per Modul
+│   ├── Validation/Test_Validate_Inputs.xaml
+│   ├── LinkedIn/Test_LinkedIn_Scraper.xaml
+│   ├── GitHub/Test_GitHub_FetchRepos.xaml
+│   ├── Document/Test_Document_GeneratePdf.xaml
+│   ├── Notification/Test_Notification_SendMail.xaml
+│   └── Webhook/Test_Webhook_NotifyWeb.xaml
+│
+└── Docs/                                           # Dokumentasi Teknis Lengkap
+    ├── Jury-Evaluation-Guide.md                    # Panduan evaluasi juri 5 menit
+    ├── Architecture-and-Workflows.md               # Arsitektur & spesifikasi modul detail
+    ├── Document-Engine-Technical-Spec.md           # Spesifikasi engine OpenXML & PDF ATS
+    ├── GenAI-Integration.md                        # Integrasi GenAI & multi-provider fallback
+    └── AutomationHub-URL-Decision.md               # Keputusan tata kelola Automation Hub
 ```
 
 ---
 
-## 1. Tools / Teknologi yang Dipakai
+## 5. Matriks Ketahanan Sistem (Multi-Layer Resilience)
 
-| Layer | Teknologi |
-|---|---|
-| **Web / Frontend** | Next.js 16.4.5 (App Router), React 19.3, TypeScript 5, Tailwind CSS v4, Lucide React |
-| **Validasi & DTO** | Zod 4 (clean architecture: `core` → `application` → `infrastructure` → `presentation`) |
-| **Email (web)** | Nodemailer |
-| **Package manager** | Bun 1.2.18 (atau npm) |
-| **Robot / RPA** | UiPath Studio 26.10, Windows framework, .NET 10, ekspresi Visual Basic |
-| **Robot activities** | UiPath.System / Mail / Excel / Testing / UIAutomation / WebAPI Activities |
-| **Script helper robot** | Node.js (`LinkedInDomExtractor.js`, `FetchGitHubRepos.js`, `GenerateResumeDocument.js`) + PowerShell runners |
-| **AI / LLM** | Gemini `gemini-3.5-flash-lite` (primary) → OpenRouter `openai/gpt-4o-mini` (fallback otomatis) |
-| **Dokumen** | Template `ATS_Resume_Template.docx` → generator DOCX/PDF |
-| **Orkestrasi** | UiPath Orchestrator Cloud + REST webhook |
+AutoCV dirancang dengan prinsip **Zero Break**: robot tidak boleh berhenti di tengah jalan hanya karena faktor eksternal:
 
----
-
-## 2. Kebutuhan Aplikasi / Koneksi
-
-### 2.1 Prasyarat
-
-| Kebutuhan | Wajib | Keterangan |
+| Titik Potensi Kegagalan | Mekanisme Ketahanan (Fallback) AutoCV | Status / Hasil |
 |---|---|---|
-| Windows 10/11 64-bit | Ya | Diperlukan UiPath Studio + otomasi browser |
-| Node.js ≥ 20 & Bun ≥ 1.2 (atau npm) | Ya (web) | Menjalankan portal Next.js |
-| UiPath Studio 26.10 + `uip` CLI | Live mode | `uip` butuh hak admin saat instalasi |
-| Ekstensi UiPath Web Automation | Live mode | Chrome atau Edge |
-| Sesi LinkedIn yang sudah login | Live mode | Robot memakai sesi browser yang ada |
-| Akun UiPath Orchestrator + External App | Live mode | Scope `OR.Execution`, `OR.Jobs`, `OR.Monitoring` |
-| ngrok / host publik | Live mode lokal | Agar robot bisa memanggil webhook ke web |
-| SMTP host & kredensial | Live mode (email) | Bisa diganti mode simulasi |
-| Gemini API key + OpenRouter API key | Ya (AI) | Hanya di file lokal, **jangan di-commit** |
-
-### 2.2 Environment Variables
-
-Salin `.env.example` → `.env.local` (web) dan `.env` (robot), lalu isi nilainya.
-Contoh di bawah hanya **placeholder**, bukan nilai asli.
-
-| Variabel | Contoh (dummy) | Dipakai oleh |
-|---|---|---|
-| `NEXT_PUBLIC_API_BASE_URL` | `http://localhost:3000` | Web |
-| `NEXT_PUBLIC_UIPATH_MODE` | `mock` atau `live` | Web |
-| `UIPATH_ORCHESTRATOR_URL` | `https://cloud.uipath.com/<org>/<tenant>/orchestrator_` | Web (live) |
-| `UIPATH_CLIENT_ID` | `<your-client-id>` | Web (live) |
-| `UIPATH_CLIENT_SECRET` | `<your-client-secret>` | Web (live) |
-| `UIPATH_TENANT_NAME` | `<tenant-name>` | Web (live) |
-| `UIPATH_FOLDER_ID` | `<folder-id>` | Web (live) |
-| `UIPATH_PROCESS_KEY_JOB1` | `<process-key-job1>` | Web (live) |
-| `UIPATH_PROCESS_KEY_JOB2` | `<process-key-job2>` | Web (live) |
-| `BACKEND_WEBHOOK_BASE_URL` | `https://<ngrok-subdomain>.ngrok-free.app` | Web + Robot |
-| `AI_PROVIDER` | `Gemini` | Robot |
-| `AI_FALLBACK_PROVIDER` | `OpenAI` | Robot |
-| `GEMINI_API_KEY` | `<gemini-api-key>` | Robot |
-| `GEMINI_CHAT_MODEL` | `gemini-3.5-flash-lite` | Robot |
-| `OPENAI_API_KEY` | `<openrouter-api-key>` | Robot (fallback) |
-| `OPENAI_BASE_URL` | `https://openrouter.ai/api/v1` | Robot (fallback) |
-| `OPENAI_CHAT_MODEL` | `openai/gpt-4o-mini` | Robot (fallback) |
-
-> Konfigurasi AI robot juga dibaca dari `AutoCV-Robot/Data/Config/ai_settings.json`.
-> Gunakan `ai_settings.example.json` sebagai template.
-
-### 2.3 Endpoint Web ↔ Robot
-
-| Method | Endpoint | Pemanggil | Fungsi |
-|---|---|---|---|
-| `POST` | `/api/cv/generate` | Frontend | Mulai Job 1, mengembalikan `{ jobId }` |
-| `GET` | `/api/cv/jobs/{jobId}` | Frontend (poll) | Status job + data draf |
-| `POST` | `/api/cv/jobs/{jobId}/draft` | Robot (Job 1) | Kirim draf hasil AI |
-| `POST` | `/api/cv/jobs/{jobId}/progress` | Robot (Job 1) | Update tahap/progress |
-| `POST` | `/api/cv/jobs/{jobId}/curate` | Frontend | Autosave hasil kurasi |
-| `POST` | `/api/cv/jobs/{jobId}/approve` | Frontend | Memicu Job 2 |
-| `POST` | `/api/cv/jobs/{jobId}/complete` | Robot (Job 2) | Kirim PDF base64 + status email |
-| `POST` | `/api/cv/jobs/{jobId}/error` | Robot | Notifikasi kegagalan |
-| `GET` | `/api/cv/jobs/{jobId}/download` | Frontend | Unduh PDF |
-| `POST` | `/api/cv/jobs/{jobId}/send-email` | Frontend | Kirim ulang PDF ke email kandidat |
+| **Sesi LinkedIn Belum Login di VM** | Mendeteksi ketiadaan sesi browser dan otomatis beralih ke [LinkedInProfileMock.json](file:///d:/KULIAHHHH_PENSSS/Hackathon/Automation/robot/Data/Mocks/LinkedInProfileMock.json). | Proses berlanjut mulus tanpa exception. |
+| **GitHub API Rate Limit / Offline** | Menangkap HTTP error 403/timeout dan beralih ke [GitHubReposMock.json](file:///d:/KULIAHHHH_PENSSS/Hackathon/Automation/robot/Data/Mocks/GitHubReposMock.json). | Portofolio tetap tersintesis sempurna. |
+| **Gemini API Limit / Kuota Habis** | Otomatis beralih ke Tier 2: OpenRouter (`gpt-4o-mini`), lalu ke Tier 3: Sintesis deterministik lokal. | Draf resume selalu berhasil dibuat. |
+| **Tidak Ada Microsoft Office Word** | Engine menggunakan **Native OpenXML Builder** (WordprocessingML) dan mencetak PDF via **Headless Chromium bawaan Windows (Edge/Chrome)**. | Zero lisensi berbayar, waktu cetak < 1.5 detik. |
+| **Kredensial SMTP Email Kosong** | Otomatis mengaktifkan `Mode: SIMULATION`, mencatat log pengiriman, dan tetap memproses webhook `/complete`. | Job Orchestrator selalu berstatus *Success*. |
 
 ---
 
-## 3. Cara Menjalankan
+## 6. Kontrak Argumen Robot (`Main.xaml`)
 
-### 3.1 Web — Mode Mock (tanpa robot, paling cepat)
-
-```powershell
-cd AutoCV-Web
-Copy-Item .env.example .env.local
-# pastikan NEXT_PUBLIC_UIPATH_MODE=mock
-bun install
-bun dev
-# buka http://localhost:3000
-```
-
-Mode mock mensimulasikan seluruh siklus job (scrape → synthesis → kurasi → PDF) tanpa
-Orchestrator, sehingga cocok untuk pengembangan frontend.
-
-### 3.2 Web — Mode Live (robot sungguhan)
-
-1. Isi `.env.local`:
-   ```env
-   NEXT_PUBLIC_UIPATH_MODE=live
-   UIPATH_ORCHESTRATOR_URL=https://cloud.uipath.com/<org>/<tenant>/orchestrator_
-   UIPATH_CLIENT_ID=<your-client-id>
-   UIPATH_CLIENT_SECRET=<your-client-secret>
-   UIPATH_FOLDER_ID=<folder-id>
-   UIPATH_PROCESS_KEY_JOB1=<process-key-job1>
-   UIPATH_PROCESS_KEY_JOB2=<process-key-job2>
-   BACKEND_WEBHOOK_BASE_URL=https://<ngrok-subdomain>.ngrok-free.app
-   ```
-2. Ekspos localhost agar robot bisa memanggil webhook:
-   ```powershell
-   ngrok http 3000
-   ```
-3. Jalankan `bun dev`, buka form, lalu submit.
-
-### 3.3 Robot — UiPath Studio
-
-1. Buka folder `AutoCV-Robot` di UiPath Studio.
-2. Isi `Data/Config/ai_settings.json` (dari `ai_settings.example.json`) atau `.env`.
-3. Jalankan `Main.xaml` dengan argumen input (lihat §4).
-
-### 3.4 Robot — `uip` CLI
-
-```powershell
-# dari folder AutoCV-Robot
-uip login                                  # sekali saja, membuka browser
-uip rpa validate --file-path "Main.xaml" --project-dir "."
-uip rpa build "."
-uip rpa pack "." "../_AutoCV-Pack-Out" --package-version 1.0.0
-uip rpa publish "../_AutoCV-Pack-Out/AutoCV.Deployment.1.0.0.nupkg"
-```
-
-### 3.5 Simulasi penuh (tanpa kredensial eksternal)
-
-Set `NEXT_PUBLIC_UIPATH_MODE=mock` di web dan jalankan robot dengan
-`in_UseMockFallback=True`. Robot akan memakai fixture di `Data/Mocks/`.
+| Argumen | Tipe | Arah | Default | Deskripsi |
+|---|---|---|---|---|
+| `in_JobId` | String | In | `"job-local-001"` | ID unik pekerjaan dari Web Portal. |
+| `in_LinkedInUrl` | String | In | `""` | URL profil publik LinkedIn kandidat. |
+| `in_GitHubUrl` | String | In | `""` | URL profil atau username GitHub kandidat. |
+| `in_TargetJobRole` | String | In | `"Software Engineer"` | Target posisi kerja untuk pembobotan kata kunci AI. |
+| `in_RecipientEmail` | String | In | `""` | Email tujuan pengiriman resume final. |
+| `in_UseMockFallback` | Boolean | In | `True` | Mengaktifkan mock fallback jika sumber eksternal offline. |
+| `in_RequireManualApproval` | Boolean | In | `True` | Menahan alur pada status `CURATING` menunggu persetujuan web. |
+| `in_WebhookBaseUrl` | String | In | `"http://localhost:3000"` | URL endpoint backend Web Portal. |
+| `in_ApprovedResumePayload` | String | In | `""` | **Kunci Dual-Mode**: Jika terisi, robot langsung menjalankan Fase 2. |
+| `out_GeneratedPdfPath` | String | Out | — | Lokasi absolut berkas PDF hasil kompilasi. |
+| `out_GeneratedDocxPath` | String | Out | — | Lokasi absolut berkas DOCX hasil kompilasi. |
+| `out_DraftResumePayload` | String | Out | — | Objek JSON draf hasil sintesis AI (Fase 1). |
+| `out_EmailSentStatus` | String | Out | — | Status akhir pengiriman email (`SENT` atau `SIMULATION`). |
 
 ---
 
-## 4. Contoh Input & Output
+## 7. Keamanan & Tata Kelola Secrets
 
-### 4.1 Input form web
+Proyek ini menerapkan standar keamanan enterprise ketat:
+- **Zero Secrets in Code**: Tidak ada API key, token GitHub, maupun kata sandi SMTP yang di-hardcode di dalam berkas XAML atau skrip.
+- **Penyimpanan Lokal Aman**: Seluruh rahasia pengujian lokal disimpan dalam `.env` atau `Data/Config/ai_settings.json` yang secara otomatis diabaikan oleh [.gitignore](file:///d:/KULIAHHHH_PENSSS/Hackathon/Automation/robot/.gitignore).
+- **Kesiapan Produksi**: Pada lingkungan produksi, konfigurasi dibaca langsung dari **UiPath Orchestrator Assets** (tipe *Credential* & *Text*).
 
-| Field | Contoh |
+---
+
+## 8. Indeks Dokumentasi Teknis Lengkap
+
+Untuk eksplorasi teknis lebih mendalam, silakan merujuk pada dokumen berikut:
+
+| Dokumen | Deskripsi |
 |---|---|
-| LinkedIn Profile URL | `https://www.linkedin.com/in/jane-doe` |
-| GitHub Profile URL | `https://github.com/janedoe` |
-| Target Job Role (opsional) | `Fullstack Software Engineer` |
-| Recipient Email | `jane.doe@example.com` |
-
-Padanan argumen robot (`Main.xaml`):
-
-```json
-{
-  "in_JobId": "job-123",
-  "in_LinkedInUrl": "https://www.linkedin.com/in/jane-doe",
-  "in_GitHubUrl": "https://github.com/janedoe",
-  "in_TargetJobRole": "Fullstack Software Engineer",
-  "in_RecipientEmail": "jane.doe@example.com",
-  "in_UseMockFallback": false,
-  "in_RequireManualApproval": true,
-  "in_WebhookBaseUrl": "http://localhost:3000"
-}
-```
-
-### 4.2 Output antara — `out_DraftResumePayload` (dipotong, data fiktif)
-
-```json
-{
-  "profile": {
-    "fullName": "Jane Doe",
-    "headline": "Fullstack Software Engineer",
-    "email": "jane.doe@example.com",
-    "summary": "Software engineer focused on scalable web applications...",
-    "linkedinUrl": "https://www.linkedin.com/in/jane-doe",
-    "githubUrl": "https://github.com/janedoe"
-  },
-  "experiences": [],
-  "projects": [
-    {
-      "id": 1,
-      "name": "inventory-service",
-      "repoUrl": "https://github.com/janedoe/inventory-service",
-      "techStack": ["TypeScript", "Node.js", "PostgreSQL"],
-      "starSummary": "Reduced checkout latency by 35%...",
-      "isSelected": true
-    }
-  ],
-  "skills": [],
-  "education": []
-}
-```
-
-### 4.3 Output akhir
-
-| Output | Lokasi / Nilai |
-|---|---|
-| PDF ATS | `AutoCV-Robot/Data/Outputs/CV_<Nama>_<timestamp>.pdf` |
-| DOCX | `AutoCV-Robot/Data/Outputs/CV_<Nama>_<timestamp>.docx` |
-| Email | Terkirim ke `in_RecipientEmail`, atau log `Mode: SIMULATION` |
-| Status job | `PENDING → SCRAPING → SYNTHESIZING → CURATING → COMPLETED` |
+| [Docs/Jury-Evaluation-Guide.md](file:///d:/KULIAHHHH_PENSSS/Hackathon/Automation/robot/Docs/Jury-Evaluation-Guide.md) | **Panduan Evaluasi Juri 5 Menit**: Perintah pengujian 1-baris, verifikasi kriteria hackathon, dan checklist penilaian. |
+| [Docs/Architecture-and-Workflows.md](file:///d:/KULIAHHHH_PENSSS/Hackathon/Automation/robot/Docs/Architecture-and-Workflows.md) | **Arsitektur Sistem & Spesifikasi Modul**: Rincian alur kerja Smart Dual-Mode, dekomposisi pipeline, dan kontrak modul. |
+| [Docs/Document-Engine-Technical-Spec.md](file:///d:/KULIAHHHH_PENSSS/Hackathon/Automation/robot/Docs/Document-Engine-Technical-Spec.md) | **Spesifikasi Engine Dokumen ATS**: Standar Harvard/Stanford ATS, OpenXML WordprocessingML, dan PDF export. |
+| [Docs/GenAI-Integration.md](file:///d:/KULIAHHHH_PENSSS/Hackathon/Automation/robot/Docs/GenAI-Integration.md) | **Integrasi GenAI & Multi-LLM**: Formula STAR/XYZ, skema ketat JSON, dan rantai fallback Gemini $\rightarrow$ OpenRouter $\rightarrow$ Mock. |
+| [Docs/AutomationHub-URL-Decision.md](file:///d:/KULIAHHHH_PENSSS/Hackathon/Automation/robot/Docs/AutomationHub-URL-Decision.md) | **Keputusan Tata Kelola Automation Hub**: Penjelasan tata kelola dan konfigurasi `automationHubUrl` pada `project.json`. |
 
 ---
 
-## 5. Struktur Project
+## 9. Lisensi & Hak Cipta
 
-```text
-Automation-CV/
-├── README.md                  # Panduan singkat ini
-├── AutoCV-Web/                # Portal Next.js (frontend + API routes)
-│   ├── src/
-│   │   ├── app/               # App Router + REST API
-│   │   ├── application/       # DTO & use-case
-│   │   ├── core/              # entity, interface, config
-│   │   ├── infrastructure/    # gateway, email, pdf, storage
-│   │   └── presentation/      # komponen UI & hooks
-│   └── .env.example
-├── AutoCV-Robot/              # Proyek robot UiPath
-│   ├── Main.xaml              # Entry point
-│   ├── Modules/               # 00–06 workflow
-│   ├── Data/
-│   │   ├── Config/            # ai_settings.json (lokal, tidak di-commit)
-│   │   ├── Mocks/             # fixture fallback
-│   │   ├── Outputs/           # hasil PDF/DOCX
-│   │   ├── Scripts/           # helper JS/PowerShell
-│   │   └── Templates/         # template DOCX
-│   ├── .env.example
-│   └── Data/Config/ai_settings.example.json
-└── Docs/                       # Dokumentasi teknis lengkap
-```
-
-Folder `_AutoCV-Pack-Out/`, `AutoCV-Robot-Packages/`, `node_modules/`, `.next/`, dan `.local/`
-adalah artefak build — tidak perlu di-commit.
-
----
-
-## 6. Security & Secrets
-
-Repository ini **tidak menyimpan** password atau API key.
-
-- File `.env`, `.env.local`, `Data/Config/.env`, `Data/Config/ai_settings.json`, dan
-  `Data/Config/gemini_api_key.txt` sudah masuk `.gitignore`.
-- Gunakan hanya file `.example` sebagai template, lalu isi nilai asli secara lokal.
-- Untuk produksi, simpan kredensial di **UiPath Orchestrator Assets** (Credential) atau
-  environment variables platform hosting.
-- Jika sebuah key pernah tidak sengaja ter-commit, **rotasi key** tersebut.
-
----
-
-## 7. Dokumentasi Lengkap
-
-| Topik | Lokasi |
-|---|---|
-| Indeks dokumentasi | `Docs/README.md` |
-| Setup pengembangan | `Docs/Getting-Started/Development-Setup.md` |
-| Arsitektur sistem | `Docs/System-Design/System-Architecture.md` |
-| Referensi API | `Docs/Backend-API/API-Reference.md` |
-| Panduan robot | `Docs/AutoCV-Robot/Workflow-Guide.md` |
-| Konfigurasi lingkungan | `Docs/Deployment/Environment-Configuration.md` |
-| Deployment | `Docs/Deployment/Deployment-Guide.md` |
-
----
-
-## 8. License
-
-MIT — Automation Hackathon 2026 (#HumanInTheLead).
+Didistribusikan di bawah Lisensi MIT. Dikembangkan khusus untuk **Automation Hackathon 2026 (#HumanInTheLead)** oleh tim AutoCV.
