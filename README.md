@@ -1,4 +1,4 @@
-# AutoCV-Robot — Intelligent Career Dossier & ATS Resume Builder
+<img width="651" height="53" alt="image" src="https://github.com/user-attachments/assets/ddc1bf9b-b504-4be8-98da-905d33e864c1" /><img width="436" height="70" alt="image" src="https://github.com/user-attachments/assets/dc0d27a1-632a-441b-9c18-fb753239f2a7" /><img width="730" height="53" alt="image" src="https://github.com/user-attachments/assets/481d857b-e64e-49ed-916c-8805f6ab969e" /># AutoCV-Robot — Intelligent Career Dossier & ATS Resume Builder
 
 > **Solusi Otomasi RPA & Generative AI untuk Transformasi Karir Berbasis Standar ATS Internasional**  
 > **Automation Hackathon 2026** · *Indosat Ooredoo Hutchison × UiPath × ONE Indonesia*  
@@ -20,9 +20,10 @@
 
 Dalam lanskap rekrutmen kerja modern, proses seleksi awal hampir sepenuhnya disaring oleh **Applicant Tracking System (ATS)** sebelum berkas sempat dilihat oleh rekruter manusia:
 
-* **Tingkat Kegagalan Screening > 75%**: Mayoritas pencari kerja tersingkir bukan karena kurangnya kompetensi, melainkan karena tata letak dokumen yang tidak terbaca oleh parser ATS (tabel multi-kolom, grafik keahlian/bintang, ikon, dan text box).
-* **Beban Waktu Pembuatan CV Manual (120–180 Menit)**: Kandidat menghabiskan waktu berjam-jam untuk menyalin riwayat kerja dari LinkedIn, merapikan proyek GitHub, memikirkan diksi kata kerja aktif, dan menyesuaikan formatting Word.
-* **Narasi Pengalaman yang Pasif**: Sebagian besar kandidat kesulitan merumuskan pencapaian menggunakan standar industri seperti metode **STAR** (*Situation, Task, Action, Result*) atau **Google XYZ Formula** (*Accomplished [X] as measured by [Y], by doing [Z]*).
+* **Data Tersebar**: Pengalaman di LinkedIn, proyek di GitHub, disalin satu per satu.
+* **Pencapaian tak terukur**: Sulit merumuskan dampak proyek menjadi kalimat berpola STAR.
+* **Format tidak ATS-friendly**: Desain rumit sering gagal dibaca sistem pelamar otomatis.
+* **Kustomisasi berulang**: Tiap posisi target berarti menyunting ulang seluruh CV.
 
 ---
 
