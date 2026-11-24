@@ -72,7 +72,7 @@
     <ui:LogMessage DisplayName="Log Start Test" sap:VirtualizedContainerService.HintSize="416,141" sap2010:WorkflowViewState.IdRef="LogMessage_1" Level="Info" Message="[&quot;Starting Test_GitHub_FetchRepos unit test.&quot;]" />
 
     <!-- Invoke 02_GitHub_FetchUserRepos with sample user -->
-    <ui:InvokeWorkflowFile ArgumentsVariable="{x:Null}" ContinueOnError="{x:Null}" DisplayName="Invoke 02_GitHub_FetchUserRepos workflow" sap:VirtualizedContainerService.HintSize="416,113.6" sap2010:WorkflowViewState.IdRef="InvokeWorkflowFile_1" UnSafe="False" WorkflowFileName="Modules\02_GitHub_FetchUserRepos.xaml">
+    <ui:InvokeWorkflowFile ArgumentsVariable="{x:Null}" ContinueOnError="{x:Null}" DisplayName="Invoke 02_GitHub_FetchUserRepos workflow" sap:VirtualizedContainerService.HintSize="416,113.6" sap2010:WorkflowViewState.IdRef="InvokeWorkflowFile_1" UnSafe="False" WorkflowFileName="Modules\GitHub\02_GitHub_FetchUserRepos.xaml">
       <ui:InvokeWorkflowFile.Arguments>
         <InArgument x:TypeArguments="x:String" x:Key="in_GitHubUsername">https://github.com/octocat</InArgument>
         <InArgument x:TypeArguments="x:String" x:Key="in_GitHubToken" />

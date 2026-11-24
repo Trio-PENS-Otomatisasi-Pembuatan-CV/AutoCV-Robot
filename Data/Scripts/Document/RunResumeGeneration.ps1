@@ -6,50 +6,21 @@ param(
 
 $ErrorActionPreference = "Stop"
 
-$scriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
-$robotDir = (Get-Item (Join-Path $scriptDir "..\..")).FullName
-$workspaceDir = (Get-Item (Join-Path $robotDir "..")).FullName
+$scriptDir = if (-not [string]::IsNullOrWhiteSpace($PSScriptRoot)) { $PSScriptRoot } else { Split-Path -Parent $MyInvocation.MyCommand.Path }
+. (Join-Path $scriptDir "..\Shared\PathUtils.ps1")
 
-function Resolve-SmartPath($p) {
-    if ([string]::IsNullOrWhiteSpace($p)) { return "" }
-    if ([System.IO.Path]::IsPathRooted($p) -and (Test-Path $p)) { return (Get-Item $p).FullName }
-    if (Test-Path $p) { return (Get-Item $p).FullName }
-    
-    $candidate1 = Join-Path $robotDir $p
-    if (Test-Path $candidate1) { return (Get-Item $candidate1).FullName }
+$ctx = Get-RobotContext -BaseDir $scriptDir
+$resolvedPayload = Resolve-SmartPath $PayloadFile -RobotDir $ctx.RobotDir -WorkspaceDir $ctx.WorkspaceDir
+$resolvedTemplate = Resolve-SmartPath $TemplatePath -RobotDir $ctx.RobotDir -WorkspaceDir $ctx.WorkspaceDir
+$resolvedOutputDir = Resolve-SmartOutputDir $OutputDir -RobotDir $ctx.RobotDir
 
-    $candidate2 = Join-Path $workspaceDir $p
-    if (Test-Path $candidate2) { return (Get-Item $candidate2).FullName }
-
-    # If it still doesn't exist, return rooted candidate1
-    return [System.IO.Path]::GetFullPath($candidate1)
-}
-
-function Resolve-SmartOutputDir($p) {
-    if ([string]::IsNullOrWhiteSpace($p)) { return (Join-Path $robotDir "Data\Outputs") }
-    if ([System.IO.Path]::IsPathRooted($p)) { return [System.IO.Path]::GetFullPath($p) }
-    if (Test-Path $p) { return (Get-Item $p).FullName }
-
-    $candidate1 = Join-Path $robotDir $p
-    if (Test-Path $candidate1) { return (Get-Item $candidate1).FullName }
-
-    return [System.IO.Path]::GetFullPath($candidate1)
-}
-
-$resolvedPayload = Resolve-SmartPath $PayloadFile
-$resolvedTemplate = Resolve-SmartPath $TemplatePath
-$resolvedOutputDir = Resolve-SmartOutputDir $OutputDir
-
-if (-not (Test-Path $resolvedOutputDir)) {
+if (-not (Test-Path -LiteralPath $resolvedOutputDir)) {
     New-Item -ItemType Directory -Path $resolvedOutputDir -Force | Out-Null
 }
 
 $generatorJs = Join-Path $scriptDir "GenerateResumeDocument.js"
 
-# Run node with stdout/stderr redirected to raw files via Start-Process.
-# Two reasons: UiPath only reads this process's stdout, and PowerShell's own
-# "2>" redirection wraps stderr in NativeCommandError records that bury the real
-# message under position/category noise.
+# Execute Node generator with isolated stdout/stderr capture
 $runId = [System.Guid]::NewGuid().ToString("N")
 $stdoutFile = Join-Path $resolvedOutputDir ("generation_stdout_" + $runId + ".log")
 $stderrFile = Join-Path $resolvedOutputDir ("generation_stderr_" + $runId + ".log")
@@ -90,13 +61,13 @@ finally {
 
 if ($generationFailed) {
     $failure = [ordered]@{
-        success      = $false
-        error        = $reason
-        docxPath     = ""
-        pdfPath      = ""
+        success       = $false
+        error         = $reason
+        docxPath      = ""
+        pdfPath       = ""
         candidateName = ""
-        timestamp    = (Get-Date).ToString("yyyyMMddHHmmss")
-        pdfGenerated = $false
+        timestamp     = (Get-Date).ToString("yyyyMMddHHmmss")
+        pdfGenerated  = $false
     }
     $output = ($failure | ConvertTo-Json -Compress)
 }

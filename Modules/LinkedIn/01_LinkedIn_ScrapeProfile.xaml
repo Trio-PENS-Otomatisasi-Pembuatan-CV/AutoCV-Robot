@@ -190,7 +190,7 @@
                             <OutArgument x:TypeArguments="x:String">[strJsFilePath]</OutArgument>
                           </Assign.To>
                           <Assign.Value>
-                            <InArgument x:TypeArguments="x:String">["Data\Scripts\LinkedInDomExtractor.js"]</InArgument>
+                            <InArgument x:TypeArguments="x:String">["Data\Scripts\LinkedIn\LinkedInDomExtractor.js"]</InArgument>
                           </Assign.Value>
                         </Assign>
                         <Assign DisplayName="Load Extractor Script from File" sap:VirtualizedContainerService.HintSize="408,113.6" sap2010:WorkflowViewState.IdRef="Assign_LoadJs">

@@ -39,7 +39,7 @@ async function main() {
 
   // 1. Normalizer tests
   console.log('--- 1. Testing normalizer.js ---');
-  const normalizer = require('./lib/normalizer');
+  const normalizer = require('./Document/lib/normalizer');
 
   test('escapeXml correctly escapes special XML characters', () => {
     assert.strictEqual(normalizer.escapeXml('A & B < C > D " E \' F'), 'A &amp; B &lt; C &gt; D &quot; E &apos; F');
@@ -89,7 +89,7 @@ async function main() {
 
   // 2. OpenXML Builder tests
   console.log('\n--- 2. Testing openXmlBuilder.js ---');
-  const openXml = require('./lib/openXmlBuilder');
+  const openXml = require('./Document/lib/openXmlBuilder');
 
   test('buildExperienceOpenXml generates valid XML with w:p', () => {
     const exps = [
@@ -122,7 +122,7 @@ async function main() {
 
   // 3. HTML Template tests
   console.log('\n--- 3. Testing htmlTemplate.js ---');
-  const htmlTemplate = require('./lib/htmlTemplate');
+  const htmlTemplate = require('./Document/lib/htmlTemplate');
 
   test('buildResumeHtml creates complete HTML document', () => {
     const payload = normalizer.normalizePayload({
@@ -138,7 +138,7 @@ async function main() {
 
   // 4. PDF Exporter tests
   console.log('\n--- 4. Testing pdfExporter.js ---');
-  const pdfExporter = require('./lib/pdfExporter');
+  const pdfExporter = require('./Document/lib/pdfExporter');
 
   test('findAvailableBrowser locates system Chrome or Edge', () => {
     const browser = pdfExporter.findAvailableBrowser();
@@ -148,7 +148,7 @@ async function main() {
 
   // 5. GitHub Fetch tests
   console.log('\n--- 5. Testing FetchGitHubRepos.js ---');
-  const github = require('./FetchGitHubRepos');
+  const github = require('./GitHub/FetchGitHubRepos');
 
   test('parseGitHubUsername extracts clean username from various formats', () => {
     assert.strictEqual(github.parseGitHubUsername('https://github.com/octocat'), 'octocat');
@@ -165,7 +165,7 @@ async function main() {
 
   // 6. End-to-end Document Generation test
   console.log('\n--- 6. Testing GenerateResumeDocument.js End-to-End ---');
-  const { generateResume } = require('./GenerateResumeDocument');
+  const { generateResume } = require('./Document/GenerateResumeDocument');
 
   test('generateResume produces valid DOCX and PDF in seconds', () => {
     const mockPath = path.resolve(__dirname, '../Mocks/CuratedResumeMock.json');
