@@ -1,0 +1,96 @@
+- Window [ref=w4]:
+  - /process: explorer.exe
+  - /class: ThumbnailDeviceHelperWnd
+- Window [ref=w6]:
+  - /process: explorer.exe
+  - /class: Shell_TrayWnd
+- Window "Trio-PENS-Otomatisasi-Pembuatan-CV repositories and 3 more pages - Profile 1 - Microsoft​ Edge" [ref=w25]:
+  - /process: msedge.exe
+  - /class: Chrome_WidgetWin_1
+  - BrowserTab "Fungsi Tools UiPath" [ref=b824]:
+    - /url: https://chatgpt.com/c/6aef22e9-03d4-83ec-a745-d4a0e28ee938
+  - BrowserTab "Trio-PENS-Otomatisasi-Pembuatan-CV/AutoCV-Robot" [ref=b825] [selected]:
+    - /url: https://github.com/Trio-PENS-Otomatisasi-Pembuatan-CV/AutoCV-Robot
+  - BrowserTab "Studio - Over HTTPS" [ref=b826]:
+    - /url: https://docs.uipath.com/studio/standalone/latest/user-guide/over-https
+  - BrowserTab "Installed GitHub App - UiPath" [ref=b827] [discarded]:
+    - /url: https://github.com/organizations/Trio-PENS-Otomatisasi-Pembuatan-CV/settings/installations/179576007
+- Window [ref=w36]:
+  - /process: uipath.uiautomation.exe
+  - /class: HwndWrapper[UiPath.UIAutomation;;a525ff2b-e5bc-4edf-af02-4a02693a2370]
+- Window [ref=w37]:
+  - /process: uipath.uiautomation.exe
+  - /class: HwndWrapper[UiPath.UIAutomation;;8f497587-abd6-45ed-a652-6d372f9ba44c]
+- Window [ref=w38]:
+  - /process: uipath.uiautomation.exe
+  - /class: HwndWrapper[UiPath.UIAutomation;;a020cc3b-1076-4adf-b22b-b2381c61a2aa]
+- Window [ref=w39]:
+  - /process: uipath.uiautomation.exe
+  - /class: HwndWrapper[UiPath.UIAutomation;;aadd792e-8abb-4ca7-ba5c-a47ac0127947]
+- Window [ref=w58]:
+  - /process: uipath.uiautomation.exe
+  - /class: HwndWrapper[UiPath.UIAutomation;;401f704a-d8b4-4e65-8865-82f7a500e711]
+- Window "ActiproWindowChromeShadow" [ref=w59]:
+  - /process: uipath.uiautomation.exe
+  - /class: HwndWrapper[UiPath.UIAutomation;;621666a4-f33e-496d-9739-ad89bdaff1b3]
+- Window "ActiproWindowChromeShadow" [ref=w61]:
+  - /process: uipath.uiautomation.exe
+  - /class: HwndWrapper[UiPath.UIAutomation;;bb243315-184a-407c-9650-ea33767d15ad]
+- Window [ref=w62]:
+  - /process: uipath.uiautomation.exe
+  - /class: HwndWrapper[UiPath.UIAutomation;;c5de3d2b-1591-445e-9617-6ea00562e5db]
+- Window "ActiproWindowChromeShadow" [ref=w64]:
+  - /process: uipath.uiautomation.exe
+  - /class: HwndWrapper[UiPath.UIAutomation;;8b9b1819-2f35-49d9-97a5-f7f13e2b39f6]
+- Window [ref=w65]:
+  - /process: uipath.uiautomation.exe
+  - /class: HwndWrapper[UiPath.UIAutomation;;78615df8-bb2b-45c9-98d3-95a95cae7ab8]
+- Window "ActiproWindowChromeShadow" [ref=w67]:
+  - /process: uipath.uiautomation.exe
+  - /class: HwndWrapper[UiPath.UIAutomation;;08fd42dc-f13d-4a34-9b54-8e8a4e1422aa]
+- Window [ref=w68]:
+  - /process: uipath.uiautomation.exe
+  - /class: HwndWrapper[UiPath.UIAutomation;;1862511b-3d79-4794-9a8d-725fc438c3db]
+- Window [ref=w132]:
+  - /process: systemsettings.exe
+  - /class: Windows.UI.Core.CoreWindow
+- Window "Settings" [ref=w134]:
+  - /process: applicationframehost.exe
+  - /class: ApplicationFrameWindow
+- Window "Windows Input Experience" [ref=w199]:
+  - /process: textinputhost.exe
+  - /class: Windows.UI.Core.CoreWindow
+- Window "NVIDIA GeForce Overlay" [ref=w213]:
+  - /process: nvidia overlay.exe
+  - /class: CEF-OSC-WIDGET
+- Window [ref=w223]:
+  - /process: explorer.exe
+  - /class: EdgeUiInputTopWndClass
+- Window [ref=w226]:
+  - /process: explorer.exe
+  - /class: DummyDWMListenerWindow
+- Window [ref=w227]:
+  - /process: explorer.exe
+  - /class: DummyDWMListenerWindow
+- Window [ref=w228]:
+  - /process: explorer.exe
+  - /class: DummyDWMListenerWindow
+- Window [ref=w229]:
+  - /process: explorer.exe
+  - /class: DummyDWMListenerWindow
+- Window [ref=w230]:
+  - /process: explorer.exe
+  - /class: DummyDWMListenerWindow
+- Window "AsHDRControl" [ref=w232]:
+  - /class: ASHDRCONTROL
+- Window "AsHotplugCtrl" [ref=w239]:
+  - /class: ASHOTPLUGCTRL
+- Window "Tes - UiPath Studio Community" [ref=w257] [minimized]:
+  - /process: uipath.studio.exe
+  - /class: HwndWrapper[UiPath.Studio;;3662e4b2-0393-46a6-ae58-ce83766e1053]
+- Window "Tes" [ref=w258] [minimized]:
+  - /process: uipath.studio.project.exe
+  - /class: HwndWrapper[UiPath.Studio.Project;;e7ab847a-383d-47a0-bf7f-6f8f111a8f2d]
+- Window "Program Manager" [ref=w260]:
+  - /process: explorer.exe
+  - /class: Progman

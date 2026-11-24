@@ -1,0 +1,60 @@
+{
+  "$schema": "https://cloud.uipath.com/draft/2024-12/entry-point",
+  "entryPoints": [
+    {
+      "filePath": "Main.xaml",
+      "uniqueId": "7f95c83d-fe8a-47ce-966d-a5b02fca88b4",
+      "type": "process",
+      "input": {
+        "type": "object",
+        "properties": {
+          "in_Language": {
+            "type": "string"
+          },
+          "in_JobId": {
+            "type": "string"
+          },
+          "in_LinkedInUrl": {
+            "type": "string"
+          },
+          "in_GitHubUrl": {
+            "type": "string"
+          },
+          "in_TargetJobRole": {
+            "type": "string"
+          },
+          "in_RecipientEmail": {
+            "type": "string"
+          },
+          "in_ApprovedResumePayload": {
+            "type": "string"
+          },
+          "in_WebhookBaseUrl": {
+            "type": "string"
+          },
+          "in_UseMockFallback": {
+            "type": "boolean"
+          },
+          "in_RequireManualApproval": {
+            "type": "boolean"
+          }
+        },
+        "required": []
+      },
+      "output": {
+        "type": "object",
+        "properties": {
+          "out_JobStatus": {
+            "type": "string"
+          },
+          "out_DraftResumePayload": {
+            "type": "string"
+          },
+          "out_OutputPdfPath": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  ]
+}

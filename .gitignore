@@ -1,0 +1,110 @@
+# ==============================================================================
+# .gitignore for UiPath Robot Project: AutoCV_Robot
+# ==============================================================================
+
+# ------------------------------------------------------------------------------
+# 1. UiPath Local & Generated Cache (DO NOT COMMIT)
+# ------------------------------------------------------------------------------
+**/.local/
+**/.tmh/
+**/.project/PackageBindingsMetadata.json
+
+# ------------------------------------------------------------------------------
+# 2. NuGet, Package Caches & Dependencies
+# ------------------------------------------------------------------------------
+*.nupkg
+*.snupkg
+*.cache
+*.props
+nuget.cache
+*PackageCache.json
+*AllDependencies.json
+**/packages/
+
+# ------------------------------------------------------------------------------
+# 3. Execution Logs, Reports & Test Results
+# ------------------------------------------------------------------------------
+*.log
+execution.log
+*.executionlog
+[Oo]utput/
+Data/Outputs/*
+!Data/Outputs/.gitkeep
+[Rr]eports/
+[Tt]estResults/
+[Tt]emp/
+**/runtime/
+
+# ------------------------------------------------------------------------------
+# 4. Backup & Temporary Files
+# ------------------------------------------------------------------------------
+*.backup
+*.bak
+*.tmp
+*_backup.xaml
+*~
+# Microsoft Office lock files (dihasilkan saat robot membuka file Excel/Word/CV)
+~$*.xlsx
+~$*.xls
+~$*.docx
+~$*.doc
+~$*.pptx
+
+# ------------------------------------------------------------------------------
+# 5. Secrets, Credentials & Local Configs
+# ------------------------------------------------------------------------------
+.env
+.env.*
+*.credential
+*.credentials
+*secret*
+*.pfx
+*.p12
+*.pem
+*.key
+*.local.json
+!project.json
+!entry-points.json
+
+# AutoCV local secrets (API keys for AI synthesis)
+Data/Config/*
+!Data/Config/.gitkeep
+
+# ------------------------------------------------------------------------------
+# 6. IDEs & Editors
+# ------------------------------------------------------------------------------
+.vs/
+.vscode/
+.idea/
+*.suo
+*.user
+*.userosv
+*.sln.docstates
+
+# ------------------------------------------------------------------------------
+# 7. OS Generated Files
+# ------------------------------------------------------------------------------
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+[Dd]esktop.ini
+$RECYCLE.BIN/
+.DS_Store
+._*
+
+# ------------------------------------------------------------------------------
+# 8. Whitelist - Explicitly Preserved for UiPath Studio
+# (Sesuai ketentuan UiPath & AGENTS.md: Object Repository, settings & workflows)
+# ------------------------------------------------------------------------------
+!.objects/
+!.screenshots/
+!.settings/
+!.entities/
+!.templates/
+!project.json
+!project.uiproj
+!entry-points.json
+!Main.xaml
+!AGENTS.md
+!CLAUDE.md

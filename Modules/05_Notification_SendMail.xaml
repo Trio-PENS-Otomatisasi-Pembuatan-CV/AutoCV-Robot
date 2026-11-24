@@ -1,0 +1,318 @@
+<Activity mc:Ignorable="sap sap2010" x:Class="_05_Notification_SendMail" xmlns="http://schemas.microsoft.com/netfx/2009/xaml/activities" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:s="clr-namespace:System;assembly=System.Private.CoreLib" xmlns:sap="http://schemas.microsoft.com/netfx/2009/xaml/activities/presentation" xmlns:sap2010="http://schemas.microsoft.com/netfx/2010/xaml/activities/presentation" xmlns:scg="clr-namespace:System.Collections.Generic;assembly=System.Private.CoreLib" xmlns:sco="clr-namespace:System.Collections.ObjectModel;assembly=System.Private.CoreLib" xmlns:ui="http://schemas.uipath.com/workflow/activities" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <x:Members>
+    <x:Property Name="in_RecipientEmail" Type="InArgument(x:String)" />
+    <x:Property Name="in_PdfFilePath" Type="InArgument(x:String)" />
+    <x:Property Name="in_CandidateName" Type="InArgument(x:String)" />
+    <x:Property Name="in_SmtpHost" Type="InArgument(x:String)" />
+    <x:Property Name="in_SmtpPort" Type="InArgument(x:Int32)" />
+    <x:Property Name="in_SmtpUser" Type="InArgument(x:String)" />
+    <x:Property Name="in_SmtpPassword" Type="InArgument(x:String)" />
+    <x:Property Name="in_SimulationMode" Type="InArgument(x:Boolean)" />
+    <x:Property Name="out_MailSent" Type="OutArgument(x:Boolean)" />
+    <x:Property Name="out_DeliveryStatus" Type="OutArgument(x:String)" />
+  </x:Members>
+  <VisualBasic.Settings>
+    <x:Null />
+  </VisualBasic.Settings>
+  <sap2010:WorkflowViewState.IdRef>_05_Notification_SendMail_1</sap2010:WorkflowViewState.IdRef>
+  <TextExpression.NamespacesForImplementation>
+    <sco:Collection x:TypeArguments="x:String">
+      <x:String>System.Activities</x:String>
+      <x:String>System.Activities.Statements</x:String>
+      <x:String>System.Activities.Expressions</x:String>
+      <x:String>System.Activities.Validation</x:String>
+      <x:String>System.Activities.XamlIntegration</x:String>
+      <x:String>Microsoft.VisualBasic</x:String>
+      <x:String>Microsoft.VisualBasic.Activities</x:String>
+      <x:String>System</x:String>
+      <x:String>System.Collections</x:String>
+      <x:String>System.Collections.Generic</x:String>
+      <x:String>System.Collections.ObjectModel</x:String>
+      <x:String>System.Data</x:String>
+      <x:String>System.Diagnostics</x:String>
+      <x:String>System.IO</x:String>
+      <x:String>System.Linq</x:String>
+      <x:String>System.Net.Mail</x:String>
+      <x:String>System.Xml</x:String>
+      <x:String>System.Xml.Linq</x:String>
+      <x:String>UiPath.Core</x:String>
+      <x:String>UiPath.Core.Activities</x:String>
+      <x:String>System.Windows.Markup</x:String>
+      <x:String>GlobalVariablesNamespace</x:String>
+      <x:String>GlobalConstantsNamespace</x:String>
+      <x:String>System.Runtime.Serialization</x:String>
+      <x:String>System.Reflection</x:String>
+      <x:String>System.Linq.Expressions</x:String>
+      <x:String>System.Text.RegularExpressions</x:String>
+    </sco:Collection>
+  </TextExpression.NamespacesForImplementation>
+  <TextExpression.ReferencesForImplementation>
+    <sco:Collection x:TypeArguments="AssemblyReference">
+      <AssemblyReference>System.Activities</AssemblyReference>
+      <AssemblyReference>Microsoft.VisualBasic</AssemblyReference>
+      <AssemblyReference>System.Private.CoreLib</AssemblyReference>
+      <AssemblyReference>mscorlib</AssemblyReference>
+      <AssemblyReference>System.Data</AssemblyReference>
+      <AssemblyReference>System</AssemblyReference>
+      <AssemblyReference>System.Linq</AssemblyReference>
+      <AssemblyReference>System.Data.Common</AssemblyReference>
+      <AssemblyReference>System.Drawing</AssemblyReference>
+      <AssemblyReference>System.Drawing.Primitives</AssemblyReference>
+      <AssemblyReference>System.Drawing.Common</AssemblyReference>
+      <AssemblyReference>System.Core</AssemblyReference>
+      <AssemblyReference>System.Xml</AssemblyReference>
+      <AssemblyReference>System.Xml.Linq</AssemblyReference>
+      <AssemblyReference>PresentationFramework</AssemblyReference>
+      <AssemblyReference>WindowsBase</AssemblyReference>
+      <AssemblyReference>PresentationCore</AssemblyReference>
+      <AssemblyReference>System.Xaml</AssemblyReference>
+      <AssemblyReference>UiPath.System.Activities</AssemblyReference>
+      <AssemblyReference>UiPath.UiAutomation.Activities</AssemblyReference>
+      <AssemblyReference>UiPath.Studio.Constants</AssemblyReference>
+      <AssemblyReference>System.Private.ServiceModel</AssemblyReference>
+      <AssemblyReference>System.Runtime.Serialization.Formatters</AssemblyReference>
+      <AssemblyReference>System.Private.DataContractSerialization</AssemblyReference>
+      <AssemblyReference>System.Runtime.Serialization.Primitives</AssemblyReference>
+      <AssemblyReference>System.Reflection.DispatchProxy</AssemblyReference>
+      <AssemblyReference>System.Reflection.TypeExtensions</AssemblyReference>
+      <AssemblyReference>System.Reflection.Metadata</AssemblyReference>
+      <AssemblyReference>System.Linq.Expressions</AssemblyReference>
+      <AssemblyReference>System.Collections</AssemblyReference>
+      <AssemblyReference>System.Collections.NonGeneric</AssemblyReference>
+      <AssemblyReference>System.Text.RegularExpressions</AssemblyReference>
+      <AssemblyReference>System.ObjectModel</AssemblyReference>
+      <AssemblyReference>System.ComponentModel.TypeConverter</AssemblyReference>
+    </sco:Collection>
+  </TextExpression.ReferencesForImplementation>
+  <Sequence DisplayName="05_Notification_SendMail" sap:VirtualizedContainerService.HintSize="688,2700" sap2010:WorkflowViewState.IdRef="Sequence_1">
+    <Sequence.Variables>
+      <Variable x:TypeArguments="x:String" Name="strRecipientEmail" />
+      <Variable x:TypeArguments="x:String" Name="strPdfFilePath" />
+      <Variable x:TypeArguments="x:String" Name="strCandidateName" />
+      <Variable x:TypeArguments="x:String" Name="strSmtpHost" />
+      <Variable x:TypeArguments="x:Int32" Name="intSmtpPort" />
+      <Variable x:TypeArguments="x:String" Name="strSmtpUser" />
+      <Variable x:TypeArguments="x:String" Name="strSmtpPassword" />
+      <Variable x:TypeArguments="x:Boolean" Name="boolSimulationMode" />
+      <Variable x:TypeArguments="x:String" Name="strScriptPath" />
+      <Variable x:TypeArguments="x:String" Name="strRunnerCommand" />
+      <Variable x:TypeArguments="x:String" Name="strRunnerOutput" />
+      <Variable x:TypeArguments="x:Boolean" Name="boolIsEmailValid" />
+      <Variable x:TypeArguments="x:Boolean" Name="boolPdfExists" />
+    </Sequence.Variables>
+    <sap:WorkflowViewStateService.ViewState>
+      <scg:Dictionary x:TypeArguments="x:String, x:Object">
+        <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+      </scg:Dictionary>
+    </sap:WorkflowViewStateService.ViewState>
+    <Assign DisplayName="Normalize Recipient Email" sap:VirtualizedContainerService.HintSize="626,113.6" sap2010:WorkflowViewState.IdRef="Assign_1">
+      <Assign.To>
+        <OutArgument x:TypeArguments="x:String">[strRecipientEmail]</OutArgument>
+      </Assign.To>
+      <Assign.Value>
+        <InArgument x:TypeArguments="x:String">[If(String.IsNullOrWhiteSpace(in_RecipientEmail), "", in_RecipientEmail.Trim())]</InArgument>
+      </Assign.Value>
+    </Assign>
+    <Assign DisplayName="Normalize PDF Path" sap:VirtualizedContainerService.HintSize="626,113.6" sap2010:WorkflowViewState.IdRef="Assign_2">
+      <Assign.To>
+        <OutArgument x:TypeArguments="x:String">[strPdfFilePath]</OutArgument>
+      </Assign.To>
+      <Assign.Value>
+        <InArgument x:TypeArguments="x:String">[If(String.IsNullOrWhiteSpace(in_PdfFilePath), "", in_PdfFilePath.Trim())]</InArgument>
+      </Assign.Value>
+    </Assign>
+    <Assign DisplayName="Normalize Candidate Name" sap:VirtualizedContainerService.HintSize="626,113.6" sap2010:WorkflowViewState.IdRef="Assign_3">
+      <Assign.To>
+        <OutArgument x:TypeArguments="x:String">[strCandidateName]</OutArgument>
+      </Assign.To>
+      <Assign.Value>
+        <InArgument x:TypeArguments="x:String">[If(String.IsNullOrWhiteSpace(in_CandidateName), "Candidate", in_CandidateName.Trim())]</InArgument>
+      </Assign.Value>
+    </Assign>
+    <Assign DisplayName="Normalize SMTP Host" sap:VirtualizedContainerService.HintSize="626,113.6" sap2010:WorkflowViewState.IdRef="Assign_4">
+      <Assign.To>
+        <OutArgument x:TypeArguments="x:String">[strSmtpHost]</OutArgument>
+      </Assign.To>
+      <Assign.Value>
+        <InArgument x:TypeArguments="x:String">[If(String.IsNullOrWhiteSpace(in_SmtpHost), "", in_SmtpHost.Trim())]</InArgument>
+      </Assign.Value>
+    </Assign>
+    <Assign DisplayName="Normalize SMTP Port" sap:VirtualizedContainerService.HintSize="626,113.6" sap2010:WorkflowViewState.IdRef="Assign_5">
+      <Assign.To>
+        <OutArgument x:TypeArguments="x:Int32">[intSmtpPort]</OutArgument>
+      </Assign.To>
+      <Assign.Value>
+        <InArgument x:TypeArguments="x:Int32">[If(in_SmtpPort &lt;= 0, 587, in_SmtpPort)]</InArgument>
+      </Assign.Value>
+    </Assign>
+    <Assign DisplayName="Normalize SMTP User" sap:VirtualizedContainerService.HintSize="626,113.6" sap2010:WorkflowViewState.IdRef="Assign_6">
+      <Assign.To>
+        <OutArgument x:TypeArguments="x:String">[strSmtpUser]</OutArgument>
+      </Assign.To>
+      <Assign.Value>
+        <InArgument x:TypeArguments="x:String">[If(String.IsNullOrWhiteSpace(in_SmtpUser), "", in_SmtpUser.Trim())]</InArgument>
+      </Assign.Value>
+    </Assign>
+    <Assign DisplayName="Normalize SMTP Password" sap:VirtualizedContainerService.HintSize="626,113.6" sap2010:WorkflowViewState.IdRef="Assign_7">
+      <Assign.To>
+        <OutArgument x:TypeArguments="x:String">[strSmtpPassword]</OutArgument>
+      </Assign.To>
+      <Assign.Value>
+        <InArgument x:TypeArguments="x:String">[If(String.IsNullOrWhiteSpace(in_SmtpPassword), "", in_SmtpPassword.Trim())]</InArgument>
+      </Assign.Value>
+    </Assign>
+    <Assign DisplayName="Determine Simulation Mode" sap:VirtualizedContainerService.HintSize="626,113.6" sap2010:WorkflowViewState.IdRef="Assign_8">
+      <Assign.To>
+        <OutArgument x:TypeArguments="x:Boolean">[boolSimulationMode]</OutArgument>
+      </Assign.To>
+      <Assign.Value>
+        <InArgument x:TypeArguments="x:Boolean">[in_SimulationMode OrElse String.IsNullOrWhiteSpace(strSmtpHost) OrElse String.IsNullOrWhiteSpace(strSmtpUser)]</InArgument>
+      </Assign.Value>
+    </Assign>
+    <Assign DisplayName="Set Script Runner Path" sap:VirtualizedContainerService.HintSize="626,113.6" sap2010:WorkflowViewState.IdRef="Assign_9">
+      <Assign.To>
+        <OutArgument x:TypeArguments="x:String">[strScriptPath]</OutArgument>
+      </Assign.To>
+      <Assign.Value>
+        <InArgument x:TypeArguments="x:String">["Data\Scripts\SendEmailNotification.ps1"]</InArgument>
+      </Assign.Value>
+    </Assign>
+    <ui:LogMessage DisplayName="Log Mail Dispatch Start" sap:VirtualizedContainerService.HintSize="626,141" sap2010:WorkflowViewState.IdRef="LogMessage_1" Level="Info" Message="[&quot;[05_Notification_SendMail] Initiating email delivery to &quot; &amp; strRecipientEmail &amp; &quot; with attachment: &quot; &amp; strPdfFilePath]" />
+    <Assign DisplayName="Validate Email Format" sap:VirtualizedContainerService.HintSize="626,113.6" sap2010:WorkflowViewState.IdRef="Assign_10">
+      <Assign.To>
+        <OutArgument x:TypeArguments="x:Boolean">[boolIsEmailValid]</OutArgument>
+      </Assign.To>
+      <Assign.Value>
+        <InArgument x:TypeArguments="x:Boolean">[Not String.IsNullOrWhiteSpace(strRecipientEmail) AndAlso System.Text.RegularExpressions.Regex.IsMatch(strRecipientEmail, "^[^@\s]+@[^@\s]+\.[^@\s]+$")]</InArgument>
+      </Assign.Value>
+    </Assign>
+    <Assign DisplayName="Validate PDF Existence" sap:VirtualizedContainerService.HintSize="626,113.6" sap2010:WorkflowViewState.IdRef="Assign_11">
+      <Assign.To>
+        <OutArgument x:TypeArguments="x:Boolean">[boolPdfExists]</OutArgument>
+      </Assign.To>
+      <Assign.Value>
+        <InArgument x:TypeArguments="x:Boolean">[Not String.IsNullOrWhiteSpace(strPdfFilePath) AndAlso System.IO.File.Exists(strPdfFilePath)]</InArgument>
+      </Assign.Value>
+    </Assign>
+    <If Condition="[boolIsEmailValid AndAlso boolPdfExists]" DisplayName="Check Preconditions" sap:VirtualizedContainerService.HintSize="626,1050" sap2010:WorkflowViewState.IdRef="If_1">
+      <If.Then>
+        <Sequence DisplayName="Dispatch Email Notification" sap:VirtualizedContainerService.HintSize="550,680" sap2010:WorkflowViewState.IdRef="Sequence_2">
+          <sap:WorkflowViewStateService.ViewState>
+            <scg:Dictionary x:TypeArguments="x:String, x:Object">
+              <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+            </scg:Dictionary>
+          </sap:WorkflowViewStateService.ViewState>
+          <TryCatch DisplayName="Try Email Sending" sap:VirtualizedContainerService.HintSize="516,620" sap2010:WorkflowViewState.IdRef="TryCatch_1">
+            <TryCatch.Try>
+              <Sequence DisplayName="Execute PowerShell Email Script" sap:VirtualizedContainerService.HintSize="480,390" sap2010:WorkflowViewState.IdRef="Sequence_3">
+                <sap:WorkflowViewStateService.ViewState>
+                  <scg:Dictionary x:TypeArguments="x:String, x:Object">
+                    <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+                  </scg:Dictionary>
+                </sap:WorkflowViewStateService.ViewState>
+                <Assign DisplayName="Build PowerShell Email Command" sap:VirtualizedContainerService.HintSize="448,113.6" sap2010:WorkflowViewState.IdRef="Assign_12">
+                  <Assign.To>
+                    <OutArgument x:TypeArguments="x:String">[strRunnerCommand]</OutArgument>
+                  </Assign.To>
+                  <Assign.Value>
+                    <InArgument x:TypeArguments="x:String">[String.Format("-ExecutionPolicy Bypass -File ""{0}"" -RecipientEmail ""{1}"" -PdfFilePath ""{2}"" -CandidateName ""{3}""{4}", strScriptPath, strRecipientEmail, strPdfFilePath, strCandidateName, If(boolSimulationMode, " -SimulationMode", String.Format(" -SmtpHost ""{0}"" -SmtpPort {1} -SmtpUser ""{2}"" -SmtpPassword ""{3}""", strSmtpHost, intSmtpPort, strSmtpUser, strSmtpPassword)))]</InArgument>
+                  </Assign.Value>
+                </Assign>
+                <Assign DisplayName="Execute Email Dispatcher" sap:VirtualizedContainerService.HintSize="448,113.6" sap2010:WorkflowViewState.IdRef="Assign_13">
+                  <Assign.To>
+                    <OutArgument x:TypeArguments="x:String">[strRunnerOutput]</OutArgument>
+                  </Assign.To>
+                  <Assign.Value>
+                    <InArgument x:TypeArguments="x:String">[System.Diagnostics.Process.Start(New System.Diagnostics.ProcessStartInfo("powershell.exe", strRunnerCommand) With {.RedirectStandardOutput = True, .UseShellExecute = False, .CreateNoWindow = True}).StandardOutput.ReadToEnd()]</InArgument>
+                  </Assign.Value>
+                </Assign>
+                <Assign DisplayName="Set Success Status" sap:VirtualizedContainerService.HintSize="448,113.6" sap2010:WorkflowViewState.IdRef="Assign_14">
+                  <Assign.To>
+                    <OutArgument x:TypeArguments="x:Boolean">[out_MailSent]</OutArgument>
+                  </Assign.To>
+                  <Assign.Value>
+                    <InArgument x:TypeArguments="x:Boolean">[True]</InArgument>
+                  </Assign.Value>
+                </Assign>
+                <Assign DisplayName="Set Delivery Status Message" sap:VirtualizedContainerService.HintSize="448,113.6" sap2010:WorkflowViewState.IdRef="Assign_15">
+                  <Assign.To>
+                    <OutArgument x:TypeArguments="x:String">[out_DeliveryStatus]</OutArgument>
+                  </Assign.To>
+                  <Assign.Value>
+                    <InArgument x:TypeArguments="x:String">[If(boolSimulationMode, "SIMULATED: Sent to " &amp; strRecipientEmail, "DELIVERED: Sent to " &amp; strRecipientEmail)]</InArgument>
+                  </Assign.Value>
+                </Assign>
+                <ui:LogMessage DisplayName="Log Success Notification" sap:VirtualizedContainerService.HintSize="448,141" sap2010:WorkflowViewState.IdRef="LogMessage_2" Level="Info" Message="[&quot;[05_Notification_SendMail] SUCCESS: Notification dispatched to &quot; &amp; strRecipientEmail &amp; &quot; (Mode: &quot; &amp; If(boolSimulationMode, &quot;SIMULATION&quot;, &quot;LIVE&quot;) &amp; &quot;)&quot;]" />
+              </Sequence>
+            </TryCatch.Try>
+            <TryCatch.Catches>
+              <Catch x:TypeArguments="s:Exception" sap:VirtualizedContainerService.HintSize="484,22" sap2010:WorkflowViewState.IdRef="Catch`1_1">
+                <sap:WorkflowViewStateService.ViewState>
+                  <scg:Dictionary x:TypeArguments="x:String, x:Object">
+                    <x:Boolean x:Key="IsExpanded">False</x:Boolean>
+                    <x:Boolean x:Key="IsPinned">False</x:Boolean>
+                  </scg:Dictionary>
+                </sap:WorkflowViewStateService.ViewState>
+                <ActivityAction x:TypeArguments="s:Exception">
+                  <ActivityAction.Argument>
+                    <DelegateInArgument x:TypeArguments="s:Exception" Name="exception" />
+                  </ActivityAction.Argument>
+                  <Sequence DisplayName="Handle Mail Exception" sap:VirtualizedContainerService.HintSize="449.6,280" sap2010:WorkflowViewState.IdRef="Sequence_4">
+                    <sap:WorkflowViewStateService.ViewState>
+                      <scg:Dictionary x:TypeArguments="x:String, x:Object">
+                        <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+                      </scg:Dictionary>
+                    </sap:WorkflowViewStateService.ViewState>
+                    <ui:LogMessage DisplayName="Log Mail Warning" sap:VirtualizedContainerService.HintSize="416,141" sap2010:WorkflowViewState.IdRef="LogMessage_3" Level="Warn" Message="[&quot;[05_Notification_SendMail] Exception during mail dispatch: &quot; &amp; exception.Message]" />
+                    <Assign DisplayName="Mark Mail Warning Fallback" sap:VirtualizedContainerService.HintSize="416,113.6" sap2010:WorkflowViewState.IdRef="Assign_16">
+                      <Assign.To>
+                        <OutArgument x:TypeArguments="x:Boolean">[out_MailSent]</OutArgument>
+                      </Assign.To>
+                      <Assign.Value>
+                        <InArgument x:TypeArguments="x:Boolean">[False]</InArgument>
+                      </Assign.Value>
+                    </Assign>
+                    <Assign DisplayName="Record Exception Status" sap:VirtualizedContainerService.HintSize="416,113.6" sap2010:WorkflowViewState.IdRef="Assign_17">
+                      <Assign.To>
+                        <OutArgument x:TypeArguments="x:String">[out_DeliveryStatus]</OutArgument>
+                      </Assign.To>
+                      <Assign.Value>
+                        <InArgument x:TypeArguments="x:String">["EXCEPTION: " &amp; exception.Message]</InArgument>
+                      </Assign.Value>
+                    </Assign>
+                  </Sequence>
+                </ActivityAction>
+              </Catch>
+            </TryCatch.Catches>
+          </TryCatch>
+        </Sequence>
+      </If.Then>
+      <If.Else>
+        <Sequence DisplayName="Handle Invalid Preconditions" sap:VirtualizedContainerService.HintSize="449.6,280" sap2010:WorkflowViewState.IdRef="Sequence_5">
+          <sap:WorkflowViewStateService.ViewState>
+            <scg:Dictionary x:TypeArguments="x:String, x:Object">
+              <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+            </scg:Dictionary>
+          </sap:WorkflowViewStateService.ViewState>
+          <ui:LogMessage DisplayName="Log Precondition Failure" sap:VirtualizedContainerService.HintSize="416,141" sap2010:WorkflowViewState.IdRef="LogMessage_4" Level="Warn" Message="[&quot;[05_Notification_SendMail] Precondition failed. ValidEmail: &quot; &amp; boolIsEmailValid.ToString() &amp; &quot;, PdfExists: &quot; &amp; boolPdfExists.ToString() &amp; &quot; (&quot; &amp; strPdfFilePath &amp; &quot;)&quot;]" />
+          <Assign DisplayName="Mark Unsent" sap:VirtualizedContainerService.HintSize="416,113.6" sap2010:WorkflowViewState.IdRef="Assign_18">
+            <Assign.To>
+              <OutArgument x:TypeArguments="x:Boolean">[out_MailSent]</OutArgument>
+            </Assign.To>
+            <Assign.Value>
+              <InArgument x:TypeArguments="x:Boolean">[False]</InArgument>
+            </Assign.Value>
+          </Assign>
+          <Assign DisplayName="Set Failure Reason" sap:VirtualizedContainerService.HintSize="416,113.6" sap2010:WorkflowViewState.IdRef="Assign_19">
+            <Assign.To>
+              <OutArgument x:TypeArguments="x:String">[out_DeliveryStatus]</OutArgument>
+            </Assign.To>
+            <Assign.Value>
+              <InArgument x:TypeArguments="x:String">["PRECONDITION_FAILED: Invalid email (" &amp; strRecipientEmail &amp; ") or PDF missing (" &amp; strPdfFilePath &amp; ")"]</InArgument>
+            </Assign.Value>
+          </Assign>
+        </Sequence>
+      </If.Else>
+    </If>
+  </Sequence>
+</Activity>
