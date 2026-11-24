@@ -80,7 +80,7 @@
       <AssemblyReference>System.IO.FileSystem.AccessControl</AssemblyReference>
     </sco:Collection>
   </TextExpression.ReferencesForImplementation>
-  <Sequence DisplayName="06_Webhook_NotifyWeb Sequence" sap:VirtualizedContainerService.HintSize="672,2100" sap2010:WorkflowViewState.IdRef="Sequence_1">
+  <Sequence sap2010:Annotation.AnnotationText="[SINGLE RESPONSIBILITY] Mengirimkan panggilan REST API balik (Webhook HTTP POST) ke Web Portal untuk memperbarui status pekerjaan (/draft, /complete, /progress, /error). Pada endpoint /complete, modul secara otomatis mengonversi dokumen PDF menjadi Base64 payload. Dilengkapi toleransi kesalahan penuh agar kegagalan jaringan webhook tidak membatalkan job robot.&#xA;&#xA;[KONTRAK ARGUMEN]&#xA;- in_WebhookBaseUrl (String): URL dasar backend Web Portal (contoh: &quot;http://localhost:3000&quot;).&#xA;- in_JobId (String): ID unik pekerjaan.&#xA;- in_EndpointType (String): Tipe endpoint (&quot;draft&quot;, &quot;complete&quot;, &quot;progress&quot;, &quot;error&quot;).&#xA;- in_PayloadJson (String opsional): Payload JSON data yang dikirimkan (misal draf resume).&#xA;- in_PdfFilePath (String opsional): Path berkas PDF untuk dikonversi ke Base64 pada endpoint /complete.&#xA;- out_StatusCode (Int32): HTTP status code dari backend.&#xA;- out_ResponseContent (String): Teks body respons balasan dari server." DisplayName="06_Webhook_NotifyWeb Sequence" sap:VirtualizedContainerService.HintSize="672,2100" sap2010:WorkflowViewState.IdRef="Sequence_1">
     <Sequence.Variables>
       <Variable x:TypeArguments="x:String" Name="strFullEndpointUrl" />
       <Variable x:TypeArguments="x:String" Name="strFinalRequestBody" />
@@ -111,7 +111,7 @@
     </Assign>
 
     <!-- 2. Validate essential parameters -->
-    <If Condition="[String.IsNullOrWhiteSpace(in_JobId) OrElse String.IsNullOrWhiteSpace(in_WebhookBaseUrl)]" DisplayName="Check if webhook configuration is present" sap:VirtualizedContainerService.HintSize="610,410" sap2010:WorkflowViewState.IdRef="If_CheckConfig">
+    <If Condition="[String.IsNullOrWhiteSpace(in_JobId) OrElse String.IsNullOrWhiteSpace(in_WebhookBaseUrl)]" sap2010:Annotation.AnnotationText="[PERCABANGAN LOGIKA] Memeriksa apakah in_JobId atau in_WebhookBaseUrl kosong. Jika salah satu kosong, lewati pengiriman webhook secara aman tanpa melempar error." DisplayName="Check if webhook configuration is present" sap:VirtualizedContainerService.HintSize="610,410" sap2010:WorkflowViewState.IdRef="If_CheckConfig">
       <If.Then>
         <Sequence DisplayName="Config missing sequence" sap:VirtualizedContainerService.HintSize="416,141" sap2010:WorkflowViewState.IdRef="Sequence_NoConfig">
           <ui:LogMessage DisplayName="Log missing config warning" sap:VirtualizedContainerService.HintSize="382,141" sap2010:WorkflowViewState.IdRef="LogMessage_ConfigMissing" Level="Warn" Message="[&quot;[Webhook] in_JobId or in_WebhookBaseUrl is not specified. Skipping HTTP webhook callback.&quot;]" />
@@ -130,7 +130,7 @@
           </Assign>
 
           <!-- Format Request Body based on Endpoint Type -->
-          <If Condition="[If(String.IsNullOrWhiteSpace(in_EndpointType), &quot;&quot;, in_EndpointType.Trim().ToLower()) = &quot;complete&quot;]" DisplayName="Check endpoint type" sap:VirtualizedContainerService.HintSize="542,480" sap2010:WorkflowViewState.IdRef="If_EndpointType">
+          <If Condition="[If(String.IsNullOrWhiteSpace(in_EndpointType), &quot;&quot;, in_EndpointType.Trim().ToLower()) = &quot;complete&quot;]" sap2010:Annotation.AnnotationText="[PERCABANGAN LOGIKA] Pemilihan format payload:&#xA;- Then (complete): Membaca berkas PDF, mengonversinya menjadi Base64 string, dan membungkusnya ke dalam JSON payload.&#xA;- Else (draft/lainnya): Menggunakan in_PayloadJson langsung." DisplayName="Check endpoint type" sap:VirtualizedContainerService.HintSize="542,480" sap2010:WorkflowViewState.IdRef="If_EndpointType">
             <If.Then>
               <!-- Complete Endpoint: Attach Base64 PDF if file exists -->
               <Sequence DisplayName="Prepare complete payload" sap:VirtualizedContainerService.HintSize="468,260" sap2010:WorkflowViewState.IdRef="Sequence_PrepareComplete">
@@ -168,7 +168,7 @@
           <ui:LogMessage DisplayName="Log dispatch start" sap:VirtualizedContainerService.HintSize="542,141" sap2010:WorkflowViewState.IdRef="LogMessage_StartDispatch" Level="Info" Message="[&quot;[Webhook] Dispatching POST to: &quot; &amp; strFullEndpointUrl]" />
 
           <!-- Try HTTP Client Request with ContinueOnError and TryCatch -->
-          <TryCatch DisplayName="Try Webhook Request" sap:VirtualizedContainerService.HintSize="542,500" sap2010:WorkflowViewState.IdRef="TryCatch_Webhook">
+          <TryCatch sap2010:Annotation.AnnotationText="[PENANGANAN ERROR] Mengirimkan HTTP POST ke endpoint Webhook. Jika server backend sedang offline atau koneksi timeout, blok Catch menangkap exception dan alur robot tetap selesai secara normal tanpa crash." DisplayName="Try Webhook Request" sap:VirtualizedContainerService.HintSize="542,500" sap2010:WorkflowViewState.IdRef="TryCatch_Webhook">
             <TryCatch.Try>
               <Sequence DisplayName="Send HTTP Request" sap:VirtualizedContainerService.HintSize="416,230" sap2010:WorkflowViewState.IdRef="Sequence_SendHttp">
                 <ui:HttpClient Body="[strFinalRequestBody]" ClientCertificate="{x:Null}" ClientCertificatePassword="{x:Null}" ConsumerKey="{x:Null}" ConsumerSecret="{x:Null}" ContinueOnError="True" FileAttachments="{x:Null}" OAuth1Token="{x:Null}" OAuth1TokenSecret="{x:Null}" OAuth2Token="{x:Null}" Password="{x:Null}" ResourcePath="{x:Null}" ResponseAttachment="{x:Null}" ResponseHeaders="{x:Null}" SecureClientCertificatePassword="{x:Null}" SecurePassword="{x:Null}" StatusCode="[out_StatusCode]" Username="{x:Null}" AcceptFormat="JSON" AuthenticationType="None" BodyFormat="application/json" DisplayName="HTTP Client Activity" EnableSSLVerification="False" EndPoint="[strFullEndpointUrl]" sap:VirtualizedContainerService.HintSize="382,70" Method="POST" Result="[out_ResponseContent]" TimeoutMS="30000" />

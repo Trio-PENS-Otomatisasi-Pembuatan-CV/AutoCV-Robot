@@ -44,6 +44,8 @@ Data/Outputs/*
 *.tmp
 *_backup.xaml
 *~
+~*.xaml
+~*
 # Microsoft Office lock files (dihasilkan saat robot membuka file Excel/Word/CV)
 ~$*.xlsx
 ~$*.xls

@@ -84,7 +84,7 @@
       <AssemblyReference>System.ComponentModel.TypeConverter</AssemblyReference>
     </sco:Collection>
   </TextExpression.ReferencesForImplementation>
-  <Sequence DisplayName="05_Notification_SendMail" sap:VirtualizedContainerService.HintSize="688,2700" sap2010:WorkflowViewState.IdRef="Sequence_1">
+  <Sequence sap2010:Annotation.AnnotationText="[SINGLE RESPONSIBILITY] Mengirimkan email notifikasi hasil akhir beserta lampiran dokumen PDF resume ATS kepada kandidat menggunakan skrip SendEmailNotification.ps1. Mendukung mode SMTP live maupun mode SIMULATION otomatis saat pengujian tanpa kredensial rahasia.&#xA;&#xA;[KONTRAK ARGUMEN]&#xA;- in_RecipientEmail (String): Alamat email valid penerima berkas.&#xA;- in_PdfFilePath (String): Path absolut dokumen PDF resume yang akan dilampirkan.&#xA;- in_CandidateName (String): Nama lengkap kandidat untuk personalisasi body email.&#xA;- in_SmtpHost (String opsional): Hostname server SMTP (misal: smtp.gmail.com).&#xA;- in_SmtpPort (Int32 opsional): Port SMTP (default: 587).&#xA;- in_SmtpUser, in_SmtpPassword (String opsional): Kredensial otentikasi SMTP.&#xA;- in_SimulationMode (Boolean): True = simulasi pengiriman aman tanpa mengirim email nyata.&#xA;- out_MailSent (Boolean): True jika pengiriman berhasil (atau tersimulasi sukses).&#xA;- out_DeliveryStatus (String): Ringkasan status pengiriman (&quot;DELIVERED&quot; atau &quot;SIMULATED&quot;)." DisplayName="05_Notification_SendMail" sap:VirtualizedContainerService.HintSize="688,2700" sap2010:WorkflowViewState.IdRef="Sequence_1">
     <Sequence.Variables>
       <Variable x:TypeArguments="x:String" Name="strRecipientEmail" />
       <Variable x:TypeArguments="x:String" Name="strPdfFilePath" />
@@ -161,7 +161,7 @@
         <InArgument x:TypeArguments="x:String">[If(String.IsNullOrWhiteSpace(in_SmtpPassword), "", in_SmtpPassword.Trim())]</InArgument>
       </Assign.Value>
     </Assign>
-    <Assign DisplayName="Determine Simulation Mode" sap:VirtualizedContainerService.HintSize="626,113.6" sap2010:WorkflowViewState.IdRef="Assign_8">
+    <Assign sap2010:Annotation.AnnotationText="[LOGIKA BISNIS] Menentukan mode simulasi otomatis: Jika in_SimulationMode=True atau jika host/user SMTP kosong, robot otomatis beralih ke Mode SIMULATION sehingga pengujian juri dapat berjalan lancar tanpa kredensial eksternal." DisplayName="Determine Simulation Mode" sap:VirtualizedContainerService.HintSize="626,113.6" sap2010:WorkflowViewState.IdRef="Assign_8">
       <Assign.To>
         <OutArgument x:TypeArguments="x:Boolean">[boolSimulationMode]</OutArgument>
       </Assign.To>
@@ -194,7 +194,7 @@
         <InArgument x:TypeArguments="x:Boolean">[Not String.IsNullOrWhiteSpace(strPdfFilePath) AndAlso System.IO.File.Exists(strPdfFilePath)]</InArgument>
       </Assign.Value>
     </Assign>
-    <If Condition="[boolIsEmailValid AndAlso boolPdfExists]" DisplayName="Check Preconditions" sap:VirtualizedContainerService.HintSize="626,1050" sap2010:WorkflowViewState.IdRef="If_1">
+    <If Condition="[boolIsEmailValid AndAlso boolPdfExists]" sap2010:Annotation.AnnotationText="[PERCABANGAN LOGIKA] Memeriksa prasyarat: format email tujuan valid dan berkas fisik PDF ditemukan di disk. Jika tidak terpenuhi, tandai kegagalan prasyarat pada out_DeliveryStatus." DisplayName="Check Preconditions" sap:VirtualizedContainerService.HintSize="626,1050" sap2010:WorkflowViewState.IdRef="If_1">
       <If.Then>
         <Sequence DisplayName="Dispatch Email Notification" sap:VirtualizedContainerService.HintSize="550,680" sap2010:WorkflowViewState.IdRef="Sequence_2">
           <sap:WorkflowViewStateService.ViewState>
@@ -202,7 +202,7 @@
               <x:Boolean x:Key="IsExpanded">True</x:Boolean>
             </scg:Dictionary>
           </sap:WorkflowViewStateService.ViewState>
-          <TryCatch DisplayName="Try Email Sending" sap:VirtualizedContainerService.HintSize="516,620" sap2010:WorkflowViewState.IdRef="TryCatch_1">
+          <TryCatch sap2010:Annotation.AnnotationText="[PENANGANAN ERROR] Menjalankan skrip PowerShell SendEmailNotification.ps1. Jika terjadi error koneksi SMTP atau timeout, blok Catch menangkap exception dan mencatat log warning tanpa menggagalkan eksekusi keseluruhan robot." DisplayName="Try Email Sending" sap:VirtualizedContainerService.HintSize="516,620" sap2010:WorkflowViewState.IdRef="TryCatch_1">
             <TryCatch.Try>
               <Sequence DisplayName="Execute PowerShell Email Script" sap:VirtualizedContainerService.HintSize="480,390" sap2010:WorkflowViewState.IdRef="Sequence_3">
                 <sap:WorkflowViewStateService.ViewState>

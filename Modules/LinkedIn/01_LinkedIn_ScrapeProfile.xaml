@@ -89,7 +89,7 @@
       <AssemblyReference>System.IO.FileSystem.DriveInfo</AssemblyReference>
     </sco:Collection>
   </TextExpression.ReferencesForImplementation>
-  <Sequence DisplayName="01_LinkedIn_ScrapeProfile" sap:VirtualizedContainerService.HintSize="892,2500" sap2010:WorkflowViewState.IdRef="Sequence_1">
+  <Sequence sap2010:Annotation.AnnotationText="[SINGLE RESPONSIBILITY] Mengekstrak data riwayat profesional dari profil publik LinkedIn (nama, headline, ringkasan, riwayat kerja, pendidikan, skills) menggunakan injeksi skrip JavaScript DOM extractor. Memiliki ketahanan otomatis beralih ke mock fixture jika sesi browser offline.&#xA;&#xA;[KONTRAK ARGUMEN]&#xA;- in_LinkedInUrl (String): URL profil publik LinkedIn (format: &quot;https://www.linkedin.com/in/...&quot;).&#xA;- in_BrowserType (String opsional): Target browser (&quot;Chrome&quot; atau &quot;Edge&quot;, default: &quot;Chrome&quot;).&#xA;- in_UseMockFallback (Boolean): True = lewati browser dan langsung gunakan mock data lokal.&#xA;- out_LinkedInDataJson (String): Objek JSON terstruktur hasil ekstraksi profil LinkedIn." DisplayName="01_LinkedIn_ScrapeProfile" sap:VirtualizedContainerService.HintSize="892,2500" sap2010:WorkflowViewState.IdRef="Sequence_1">
     <Sequence.Variables>
       <Variable x:TypeArguments="x:String" Name="strBrowserName" />
       <Variable x:TypeArguments="x:String" Name="strScrapedJsonRaw" />
@@ -131,7 +131,7 @@
         <InArgument x:TypeArguments="x:String">[""]</InArgument>
       </Assign.Value>
     </Assign>
-    <If Condition="[in_UseMockFallback]" DisplayName="Route: Mock Fallback or Live Browser" sap:VirtualizedContainerService.HintSize="656,1800" sap2010:WorkflowViewState.IdRef="If_MockOrLive">
+    <If Condition="[in_UseMockFallback]" sap2010:Annotation.AnnotationText="[PERCABANGAN LOGIKA] Rute Eksekusi: Mengecek flag in_UseMockFallback.&#xA;- Then: Langsung membaca fixture mock Data/Mocks/LinkedInMock.json tanpa membuka browser (cepat &amp; zero-dependency).&#xA;- Else: Membuka browser lokal dan menginjeksi skrip DOM extraction." DisplayName="Route: Mock Fallback or Live Browser" sap:VirtualizedContainerService.HintSize="656,1800" sap2010:WorkflowViewState.IdRef="If_MockOrLive">
       <If.Then>
         <Sequence DisplayName="Load Mock Data Directly" sap:VirtualizedContainerService.HintSize="449.6,280" sap2010:WorkflowViewState.IdRef="Sequence_MockDirect">
           <sap:WorkflowViewStateService.ViewState>
@@ -165,7 +165,7 @@
               <x:Boolean x:Key="IsExpanded">True</x:Boolean>
             </scg:Dictionary>
           </sap:WorkflowViewStateService.ViewState>
-          <TryCatch DisplayName="Try Catch Live Profile Scraping" sap:VirtualizedContainerService.HintSize="656,1350" sap2010:WorkflowViewState.IdRef="TryCatch_1">
+          <TryCatch sap2010:Annotation.AnnotationText="[PENANGANAN ERROR] Mencoba membuka browser dan menginjeksi skrip DOM. Jika terjadi error (sesi belum login, timeout, atau selector hilang), blok Catch menangkap exception dan mengalihkan alur ke mock fallback tanpa menghentikan robot." DisplayName="Try Catch Live Profile Scraping" sap:VirtualizedContainerService.HintSize="656,1350" sap2010:WorkflowViewState.IdRef="TryCatch_1">
             <TryCatch.Try>
               <Sequence DisplayName="Browser Automation Sequence" sap:VirtualizedContainerService.HintSize="510,950" sap2010:WorkflowViewState.IdRef="Sequence_2">
                 <sap:WorkflowViewStateService.ViewState>
@@ -300,7 +300,7 @@
               </If>
             </TryCatch.Finally>
           </TryCatch>
-          <If Condition="[boolExtractionSuccessful]" DisplayName="Check If Data Was Extracted Successfully" sap:VirtualizedContainerService.HintSize="656,580" sap2010:WorkflowViewState.IdRef="If_2">
+          <If Condition="[boolExtractionSuccessful]" sap2010:Annotation.AnnotationText="[PERCABANGAN LOGIKA] Memeriksa apakah ekstraksi live berhasil menghasilkan data profil. Jika gagal (misal profil privat atau kena challenge), blok Else otomatis memuat data mock Data/Mocks/LinkedInMock.json sebagai fallback." DisplayName="Check If Data Was Extracted Successfully" sap:VirtualizedContainerService.HintSize="656,580" sap2010:WorkflowViewState.IdRef="If_2">
             <If.Then>
               <Sequence DisplayName="Assign Live Result" sap:VirtualizedContainerService.HintSize="449.6,173.6" sap2010:WorkflowViewState.IdRef="Sequence_4">
                 <sap:WorkflowViewStateService.ViewState>

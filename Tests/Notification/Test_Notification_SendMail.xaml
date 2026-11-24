@@ -59,7 +59,7 @@
       <AssemblyReference>System.ComponentModel.TypeConverter</AssemblyReference>
     </sco:Collection>
   </TextExpression.ReferencesForImplementation>
-  <Sequence DisplayName="Test_Notification_SendMail" sap:VirtualizedContainerService.HintSize="892,1200" sap2010:WorkflowViewState.IdRef="Sequence_1">
+  <Sequence sap2010:Annotation.AnnotationText="[UNIT TEST] Menguji modul 05_Notification_SendMail.xaml dalam mode simulasi (SimulationMode=True) untuk memastikan logika pengiriman email dan pelampiran file PDF berjalan tanpa error." DisplayName="Test_Notification_SendMail" sap:VirtualizedContainerService.HintSize="892,1200" sap2010:WorkflowViewState.IdRef="Sequence_1">
     <Sequence.Variables>
       <Variable x:TypeArguments="x:String" Name="strTestPdfPath" />
       <Variable x:TypeArguments="x:Boolean" Name="boolMailSent" />

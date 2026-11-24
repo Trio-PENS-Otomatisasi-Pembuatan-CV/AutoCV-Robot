@@ -87,7 +87,7 @@
       <AssemblyReference>System.Runtime.Serialization.Primitives</AssemblyReference>
     </sco:Collection>
   </TextExpression.ReferencesForImplementation>
-  <Sequence DisplayName="00_ValidateAndNormalizeInputs" sap:VirtualizedContainerService.HintSize="892,1900" sap2010:WorkflowViewState.IdRef="Sequence_1">
+  <Sequence sap2010:Annotation.AnnotationText="[SINGLE RESPONSIBILITY] Memvalidasi integritas format URL LinkedIn, URL/username GitHub, dan format email penerima menggunakan ekspresi reguler (Regex), serta menormalkan spasi dan format URL. Melemparkan BusinessRuleException jika data masukan tidak sesuai standar rekrutmen.&#xA;&#xA;[KONTRAK ARGUMEN]&#xA;- in_LinkedInUrl (String): URL profil publik LinkedIn (format: &quot;https://www.linkedin.com/in/...&quot;).&#xA;- in_GitHubUrl (String): URL profil atau username akun GitHub (contoh: &quot;https://github.com/user&quot; atau &quot;user&quot;).&#xA;- in_TargetJobRole (String opsional): Target posisi pekerjaan.&#xA;- in_RecipientEmail (String): Alamat email valid penerima hasil resume.&#xA;- out_NormalizedLinkedInUrl (String): URL LinkedIn yang telah dibersihkan whitespace.&#xA;- out_NormalizedGitHubUrl (String): URL lengkap https://github.com/... yang telah dinormalisasi.&#xA;- out_NormalizedRole (String): Nama posisi kerja yang telah di-trim.&#xA;- out_NormalizedEmail (String): Email penerima yang telah terverifikasi regex." DisplayName="00_ValidateAndNormalizeInputs" sap:VirtualizedContainerService.HintSize="892,1900" sap2010:WorkflowViewState.IdRef="Sequence_1">
     <sap:WorkflowViewStateService.ViewState>
       <scg:Dictionary x:TypeArguments="x:String, x:Object">
         <x:Boolean x:Key="IsExpanded">True</x:Boolean>
@@ -96,7 +96,7 @@
     <ui:LogMessage DisplayName="Log Validation Start" sap:VirtualizedContainerService.HintSize="510,141" sap2010:WorkflowViewState.IdRef="LogMessage_1" Level="Info" Message="[&quot;[00_ValidateAndNormalizeInputs] Starting input parameter validation &amp; normalization.&quot;]" />
     
     <!-- 1. Validate & Normalize LinkedIn URL -->
-    <If Condition="[String.IsNullOrWhiteSpace(in_LinkedInUrl) OrElse Not System.Text.RegularExpressions.Regex.IsMatch(in_LinkedInUrl.Trim(), &quot;^https?://([a-zA-Z0-9-]+\.)?linkedin\.com/in/[A-Za-z0-9_\-\%]+/?&quot;, System.Text.RegularExpressions.RegexOptions.IgnoreCase)]" DisplayName="Validate LinkedIn URL Format" sap:VirtualizedContainerService.HintSize="510,336" sap2010:WorkflowViewState.IdRef="If_LinkedIn">
+    <If Condition="[String.IsNullOrWhiteSpace(in_LinkedInUrl) OrElse Not System.Text.RegularExpressions.Regex.IsMatch(in_LinkedInUrl.Trim(), &quot;^https?://([a-zA-Z0-9-]+\.)?linkedin\.com/in/[A-Za-z0-9_\-\%]+/?&quot;, System.Text.RegularExpressions.RegexOptions.IgnoreCase)]" sap2010:Annotation.AnnotationText="[PERCABANGAN LOGIKA] Memvalidasi format URL profil LinkedIn publik. Jika kosong atau format salah, lempar BusinessRuleException. Jika valid, simpan ke out_NormalizedLinkedInUrl." DisplayName="Validate LinkedIn URL Format" sap:VirtualizedContainerService.HintSize="510,336" sap2010:WorkflowViewState.IdRef="If_LinkedIn">
       <If.Then>
         <Sequence DisplayName="Invalid LinkedIn URL" sap:VirtualizedContainerService.HintSize="449.6,173.6" sap2010:WorkflowViewState.IdRef="Sequence_InvalidLinkedIn">
           <sap:WorkflowViewStateService.ViewState>
@@ -120,7 +120,7 @@
     </If>
 
     <!-- 2. Validate & Normalize GitHub Input -->
-    <If Condition="[String.IsNullOrWhiteSpace(in_GitHubUrl)]" DisplayName="Validate GitHub Required" sap:VirtualizedContainerService.HintSize="510,336" sap2010:WorkflowViewState.IdRef="If_GitHubEmpty">
+    <If Condition="[String.IsNullOrWhiteSpace(in_GitHubUrl)]" sap2010:Annotation.AnnotationText="[PERCABANGAN LOGIKA] Memeriksa apakah input GitHub diisi. Wajib ada untuk keperluan sintesis proyek portofolio." DisplayName="Validate GitHub Required" sap:VirtualizedContainerService.HintSize="510,336" sap2010:WorkflowViewState.IdRef="If_GitHubEmpty">
       <If.Then>
         <Sequence DisplayName="Empty GitHub Input" sap:VirtualizedContainerService.HintSize="449.6,173.6" sap2010:WorkflowViewState.IdRef="Sequence_EmptyGitHub">
           <sap:WorkflowViewStateService.ViewState>
@@ -138,7 +138,7 @@
               <x:Boolean x:Key="IsExpanded">True</x:Boolean>
             </scg:Dictionary>
           </sap:WorkflowViewStateService.ViewState>
-          <If Condition="[in_GitHubUrl.Trim().ToLower().StartsWith(&quot;http://&quot;) OrElse in_GitHubUrl.Trim().ToLower().StartsWith(&quot;https://&quot;)]" DisplayName="Check If GitHub Full URL" sap:VirtualizedContainerService.HintSize="438.4,336" sap2010:WorkflowViewState.IdRef="If_GitHubUrlCheck">
+          <If Condition="[in_GitHubUrl.Trim().ToLower().StartsWith(&quot;http://&quot;) OrElse in_GitHubUrl.Trim().ToLower().StartsWith(&quot;https://&quot;)]" sap2010:Annotation.AnnotationText="[PERCABANGAN LOGIKA] Mendeteksi apakah input berupa URL lengkap atau sekadar username. Menormalkan ke format https://github.com/&lt;user&gt;." DisplayName="Check If GitHub Full URL" sap:VirtualizedContainerService.HintSize="438.4,336" sap2010:WorkflowViewState.IdRef="If_GitHubUrlCheck">
             <If.Then>
               <If Condition="[Not System.Text.RegularExpressions.Regex.IsMatch(in_GitHubUrl.Trim(), &quot;^https?:\/\/(www\.)?github\.com\/[A-Za-z0-9_\-\.]+&quot;, System.Text.RegularExpressions.RegexOptions.IgnoreCase)]" DisplayName="Validate GitHub URL Pattern" sap:VirtualizedContainerService.HintSize="416,280" sap2010:WorkflowViewState.IdRef="If_GitHubUrlPattern">
                 <If.Then>
@@ -179,7 +179,7 @@
     </If>
 
     <!-- 3. Validate Recipient Email -->
-    <If Condition="[String.IsNullOrWhiteSpace(in_RecipientEmail) OrElse Not System.Text.RegularExpressions.Regex.IsMatch(in_RecipientEmail.Trim(), &quot;^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$&quot;)]" DisplayName="Validate Recipient Email Format" sap:VirtualizedContainerService.HintSize="510,336" sap2010:WorkflowViewState.IdRef="If_Email">
+    <If Condition="[String.IsNullOrWhiteSpace(in_RecipientEmail) OrElse Not System.Text.RegularExpressions.Regex.IsMatch(in_RecipientEmail.Trim(), &quot;^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$&quot;)]" sap2010:Annotation.AnnotationText="[PERCABANGAN LOGIKA] Memvalidasi alamat email menggunakan standar format regex RFC-5322. Menolak input jika kosong atau tidak valid." DisplayName="Validate Recipient Email Format" sap:VirtualizedContainerService.HintSize="510,336" sap2010:WorkflowViewState.IdRef="If_Email">
       <If.Then>
         <Sequence DisplayName="Invalid Recipient Email" sap:VirtualizedContainerService.HintSize="449.6,173.6" sap2010:WorkflowViewState.IdRef="Sequence_InvalidEmail">
           <sap:WorkflowViewStateService.ViewState>
