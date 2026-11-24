@@ -1,12 +1,18 @@
 /**
  * FetchGitHubRepos.js
  * AutoCV GitHub Repository & Profile Ingestion Module
- * Queries GitHub REST API for non-fork repositories, stars, and languages with automatic mock fallback.
+ * Fetches user profile, starred metrics, language breakdowns, and public repositories with graceful mock fallback.
  */
 
 const fs = require('fs');
 const path = require('path');
 
+const DEFAULT_MAX_REPOS = parseInt(process.env.GITHUB_MAX_REPOS || '30', 10);
+const GITHUB_API_BASE = 'https://api.github.com';
+
+/**
+ * Extracts and cleans a GitHub username from username or full profile URL.
+ */
 function parseGitHubUsername(input) {
   if (!input) return '';
   let clean = String(input).trim().replace(/^@/, '');
@@ -15,6 +21,25 @@ function parseGitHubUsername(input) {
   return clean.split('/')[0].trim();
 }
 
+/**
+ * Builds HTTP headers for GitHub REST API requests.
+ */
+function buildGitHubHeaders(token) {
+  const headers = {
+    'User-Agent': 'AutoCV-Robot/1.0',
+    'Accept': 'application/vnd.github.v3+json'
+  };
+
+  if (token && String(token).trim().length > 0) {
+    headers['Authorization'] = `Bearer ${String(token).trim()}`;
+  }
+
+  return headers;
+}
+
+/**
+ * Loads mock repositories data fallback when live API request fails or is rate-limited.
+ */
 function loadMockFallback(reason) {
   const mockPath = path.resolve(__dirname, '../Mocks/mock_github_repos.json');
   if (fs.existsSync(mockPath)) {
@@ -25,10 +50,10 @@ function loadMockFallback(reason) {
       data.fetched_at = new Date().toISOString();
       return data;
     } catch (e) {
-      // ignore
+      // Ignore JSON parse error, fall back to built-in minimal mock
     }
   }
-  // Hardcoded minimal fallback if mock file is somehow inaccessible
+
   return {
     user: {
       login: 'candidate-dev',
@@ -65,7 +90,80 @@ function loadMockFallback(reason) {
   };
 }
 
-async function fetchGitHubData(usernameOrUrl, token, useMockFallback = true) {
+/**
+ * Fetches GitHub user profile data.
+ */
+async function fetchUserProfile(username, headers) {
+  const res = await fetch(`${GITHUB_API_BASE}/users/${encodeURIComponent(username)}`, {
+    headers,
+    signal: AbortSignal.timeout(8000)
+  });
+
+  if (!res.ok) {
+    if (res.status === 403) {
+      throw new Error('GitHub API Rate limit exceeded (HTTP 403)');
+    } else if (res.status === 404) {
+      throw new Error(`GitHub user '${username}' not found (HTTP 404)`);
+    } else {
+      throw new Error(`GitHub user API returned HTTP ${res.status}: ${res.statusText}`);
+    }
+  }
+
+  return res.json();
+}
+
+/**
+ * Fetches up to 100 repositories sorted by latest update.
+ */
+async function fetchUserRepositories(username, headers) {
+  const url = `${GITHUB_API_BASE}/users/${encodeURIComponent(username)}/repos?per_page=100&sort=updated`;
+  const res = await fetch(url, {
+    headers,
+    signal: AbortSignal.timeout(10000)
+  });
+
+  if (!res.ok) {
+    throw new Error(`GitHub repos API returned HTTP ${res.status}: ${res.statusText}`);
+  }
+
+  const data = await res.json();
+  if (!Array.isArray(data)) {
+    throw new Error('GitHub repos response is not an array.');
+  }
+
+  return data;
+}
+
+/**
+ * Filters, sorts, and transforms raw repository objects into ATS-ready project objects.
+ */
+function transformRepositories(rawRepos, username, maxRepos = DEFAULT_MAX_REPOS) {
+  // Sort by update date descending
+  const sorted = [...rawRepos].sort((a, b) => {
+    return new Date(b.updated_at || 0).getTime() - new Date(a.updated_at || 0).getTime();
+  });
+
+  // Prioritize original (non-fork) repositories first
+  const nonForks = sorted.filter(repo => !repo.fork);
+  const forks = sorted.filter(repo => repo.fork);
+  const prioritized = nonForks.concat(forks);
+
+  return prioritized.slice(0, maxRepos).map(repo => ({
+    name: repo.name || '',
+    description: repo.description || '',
+    language: repo.language || '',
+    stargazers_count: repo.stargazers_count || 0,
+    forks_count: repo.forks_count || 0,
+    topics: Array.isArray(repo.topics) ? repo.topics : [],
+    fork: Boolean(repo.fork),
+    html_url: repo.html_url || `https://github.com/${username}/${repo.name}`
+  }));
+}
+
+/**
+ * Main function fetching GitHub candidate dossier.
+ */
+async function fetchGitHubData(usernameOrUrl, token, useMockFallback = true, maxRepos = DEFAULT_MAX_REPOS) {
   const username = parseGitHubUsername(usernameOrUrl);
 
   if (!username) {
@@ -75,68 +173,12 @@ async function fetchGitHubData(usernameOrUrl, token, useMockFallback = true) {
     throw new Error('Empty or invalid GitHub username/URL provided.');
   }
 
-  const headers = {
-    'User-Agent': 'AutoCV-Robot/1.0',
-    'Accept': 'application/vnd.github.v3+json'
-  };
-
-  if (token && String(token).trim().length > 0) {
-    headers['Authorization'] = `Bearer ${String(token).trim()}`;
-  }
+  const headers = buildGitHubHeaders(token);
 
   try {
-    // 1. Fetch User Profile
-    const userRes = await fetch(`https://api.github.com/users/${encodeURIComponent(username)}`, {
-      headers,
-      signal: AbortSignal.timeout(8000)
-    });
-
-    if (!userRes.ok) {
-      if (userRes.status === 403) {
-        throw new Error(`GitHub API Rate limit exceeded (HTTP 403)`);
-      } else if (userRes.status === 404) {
-        throw new Error(`GitHub user '${username}' not found (HTTP 404)`);
-      } else {
-        throw new Error(`GitHub user API returned HTTP ${userRes.status}: ${userRes.statusText}`);
-      }
-    }
-
-    const userData = await userRes.json();
-
-    // 2. Fetch Repositories
-    const reposRes = await fetch(`https://api.github.com/users/${encodeURIComponent(username)}/repos?per_page=100&sort=updated`, {
-      headers,
-      signal: AbortSignal.timeout(10000)
-    });
-
-    if (!reposRes.ok) {
-      throw new Error(`GitHub repos API returned HTTP ${reposRes.status}: ${reposRes.statusText}`);
-    }
-
-    const reposData = await reposRes.json();
-
-    if (!Array.isArray(reposData)) {
-      throw new Error('GitHub repos response is not an array.');
-    }
-
-    // 3. Filter non-fork repositories and sort by latest activity (updated_at descending)
-    const nonForks = reposData.filter(repo => !repo.fork);
-
-    nonForks.sort((a, b) => {
-      return new Date(b.updated_at || 0).getTime() - new Date(a.updated_at || 0).getTime();
-    });
-
-    // Take top 10 latest updated non-fork repositories
-    const topRepos = nonForks.slice(0, 10).map(repo => ({
-      name: repo.name || '',
-      description: repo.description || '',
-      language: repo.language || '',
-      stargazers_count: repo.stargazers_count || 0,
-      forks_count: repo.forks_count || 0,
-      topics: Array.isArray(repo.topics) ? repo.topics : [],
-      fork: false,
-      html_url: repo.html_url || `https://github.com/${username}/${repo.name}`
-    }));
+    const userData = await fetchUserProfile(username, headers);
+    const reposData = await fetchUserRepositories(username, headers);
+    const topRepos = transformRepositories(reposData, username, maxRepos);
 
     return {
       user: {
@@ -165,8 +207,9 @@ if (require.main === module) {
   const token = args[1] || '';
   const useMockFallback = args[2] !== 'false';
   const outputPath = args[3] || '';
+  const maxRepos = args[4] ? parseInt(args[4], 10) : DEFAULT_MAX_REPOS;
 
-  fetchGitHubData(usernameOrUrl, token, useMockFallback)
+  fetchGitHubData(usernameOrUrl, token, useMockFallback, maxRepos)
     .then(result => {
       const jsonStr = JSON.stringify(result, null, 2);
       if (outputPath) {
@@ -183,4 +226,10 @@ if (require.main === module) {
     });
 }
 
-module.exports = { fetchGitHubData, parseGitHubUsername };
+module.exports = {
+  fetchGitHubData,
+  parseGitHubUsername,
+  buildGitHubHeaders,
+  loadMockFallback,
+  transformRepositories
+};
