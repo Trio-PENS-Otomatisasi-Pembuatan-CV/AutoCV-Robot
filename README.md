@@ -7,12 +7,12 @@
 [![UiPath Studio](https://img.shields.io/badge/UiPath%20Studio-26.10-orange.svg?logo=uipath)](https://www.uipath.com/)
 [![Runtime Framework](https://img.shields.io/badge/Framework-.NET%2010%20Windows-blue.svg)](https://dotnet.microsoft.com/)
 [![GenAI Provider](https://img.shields.io/badge/GenAI-Google%20Gemini%202.0%20Flash-4285F4.svg?logo=google)](https://ai.google.dev/)
-[![Architecture](https://img.shields.io/badge/Architecture-Clean%20Code%20%7C%20SRP%20Dual--Mode-success.svg)](#6-arsitektur-dan-alur-orkestrasi)
-[![XAML Integrity](https://img.shields.io/badge/XAML%20Validation-16%2F16%20Passed%20(100%25)-brightgreen.svg)](#8-quickstart-evaluasi-juri-5-minute-review)
-[![License](https://img.shields.io/badge/License-MIT-lightgrey.svg)](LICENSE)
+[![Architecture](https://img.shields.io/badge/Architecture-Clean%20Code%20%7C%20SRP%20Dual--Mode-success.svg)](#5-arsitektur-dan-alur-orkestrasi-sequence-diagram)
+[![XAML Integrity](https://img.shields.io/badge/XAML%20Validation-16%2F16%20Passed%20(100%25)-brightgreen.svg)](#9-quickstart-evaluasi-juri-5-minute-review)
+[![License](https://img.shields.io/badge/License-MIT-lightgrey.svg)](https://opensource.org/licenses/MIT)
 
 > 🔗 **Tautan Repositori Pendukung**:  
-> Untuk antarmuka portal kurasi pengguna (*frontend & API routes*), silakan kunjungi: **[Repositori AutoCV-Web (Curation Studio)](file:///d:/KULIAHHHH_PENSSS/Hackathon/Automation/web/README.md)**.
+> Untuk antarmuka portal kurasi pengguna (*frontend & API routes*), silakan kunjungi: **[Repositori AutoCV-Web (Curation Studio)](https://github.com/Trio-PENS-Otomatisasi-Pembuatan-CV/AutoCV-Web)**.
 
 ---
 
@@ -34,19 +34,19 @@ AutoCV mentransformasikan proses manual yang lambat dan rentan kesalahan menjadi
 
 ```mermaid
 flowchart TD
-    subgraph AsIs [Proses Manual (As-Is): ~180 Menit, 12 Langkah Manual]
-        A1[Kandidat Buka LinkedIn & GitHub] --> A2[Salin Riwayat Manual ke MS Word]
-        A2 --> A3[Format Font & Spasi Manual]
-        A3 --> A4[Tulis Ulang Deskripsi Pekerjaan]
-        A4 --> A5[Export PDF Manual]
-        A5 --> A6[Kirim Email Manual ke HRD]
+    subgraph AsIs["Proses Manual (As-Is): ~180 Menit, 12 Langkah Manual"]
+        A1["Kandidat Buka LinkedIn & GitHub"] --> A2["Salin Riwayat Manual ke MS Word"]
+        A2 --> A3["Format Font & Spasi Manual"]
+        A3 --> A4["Tulis Ulang Deskripsi Pekerjaan"]
+        A4 --> A5["Export PDF Manual"]
+        A5 --> A6["Kirim Email Manual ke HRD"]
     end
 
-    subgraph ToBe [Proses AutoCV (To-Be): < 2 Menit, 1 Klik Kurasi Manusia]
-        B1[Input URL LinkedIn & GitHub di Web] --> B2[Robot Job 1: Ekstraksi Data Otomatis]
-        B2 --> B3[AI: Sintesis STAR & Format ATS]
-        B3 --> B4[Curation Studio: Manusia Review & Approve #HumanInTheLead]
-        B4 --> B5[Robot Job 2: Render OpenXML DOCX/PDF & Email Otomatis]
+    subgraph ToBe["Proses AutoCV (To-Be): < 2 Menit, 1 Klik Kurasi Manusia"]
+        B1["Input URL LinkedIn & GitHub di Web"] --> B2["Robot Job 1: Ekstraksi Data Otomatis"]
+        B2 --> B3["AI: Sintesis STAR & Format ATS"]
+        B3 --> B4["Curation Studio: Review & Approval Manusia"]
+        B4 --> B5["Robot Job 2: Render OpenXML DOCX/PDF & Email Otomatis"]
     end
 ```
 
@@ -88,15 +88,15 @@ Berikut alur komunikasi end-to-end antara Web Portal, UiPath Orchestrator, Robot
 ```mermaid
 sequenceDiagram
     autonumber
-    actor User as Kandidat (Manusia)
-    participant Web as Web Portal (Curation Studio)
-    participant Orch as UiPath Orchestrator Cloud
-    participant Bot as AutoCV-Robot (Main.xaml)
-    participant LLM as Google Gemini / OpenRouter
-    participant Mail as Layanan Email (SMTP)
+    actor User as "Kandidat (Manusia)"
+    participant Web as "Web Portal (Curation Studio)"
+    participant Orch as "UiPath Orchestrator Cloud"
+    participant Bot as "AutoCV-Robot (Main.xaml)"
+    participant LLM as "Google Gemini / OpenRouter"
+    participant Mail as "Layanan Email (SMTP)"
 
     User->>Web: 1. Submit URL LinkedIn & GitHub
-    Web->>Orch: 2. Trigger Job 1 (in_ApprovedResumePayload = "")
+    Web->>Orch: 2. Trigger Job 1 (in_ApprovedResumePayload kosong)
     Orch->>Bot: 3. Dispatch Pipeline_IngestionAndSynthesis
     Bot->>Bot: 4. Scrape LinkedIn & Fetch GitHub Data
     Bot->>LLM: 5. Sintesis Pencapaian (STAR / XYZ Formula)
@@ -104,10 +104,10 @@ sequenceDiagram
     Bot->>Web: 7. Webhook POST /draft (Kirim Hasil Draf)
     Bot-->>Orch: 8. Job 1 Selesai Normal (Status: CURATING)
 
-    Note over User,Web: #HumanInTheLead: Kandidat Mengedit & Menyetujui Draf
+    Note over User,Web: Human-in-the-Lead: Kandidat Mengedit & Menyetujui Draf
     User->>Web: 9. Approve Draf Resume di Curation Studio
 
-    Web->>Orch: 10. Trigger Job 2 (in_ApprovedResumePayload = JSON Terkurasi)
+    Web->>Orch: 10. Trigger Job 2 (in_ApprovedResumePayload terisi JSON)
     Orch->>Bot: 11. Dispatch Pipeline_RenderAndDeliver
     Bot->>Bot: 12. Render Native OpenXML DOCX & Headless PDF
     Bot->>Mail: 13. Kirim Email Lampiran PDF Resmi ke Kandidat
@@ -121,18 +121,18 @@ sequenceDiagram
 
 ### 6.1 Smart Dual-Mode Dispatcher (`Main.xaml`)
 Untuk menghindari pemborosan lisensi unattended robot saat menunggu review manusia (*Zero Idle Cost*), `Main.xaml` dirancang sebagai router cerdas:
-- **Jika `in_ApprovedResumePayload` Kosong** $\rightarrow$ Menjalankan [Pipeline_IngestionAndSynthesis.xaml](file:///d:/KULIAHHHH_PENSSS/Hackathon/Automation/robot/Modules/Pipelines/Pipeline_IngestionAndSynthesis.xaml) (Fase 1).
-- **Jika `in_ApprovedResumePayload` Terisi** $\rightarrow$ Menjalankan [Pipeline_RenderAndDeliver.xaml](file:///d:/KULIAHHHH_PENSSS/Hackathon/Automation/robot/Modules/Pipelines/Pipeline_RenderAndDeliver.xaml) (Fase 2).
+- **Jika `in_ApprovedResumePayload` Kosong** → Menjalankan [Pipeline_IngestionAndSynthesis.xaml](Modules/Pipelines/Pipeline_IngestionAndSynthesis.xaml) (Fase 1).
+- **Jika `in_ApprovedResumePayload` Terisi** → Menjalankan [Pipeline_RenderAndDeliver.xaml](Modules/Pipelines/Pipeline_RenderAndDeliver.xaml) (Fase 2).
 
 ### 6.2 Modul-Modul Alur Kerja (`Modules/*`)
 Setiap modul menganut prinsip *Single Responsibility Principle (SRP)*:
-1. **[00_ValidateAndNormalizeInputs](file:///d:/KULIAHHHH_PENSSS/Hackathon/Automation/robot/Modules/Validation/00_ValidateAndNormalizeInputs.xaml)**: Sanitasi regex URL profil dan format email.
-2. **[01_LinkedIn_ScrapeProfile](file:///d:/KULIAHHHH_PENSSS/Hackathon/Automation/robot/Modules/LinkedIn/01_LinkedIn_ScrapeProfile.xaml)**: Ekstraksi riwayat karir via Modern UI + JavaScript DOM injection (resilient selector).
-3. **[02_GitHub_FetchUserRepos](file:///d:/KULIAHHHH_PENSSS/Hackathon/Automation/robot/Modules/GitHub/02_GitHub_FetchUserRepos.xaml)**: Fetch metadata repositori, bintang, bahasa pemrograman, dan topik.
-4. **[03_AI_SynthesizePortfolio](file:///d:/KULIAHHHH_PENSSS/Hackathon/Automation/robot/Modules/AI/03_AI_SynthesizePortfolio.xaml)**: Sintesis multi-LLM (Gemini 2.0 Flash $\rightarrow$ OpenRouter GPT-4o-mini $\rightarrow$ Mock).
-5. **[04_Document_GeneratePdf](file:///d:/KULIAHHHH_PENSSS/Hackathon/Automation/robot/Modules/Document/04_Document_GeneratePdf.xaml)**: Generator OpenXML DOCX murni dan PDF headless Edge/Chrome.
-6. **[05_Notification_SendMail](file:///d:/KULIAHHHH_PENSSS/Hackathon/Automation/robot/Modules/Notification/05_Notification_SendMail.xaml)**: Pengiriman notifikasi email lampiran PDF (mendukung mode SMTP live & SIMULATION).
-7. **[06_Webhook_NotifyWeb](file:///d:/KULIAHHHH_PENSSS/Hackathon/Automation/robot/Modules/Webhook/06_Webhook_NotifyWeb.xaml)**: Komunikasi REST API dua arah kembali ke Web Portal.
+1. **[00_ValidateAndNormalizeInputs](Modules/Validation/00_ValidateAndNormalizeInputs.xaml)**: Sanitasi regex URL profil dan format email.
+2. **[01_LinkedIn_ScrapeProfile](Modules/LinkedIn/01_LinkedIn_ScrapeProfile.xaml)**: Ekstraksi riwayat karir via Modern UI + JavaScript DOM injection (resilient selector).
+3. **[02_GitHub_FetchUserRepos](Modules/GitHub/02_GitHub_FetchUserRepos.xaml)**: Fetch metadata repositori, bintang, bahasa pemrograman, dan topik.
+4. **[03_AI_SynthesizePortfolio](Modules/AI/03_AI_SynthesizePortfolio.xaml)**: Sintesis multi-LLM (Gemini 2.0 Flash → OpenRouter GPT-4o-mini → Mock).
+5. **[04_Document_GeneratePdf](Modules/Document/04_Document_GeneratePdf.xaml)**: Generator OpenXML DOCX murni dan PDF headless Edge/Chrome.
+6. **[05_Notification_SendMail](Modules/Notification/05_Notification_SendMail.xaml)**: Pengiriman notifikasi email lampiran PDF (mendukung mode SMTP live & SIMULATION).
+7. **[06_Webhook_NotifyWeb](Modules/Webhook/06_Webhook_NotifyWeb.xaml)**: Komunikasi REST API dua arah kembali ke Web Portal.
 
 ### 6.3 Standar Naming Convention, Scoping & Anotasi
 * **Variabel & Argumen**: Menggunakan prefix tipe data baku (`str_`, `bool_`, `int_`) serta arah aliran (`in_`, `out_`, `io_`).
@@ -146,7 +146,7 @@ Setiap modul menganut prinsip *Single Responsibility Principle (SRP)*:
 ### 7.1 Prasyarat Sistem
 * **Sistem Operasi**: Windows 10 / 11 64-bit.
 * **UiPath Studio**: Versi 26.10 (atau versi modern dengan dukungan framework .NET Windows).
-* **Node.js**: Versi $\ge$ 20.x (untuk engine generator dokumen & GitHub runner).
+* **Node.js**: Versi ≥ 20.x (untuk engine generator dokumen & GitHub runner).
 * **Ekstensi Browser**: UiPath Web Automation Extension (Chrome atau Microsoft Edge).
 
 ### 7.2 Kebutuhan Tenant UiPath Orchestrator
@@ -200,7 +200,7 @@ node Data\Scripts\test_modules.js
 ```powershell
 powershell -ExecutionPolicy Bypass -File Data\Scripts\Document\RunResumeGeneration.ps1 -PayloadFile "Data\Mocks\CuratedResumeMock.json"
 ```
-*Hasil dokumen `.docx` dan `.pdf` dapat langsung diinspeksi di folder [Data/Outputs/](file:///d:/KULIAHHHH_PENSSS/Hackathon/Automation/robot/Data/Outputs).*
+*Hasil dokumen `.docx` dan `.pdf` dapat langsung diinspeksi di folder [Data/Outputs/](Data/Outputs).*
 
 ### 4. Uji Pengambilan Portofolio GitHub
 ```powershell
@@ -222,11 +222,11 @@ powershell -ExecutionPolicy Bypass -File Data\Scripts\GitHub\RunGitHubFetch.ps1 
 ## 11. Referensi Dokumen & Tim Pengembang
 
 ### Dokumen Teknis Lengkap di Folder `Docs/`:
-* [Docs/Jury-Evaluation-Guide.md](file:///d:/KULIAHHHH_PENSSS/Hackathon/Automation/robot/Docs/Jury-Evaluation-Guide.md): Panduan verifikasi cepat untuk Dewan Juri.
-* [Docs/Architecture-and-Workflows.md](file:///d:/KULIAHHHH_PENSSS/Hackathon/Automation/robot/Docs/Architecture-and-Workflows.md): Arsitektur mendalam, kontrak argumen, dan alasan pemilihan aktivitas.
-* [Docs/Document-Engine-Technical-Spec.md](file:///d:/KULIAHHHH_PENSSS/Hackathon/Automation/robot/Docs/Document-Engine-Technical-Spec.md): Spesifikasi teknis OpenXML Word & PDF ATS engine.
-* [Docs/GenAI-Integration.md](file:///d:/KULIAHHHH_PENSSS/Hackathon/Automation/robot/Docs/GenAI-Integration.md): Prompt engineering formula STAR/XYZ dan fallback chain multi-LLM.
-* [Docs/Security-Logging-and-Governance.md](file:///d:/KULIAHHHH_PENSSS/Hackathon/Automation/robot/Docs/Security-Logging-and-Governance.md): Standar keamanan data, sanitasi log zero-PII, dan tata kelola Automation Hub.
+* [Docs/Jury-Evaluation-Guide.md](Docs/Jury-Evaluation-Guide.md): Panduan verifikasi cepat untuk Dewan Juri.
+* [Docs/Architecture-and-Workflows.md](Docs/Architecture-and-Workflows.md): Arsitektur mendalam, kontrak argumen, dan alasan pemilihan aktivitas.
+* [Docs/Document-Engine-Technical-Spec.md](Docs/Document-Engine-Technical-Spec.md): Spesifikasi teknis OpenXML Word & PDF ATS engine.
+* [Docs/GenAI-Integration.md](Docs/GenAI-Integration.md): Prompt engineering formula STAR/XYZ dan fallback chain multi-LLM.
+* [Docs/Security-Logging-and-Governance.md](Docs/Security-Logging-and-Governance.md): Standar keamanan data, sanitasi log zero-PII, dan tata kelola Automation Hub.
 
 ### Tim Pengembang — AutoCV (Trio PENS)
 Dikembangkan dengan dedikasi untuk **Automation Hackathon 2026 (#HumanInTheLead)**  

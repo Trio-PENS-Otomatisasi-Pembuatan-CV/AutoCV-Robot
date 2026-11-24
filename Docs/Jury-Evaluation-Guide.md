@@ -91,7 +91,7 @@ powershell -ExecutionPolicy Bypass -File Data\Scripts\Document\RunResumeGenerati
   "exportMethod": "chrome_headless (atau word_com)"
 }
 ```
-*Hasil dokumen dapat langsung dibuka dan diperiksa di folder:* [Data/Outputs/](file:///d:/KULIAHHHH_PENSSS/Hackathon/Automation/robot/Data/Outputs)
+*Hasil dokumen dapat langsung dibuka dan diperiksa di folder:* [Data/Outputs/](../Data/Outputs)
 
 ---
 
@@ -108,11 +108,11 @@ powershell -ExecutionPolicy Bypass -File Data\Scripts\GitHub\RunGitHubFetch.ps1 
 
 | Kriteria Penilaian | Implementasi Nyata pada AutoCV-Robot | Bukti / Lokasi Kode |
 |---|---|---|
-| **Inovasi & Relevansi Solusi** | Mengubah resume informal/mentah menjadi ATS-Compliant Career Dossier dengan standar Harvard & Stanford. Menjunjung filosofi **#HumanInTheLead** di mana AI menyusun draf, namun manusia memegang kendali kurasi akhir. | [03_AI_SynthesizePortfolio.xaml](file:///d:/KULIAHHHH_PENSSS/Hackathon/Automation/robot/Modules/AI/03_AI_SynthesizePortfolio.xaml) |
-| **Kematangan Arsitektur UiPath** | Menggunakan arsitektur *Smart Dual-Mode Dispatcher* berprinsip Single Responsibility (SRP). Memisahkan fase Ingestion (`Pipeline_IngestionAndSynthesis.xaml`) dan Render (`Pipeline_RenderAndDeliver.xaml`). | [Main.xaml](file:///d:/KULIAHHHH_PENSSS/Hackathon/Automation/robot/Main.xaml), [Pipelines/](file:///d:/KULIAHHHH_PENSSS/Hackathon/Automation/robot/Modules/Pipelines/) |
+| **Inovasi & Relevansi Solusi** | Mengubah resume informal/mentah menjadi ATS-Compliant Career Dossier dengan standar Harvard & Stanford. Menjunjung filosofi **#HumanInTheLead** di mana AI menyusun draf, namun manusia memegang kendali kurasi akhir. | [03_AI_SynthesizePortfolio.xaml](../Modules/AI/03_AI_SynthesizePortfolio.xaml) |
+| **Kematangan Arsitektur UiPath** | Menggunakan arsitektur *Smart Dual-Mode Dispatcher* berprinsip Single Responsibility (SRP). Memisahkan fase Ingestion (`Pipeline_IngestionAndSynthesis.xaml`) dan Render (`Pipeline_RenderAndDeliver.xaml`). | [Main.xaml](../Main.xaml), [Pipelines/](../Modules/Pipelines/) |
 | **Ketahanan & Robustness (Zero Break)** | Tidak pernah membiarkan robot crash saat network putus atau kredensial kosong. Menggunakan flag `in_UseMockFallback` dan multi-provider LLM fallback (Gemini $\rightarrow$ OpenRouter $\rightarrow$ Local Mock). | `01_LinkedIn`, `02_GitHub`, `03_AI` |
-| **Dokumentasi & Standar OpenXML** | Membuat dokumen DOCX murni melalui manipulasi XML WordprocessingML tanpa lisensi berbayar Word, serta mengonversinya ke PDF ATS via Edge/Chrome headless. | [Data/Scripts/Document/lib/](file:///d:/KULIAHHHH_PENSSS/Hackathon/Automation/robot/Data/Scripts/Document/lib/) |
-| **Keamanan & Kepatuhan Enterprise** | Nol credential leak. Seluruh API key dan token diisolasi di `.env` (di-ignore git), serta disiapkan kompatibel dengan *UiPath Orchestrator Assets*. | [.gitignore](file:///d:/KULIAHHHH_PENSSS/Hackathon/Automation/robot/.gitignore) |
+| **Dokumentasi & Standar OpenXML** | Membuat dokumen DOCX murni melalui manipulasi XML WordprocessingML tanpa lisensi berbayar Word, serta mengonversinya ke PDF ATS via Edge/Chrome headless. | [Data/Scripts/Document/lib/](../Data/Scripts/Document/lib/) |
+| **Keamanan & Kepatuhan Enterprise** | Nol credential leak. Seluruh API key dan token diisolasi di `.env` (di-ignore git), serta disiapkan kompatibel dengan *UiPath Orchestrator Assets*. | [.gitignore](../.gitignore) |
 
 ---
 
@@ -120,8 +120,8 @@ powershell -ExecutionPolicy Bypass -File Data\Scripts\GitHub\RunGitHubFetch.ps1 
 
 Bagi Dewan Juri yang ingin menginspeksi alur kerja secara visual di **UiPath Studio 26.10**:
 
-1. Buka project dengan memilih berkas [project.json](file:///d:/KULIAHHHH_PENSSS/Hackathon/Automation/robot/project.json).
-2. Buka berkas [Main.xaml](file:///d:/KULIAHHHH_PENSSS/Hackathon/Automation/robot/Main.xaml).
+1. Buka project dengan memilih berkas [project.json](../project.json).
+2. Buka berkas [Main.xaml](../Main.xaml).
 3. **Skenario 1: Menjalankan Fase 1 (Ingestion & AI Synthesis)**
    Klik *Run with Arguments* pada `Main.xaml` dengan parameter:
    - `in_JobId`: `"test-job-001"`
@@ -136,7 +136,7 @@ Bagi Dewan Juri yang ingin menginspeksi alur kerja secara visual di **UiPath Stu
 
 4. **Skenario 2: Menjalankan Fase 2 (Rendering Dokumen & Pengiriman Email)**
    Klik *Run with Arguments* dengan mengisi:
-   - `in_ApprovedResumePayload`: Salin isi dari berkas [CuratedResumeMock.json](file:///d:/KULIAHHHH_PENSSS/Hackathon/Automation/robot/Data/Mocks/CuratedResumeMock.json).
+   - `in_ApprovedResumePayload`: Salin isi dari berkas [CuratedResumeMock.json](../Data/Mocks/CuratedResumeMock.json).
    - `in_UseMockFallback`: `True`
    *Robot langsung memproses dokumen, menghasilkan PDF/DOCX di `Data/Outputs/`, dan mencatat notifikasi email sukses.*
 
@@ -144,7 +144,7 @@ Bagi Dewan Juri yang ingin menginspeksi alur kerja secara visual di **UiPath Stu
 
 ## 5. Ringkasan File & Tautan Referensi Cepat
 
-- **Arsitektur Lengkap & Rincian Modul**: [Architecture-and-Workflows.md](file:///d:/KULIAHHHH_PENSSS/Hackathon/Automation/robot/Docs/Architecture-and-Workflows.md)
-- **Spesifikasi Engine Dokumen ATS**: [Document-Engine-Technical-Spec.md](file:///d:/KULIAHHHH_PENSSS/Hackathon/Automation/robot/Docs/Document-Engine-Technical-Spec.md)
-- **Spesifikasi Integrasi GenAI & Multi-LLM**: [GenAI-Integration.md](file:///d:/KULIAHHHH_PENSSS/Hackathon/Automation/robot/Docs/GenAI-Integration.md)
-- **Keputusan Tata Kelola Automation Hub**: [AutomationHub-URL-Decision.md](file:///d:/KULIAHHHH_PENSSS/Hackathon/Automation/robot/Docs/AutomationHub-URL-Decision.md)
+- **Arsitektur Lengkap & Rincian Modul**: [Architecture-and-Workflows.md](./Architecture-and-Workflows.md)
+- **Spesifikasi Engine Dokumen ATS**: [Document-Engine-Technical-Spec.md](./Document-Engine-Technical-Spec.md)
+- **Spesifikasi Integrasi GenAI & Multi-LLM**: [GenAI-Integration.md](./GenAI-Integration.md)
+- **Keputusan Tata Kelola Automation Hub**: [AutomationHub-URL-Decision.md](./AutomationHub-URL-Decision.md)

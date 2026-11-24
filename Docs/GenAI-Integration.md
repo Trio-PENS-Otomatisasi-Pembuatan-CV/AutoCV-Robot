@@ -3,7 +3,7 @@
 > **AutoCV GenAI Integration Technical Specification**  
 > Standar Sintesis: STAR & Google XYZ Formula, Multi-Provider Fallback (Gemini $\rightarrow$ OpenRouter $\rightarrow$ Offline Mock), Zero-Failure Execution.
 
-Dokumen ini menjelaskan integrasi kecerdasan buatan generatif (*Generative AI*) pada modul robot [03_AI_SynthesizePortfolio.xaml](file:///d:/KULIAHHHH_PENSSS/Hackathon/Automation/robot/Modules/AI/03_AI_SynthesizePortfolio.xaml), perancangan sistem prompt, kontrak skema JSON terstruktur, dan rantai ketahanan (*fallback chain*) multi-provider.
+Dokumen ini menjelaskan integrasi kecerdasan buatan generatif (*Generative AI*) pada modul robot [03_AI_SynthesizePortfolio.xaml](../Modules/AI/03_AI_SynthesizePortfolio.xaml), perancangan sistem prompt, kontrak skema JSON terstruktur, dan rantai ketahanan (*fallback chain*) multi-provider.
 
 ---
 
@@ -30,15 +30,15 @@ Otomasi kelas enterprise tidak boleh berhenti hanya karena satu penyedia API men
 
 ```mermaid
 flowchart TD
-    Start([Data LinkedIn & GitHub Siap]) --> T1{Tier 1: Google Gemini API}
-    T1 -->|HTTP 200 OK| Validate[Validasi Skema JSON]
-    T1 -->|Rate Limit / Timeout / 5xx| T2{Tier 2: OpenRouter API}
+    Start(["Data LinkedIn & GitHub Siap"]) --> T1{"Tier 1: Google Gemini API"}
+    T1 -->|"HTTP 200 OK"| Validate["Validasi Skema JSON"]
+    T1 -->|"Rate Limit / Timeout / 5xx"| T2{"Tier 2: OpenRouter API"}
     
-    T2 -->|HTTP 200 OK: GPT-4o-mini| Validate
-    T2 -->|Error / Network Putus| T3[Tier 3: Deterministic Offline Mock]
+    T2 -->|"HTTP 200 OK (GPT-4o-mini)"| Validate
+    T2 -->|"Error / Network Putus"| T3["Tier 3: Deterministic Offline Mock"]
     
-    Validate -->|Valid JSON| Output([Payload Draf Siap Dikirim])
-    Validate -->|Corrupted JSON| T3
+    Validate -->|"Valid JSON"| Output(["Payload Draf Siap Dikirim"])
+    Validate -->|"Corrupted JSON"| T3
     T3 --> Output
 ```
 

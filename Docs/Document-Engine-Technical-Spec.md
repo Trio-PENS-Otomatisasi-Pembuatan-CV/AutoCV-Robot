@@ -58,14 +58,14 @@ Untuk menghasilkan file PDF berkualitas cetak tinggi dengan layout yang presisi:
 
 ```mermaid
 flowchart TD
-    Start([Kebutuhan Export PDF]) --> CheckChrome{Cari Google Chrome Headless}
-    CheckChrome -->|Ditemukan| PrintChrome[Cetak PDF via Chrome CLI: --print-to-pdf]
-    CheckChrome -->|Tidak Ada| CheckEdge{Cari Microsoft Edge Headless}
-    CheckEdge -->|Ditemukan| PrintEdge[Cetak PDF via Edge CLI: --print-to-pdf]
-    CheckEdge -->|Tidak Ada| CheckWord{Cari Word COM Automation}
-    CheckWord -->|Ditemukan| PrintWord[Export PDF via MS Word COM API]
-    CheckWord -->|Tidak Ada| Error([Throw Exception: Browser Engine Not Found])
-    PrintChrome --> Done([PDF ATS Berhasil Dibuat])
+    Start(["Kebutuhan Export PDF"]) --> CheckChrome{"Cari Google Chrome Headless"}
+    CheckChrome -->|"Ditemukan"| PrintChrome["Cetak PDF via Chrome CLI (--print-to-pdf)"]
+    CheckChrome -->|"Tidak Ada"| CheckEdge{"Cari Microsoft Edge Headless"}
+    CheckEdge -->|"Ditemukan"| PrintEdge["Cetak PDF via Edge CLI (--print-to-pdf)"]
+    CheckEdge -->|"Tidak Ada"| CheckWord{"Cari Word COM Automation"}
+    CheckWord -->|"Ditemukan"| PrintWord["Export PDF via MS Word COM API"]
+    CheckWord -->|"Tidak Ada"| Error(["Throw Exception (Browser Engine Not Found)"])
+    PrintChrome --> Done(["PDF ATS Berhasil Dibuat"])
     PrintEdge --> Done
     PrintWord --> Done
 ```
