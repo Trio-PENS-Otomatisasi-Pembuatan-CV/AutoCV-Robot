@@ -155,3 +155,46 @@ function Get-RobotContext {
 ```
 
 **Dampak Positif**: Seluruh skrip otomatis menemukan letak direktori root `robot/`, `Data/Outputs/`, dan `Data/Templates/` secara independen, tanpa pernah bergantung pada *hardcoded drive letter* (`C:\` atau `D:\`) maupun kedalaman folder relatif (`..\..`).
+
+---
+
+## 5. Standar Naming Convention, Variable Scoping & Anotasi UiPath
+
+AutoCV menerapkan standar industri pengembangan UiPath (sejalan dengan *UiPath Official Best Practices* dan *Workflow Analyzer*):
+
+### 5.1 Standar Penamaan Argumen & Variabel
+Setiap argumen dan variabel memiliki prefix tipe data dan arah aliran:
+
+| Kategori | Prefix Standar | Contoh Nyata di Proyek | Keterangan |
+|---|---|---|---|
+| **In Argument** | `in_` atau `in_str_`, `in_bool_` | `in_JobId`, `in_LinkedInUrl`, `in_UseMockFallback` | Data masukan ke dalam workflow |
+| **Out Argument** | `out_` atau `out_str_`, `out_bool_` | `out_GeneratedPdfPath`, `out_DraftResumePayload` | Nilai hasil luaran workflow |
+| **InOut Argument** | `io_` | `io_ExecutionConfig` | Data yang dibaca dan dimutasi |
+| **String Variable** | `str_` atau `str` | `strScrapedJsonRaw`, `strNormalizedEmail` | Teks dan payload JSON string |
+| **Boolean Variable** | `bool_` atau `bool` | `boolIsJob2`, `boolExtractionSuccessful` | Kondisi logika True/False |
+| **Integer Variable** | `int_` atau `int` | `intInjectJsTimeoutMs`, `intStatusCode` | Angka bulat / timeout |
+| **DataTable / Object**| `dt_`, `obj_` | `dt_SkillsMatrix`, `objPayload` | Struktur data tabel atau generic object |
+
+### 5.2 Aturan Variable Scoping (Prinsip Akses Minimum)
+- **Scope Terbatas (Local Isolation)**: Variabel lokal dideklarasikan pada *Sequence* terkecil yang membutuhkannya, bukan ditarik ke root sequence workflow. Hal ini mencegah konflik penamaan (*variable shadowing*) dan kebocoran memori.
+- **Argumen sebagai Jembatan Antar Modul**: Pertukaran data antar berkas XAML hanya diizinkan melalui *In/Out Arguments* yang terikat secara eksplisit pada aktivitas `InvokeWorkflowFile`.
+
+### 5.3 Penamaan Sequence, Activity & Anotasi Visual
+- **Penamaan Deskriptif**: Tidak ada sequence bernama `Sequence_1` atau activity bernama `Assign_2`. Semua aktivitas diberi nama operasional, misalnya: `Validate URL Formats`, `Inject Resilient Profile Scraper`, `Check Execution Phase Dual-Mode`.
+- **Anotasi Visual (Annotation)**: Seluruh Sequence utama, blok `TryCatch`, dan kondisi percabangan `If` krusial dilengkapi anotasi visual (`sap2010:Annotation.AnnotationText`) untuk mempermudah Dewan Juri memahami maksud bisnis alur tanpa harus membuka panel *Properties*.
+
+---
+
+## 6. Alasan Pemilihan Aktivitas Tertentu (Activity Selection Rationale)
+
+Setiap aktivitas UiPath dipilih dengan pertimbangan teknis matang:
+
+1. **`Use Application/Browser` & `InjectJsScript` (Modul LinkedIn)**:
+   - *Alasan*: Halaman profil LinkedIn adalah *Single Page Application (SPA)* berbasis React dengan class CSS dinamis yang sering berubah. Selektor visual standar sangat rapuh (*flaky*). Dengan menginjeksikan skrip JavaScript DOM extractor langsung ke konteks halaman, ekstraksi data menjadi deterministik, tahan terhadap pembaruan antarmuka LinkedIn, dan tidak memicu deteksi bot agresif.
+2. **`NetHttpRequest` / `HttpClient` (Modul GenAI & Webhook)**:
+   - *Alasan*: Menghubungi REST API Google Gemini dan backend Webhook secara langsung tanpa ketergantungan pada *UiPath GenAI Activities* (yang membutuhkan lisensi tenant komersial khusus dan konfigurasi AI Trust Layer). Pendekatan ini mandiri, portabel, dan langsung bisa dijalankan di lingkungan pengujian manapun.
+3. **`Invoke PowerShell` & Node.js Engine (Modul Dokumen & GitHub)**:
+   - *Alasan*: Membangun dokumen WordprocessingML (.docx) dan PDF ATS berkecepatan tinggi (< 1.5 detik) tanpa memerlukan instalasi Microsoft Office Word di mesin virtual (*Zero MS Office License*), serta memanfaatkan browser Chromium headless (Edge/Chrome bawaan Windows) yang selalu tersedia di setiap PC.
+4. **`InvokeWorkflowFile` (Main Dispatcher & Pipelines)**:
+   - *Alasan*: Menjaga isolasi tanggung jawab (*Single Responsibility Principle*). Jalur file menggunakan relative path ke root robot (`Modules\Pipelines\...`) yang divalidasi otomatis oleh compiler UiPath.
+
