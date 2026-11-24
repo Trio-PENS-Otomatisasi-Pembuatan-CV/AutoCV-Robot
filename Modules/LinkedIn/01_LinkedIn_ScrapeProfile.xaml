@@ -99,7 +99,7 @@
       <Variable x:TypeArguments="x:String" Name="strJsScriptCode" />
       <Variable x:TypeArguments="x:Int32" Name="intInjectJsTimeoutMs" Default="25000" />
       <Variable x:TypeArguments="x:Int32" Name="intScrollStep" Default="0" />
-      <Variable x:TypeArguments="ui:UiBrowser" Name="uiBrowser" />
+      <Variable x:TypeArguments="ui:Browser" Name="uiBrowser" />
     </Sequence.Variables>
     <sap:WorkflowViewStateService.ViewState>
       <scg:Dictionary x:TypeArguments="x:String, x:Object">
