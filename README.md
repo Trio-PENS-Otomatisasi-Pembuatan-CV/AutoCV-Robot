@@ -24,6 +24,7 @@ Dalam lanskap rekrutmen kerja modern, proses seleksi awal hampir sepenuhnya disa
 * **Pencapaian tak terukur**: Sulit merumuskan dampak proyek menjadi kalimat berpola STAR.
 * **Format tidak ATS-friendly**: Desain rumit sering gagal dibaca sistem pelamar otomatis.
 * **Kustomisasi berulang**: Tiap posisi target berarti menyunting ulang seluruh CV.
+* **Membuat CV yang lolos ATS masih kerja manual berulang**: Setiap lamaran menuntut CV yang disesuaikan ulang dari nol.
 
 ---
 
