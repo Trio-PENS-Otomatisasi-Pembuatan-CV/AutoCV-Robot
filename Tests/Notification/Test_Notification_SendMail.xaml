@@ -68,38 +68,48 @@
     <sap:WorkflowViewStateService.ViewState>
       <scg:Dictionary x:TypeArguments="x:String, x:Object">
         <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+        <x:Boolean x:Key="IsAnnotationDocked">True</x:Boolean>
       </scg:Dictionary>
     </sap:WorkflowViewStateService.ViewState>
-    <ui:LogMessage DisplayName="Log Start Test" sap:VirtualizedContainerService.HintSize="416,141" sap2010:WorkflowViewState.IdRef="LogMessage_1" Level="Info" Message="[&quot;Starting Test_Notification_SendMail unit test.&quot;]" />
-    <Assign DisplayName="Locate Test PDF" sap:VirtualizedContainerService.HintSize="416,113.6" sap2010:WorkflowViewState.IdRef="Assign_1">
-      <Assign.To>
-        <OutArgument x:TypeArguments="x:String">[strTestPdfPath]</OutArgument>
-      </Assign.To>
-      <Assign.Value>
-        <InArgument x:TypeArguments="x:String">[System.Linq.Enumerable.FirstOrDefault(System.Linq.Enumerable.OrderByDescending(System.IO.Directory.GetFiles("Data\Outputs", "*.pdf"), Function(f) System.IO.File.GetLastWriteTime(f)))]</InArgument>
-      </Assign.Value>
-    </Assign>
-    <ui:InvokeWorkflowFile ArgumentsVariable="{x:Null}" DisplayName="Invoke 05_Notification_SendMail workflow" sap:VirtualizedContainerService.HintSize="416,113.6" sap2010:WorkflowViewState.IdRef="InvokeWorkflowFile_1" UnSafe="False" WorkflowFileName="Modules\Notification\05_Notification_SendMail.xaml">
-      <ui:InvokeWorkflowFile.Arguments>
-        <InArgument x:TypeArguments="x:String" x:Key="in_RecipientEmail">candidate.test@example.com</InArgument>
-        <InArgument x:TypeArguments="x:String" x:Key="in_PdfFilePath">[strTestPdfPath]</InArgument>
-        <InArgument x:TypeArguments="x:String" x:Key="in_CandidateName">Jane Mustika Pratama</InArgument>
-        <InArgument x:TypeArguments="x:String" x:Key="in_SmtpHost" />
-        <InArgument x:TypeArguments="x:Int32" x:Key="in_SmtpPort">[587]</InArgument>
-        <InArgument x:TypeArguments="x:String" x:Key="in_SmtpUser" />
-        <InArgument x:TypeArguments="x:String" x:Key="in_SmtpPassword" />
-        <InArgument x:TypeArguments="x:Boolean" x:Key="in_SimulationMode">[True]</InArgument>
-        <OutArgument x:TypeArguments="x:Boolean" x:Key="out_MailSent">[boolMailSent]</OutArgument>
-        <OutArgument x:TypeArguments="x:String" x:Key="out_DeliveryStatus">[strDeliveryStatus]</OutArgument>
-      </ui:InvokeWorkflowFile.Arguments>
-    </ui:InvokeWorkflowFile>
-    <If Condition="[boolMailSent AndAlso Not String.IsNullOrWhiteSpace(strDeliveryStatus)]" DisplayName="Assert Mail Dispatched Successfully" sap:VirtualizedContainerService.HintSize="416,380" sap2010:WorkflowViewState.IdRef="If_1">
-      <If.Then>
-        <ui:LogMessage DisplayName="Test Passed" sap:VirtualizedContainerService.HintSize="382.4,141" sap2010:WorkflowViewState.IdRef="LogMessage_2" Level="Info" Message="[&quot;Test_Notification_SendMail PASSED! Status: &quot; &amp; strDeliveryStatus]" />
-      </If.Then>
-      <If.Else>
-        <ui:LogMessage DisplayName="Test Failed" sap:VirtualizedContainerService.HintSize="382.4,141" sap2010:WorkflowViewState.IdRef="LogMessage_3" Level="Error" Message="[&quot;Test_Notification_SendMail FAILED: Mail was not sent or status is empty.&quot;]" />
-      </If.Else>
-    </If>
+    <Sequence sap2010:Annotation.AnnotationText="[UNIT TEST] Menguji modul 05_Notification_SendMail.xaml dalam mode simulasi (SimulationMode=True) untuk memastikan logika pengiriman email dan pelampiran file PDF berjalan tanpa error." DisplayName="Workflow Scope: Test_Notification_SendMail" sap:VirtualizedContainerService.HintSize="650,1800" sap2010:WorkflowViewState.IdRef="Sequence_WorkflowScope">
+      <sap:WorkflowViewStateService.ViewState>
+        <scg:Dictionary x:TypeArguments="x:String, x:Object">
+          <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+          <x:Boolean x:Key="IsAnnotationDocked">True</x:Boolean>
+        </scg:Dictionary>
+      </sap:WorkflowViewStateService.ViewState>
+      <ui:LogMessage DisplayName="Log Start Test" sap:VirtualizedContainerService.HintSize="416,141" sap2010:WorkflowViewState.IdRef="LogMessage_1" Level="Info" Message="[&quot;Starting Test_Notification_SendMail unit test.&quot;]" />
+      <Assign DisplayName="Locate Test PDF" sap:VirtualizedContainerService.HintSize="416,113.6" sap2010:WorkflowViewState.IdRef="Assign_1">
+        <Assign.To>
+          <OutArgument x:TypeArguments="x:String">[strTestPdfPath]</OutArgument>
+        </Assign.To>
+        <Assign.Value>
+          <InArgument x:TypeArguments="x:String">[System.Linq.Enumerable.FirstOrDefault(System.Linq.Enumerable.OrderByDescending(System.IO.Directory.GetFiles("Data\Outputs", "*.pdf"), Function(f) System.IO.File.GetLastWriteTime(f)))]</InArgument>
+        </Assign.Value>
+      </Assign>
+      <ui:InvokeWorkflowFile ArgumentsVariable="{x:Null}" DisplayName="Invoke 05_Notification_SendMail workflow" sap:VirtualizedContainerService.HintSize="416,113.6" sap2010:WorkflowViewState.IdRef="InvokeWorkflowFile_1" UnSafe="False" WorkflowFileName="Modules\Notification\05_Notification_SendMail.xaml">
+        <ui:InvokeWorkflowFile.Arguments>
+          <InArgument x:TypeArguments="x:String" x:Key="in_RecipientEmail">candidate.test@example.com</InArgument>
+          <InArgument x:TypeArguments="x:String" x:Key="in_PdfFilePath">[strTestPdfPath]</InArgument>
+          <InArgument x:TypeArguments="x:String" x:Key="in_CandidateName">Jane Mustika Pratama</InArgument>
+          <InArgument x:TypeArguments="x:String" x:Key="in_SmtpHost" />
+          <InArgument x:TypeArguments="x:Int32" x:Key="in_SmtpPort">[587]</InArgument>
+          <InArgument x:TypeArguments="x:String" x:Key="in_SmtpUser" />
+          <InArgument x:TypeArguments="x:String" x:Key="in_SmtpPassword" />
+          <InArgument x:TypeArguments="x:Boolean" x:Key="in_SimulationMode">[True]</InArgument>
+          <OutArgument x:TypeArguments="x:Boolean" x:Key="out_MailSent">[boolMailSent]</OutArgument>
+          <OutArgument x:TypeArguments="x:String" x:Key="out_DeliveryStatus">[strDeliveryStatus]</OutArgument>
+        </ui:InvokeWorkflowFile.Arguments>
+      </ui:InvokeWorkflowFile>
+      <If Condition="[boolMailSent AndAlso Not String.IsNullOrWhiteSpace(strDeliveryStatus)]" DisplayName="Assert Mail Dispatched Successfully" sap:VirtualizedContainerService.HintSize="416,380" sap2010:WorkflowViewState.IdRef="If_1">
+        <If.Then>
+          <ui:LogMessage DisplayName="Test Passed" sap:VirtualizedContainerService.HintSize="382.4,141" sap2010:WorkflowViewState.IdRef="LogMessage_2" Level="Info" Message="[&quot;Test_Notification_SendMail PASSED! Status: &quot; &amp; strDeliveryStatus]" />
+        </If.Then>
+        <If.Else>
+          <ui:LogMessage DisplayName="Test Failed" sap:VirtualizedContainerService.HintSize="382.4,141" sap2010:WorkflowViewState.IdRef="LogMessage_3" Level="Error" Message="[&quot;Test_Notification_SendMail FAILED: Mail was not sent or status is empty.&quot;]" />
+        </If.Else>
+      </If>
+    </Sequence>
+    <ui:LogMessage DisplayName="Log Workflow Scope Completed" sap2010:WorkflowViewState.IdRef="LogMessage_ScopeCompleted" Level="Trace" Message="[&quot;[Test_Notification_SendMail] Workflow scope execution completed.&quot;]" />
   </Sequence>
 </Activity>

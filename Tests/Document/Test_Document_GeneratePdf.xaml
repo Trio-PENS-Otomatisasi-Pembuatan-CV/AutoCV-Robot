@@ -69,34 +69,44 @@
     <sap:WorkflowViewStateService.ViewState>
       <scg:Dictionary x:TypeArguments="x:String, x:Object">
         <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+        <x:Boolean x:Key="IsAnnotationDocked">True</x:Boolean>
       </scg:Dictionary>
     </sap:WorkflowViewStateService.ViewState>
-    <ui:LogMessage DisplayName="Log Start Test" sap:VirtualizedContainerService.HintSize="416,141" sap2010:WorkflowViewState.IdRef="LogMessage_1" Level="Info" Message="[&quot;Starting Test_Document_GeneratePdf unit test.&quot;]" />
-    <ui:ReadTextFile File="{x:Null}" Content="[strMockCuratedJson]" DisplayName="Read Curated Resume Mock Data" FileName="Data\Mocks\CuratedResumeMock.json" sap:VirtualizedContainerService.HintSize="416,80" sap2010:WorkflowViewState.IdRef="ReadTextFile_1" />
-    <ui:InvokeWorkflowFile ArgumentsVariable="{x:Null}" DisplayName="Invoke 04_Document_GeneratePdf workflow" sap:VirtualizedContainerService.HintSize="416,113.6" sap2010:WorkflowViewState.IdRef="InvokeWorkflowFile_1" UnSafe="False" WorkflowFileName="Modules\Document\04_Document_GeneratePdf.xaml">
-      <ui:InvokeWorkflowFile.Arguments>
-        <InArgument x:TypeArguments="x:String" x:Key="in_CuratedResumeJson">[strMockCuratedJson]</InArgument>
-        <InArgument x:TypeArguments="x:String" x:Key="in_TemplatePath">["Data\Templates\ATS_Resume_Template.docx"]</InArgument>
-        <InArgument x:TypeArguments="x:String" x:Key="in_OutputDir">["Data\Outputs"]</InArgument>
-        <OutArgument x:TypeArguments="x:String" x:Key="out_GeneratedPdfPath">[strGeneratedPdf]</OutArgument>
-        <OutArgument x:TypeArguments="x:String" x:Key="out_GeneratedDocxPath">[strGeneratedDocx]</OutArgument>
-      </ui:InvokeWorkflowFile.Arguments>
-    </ui:InvokeWorkflowFile>
-    <Assign DisplayName="Check If Generated PDF Exists" sap:VirtualizedContainerService.HintSize="416,113.6" sap2010:WorkflowViewState.IdRef="Assign_1">
-      <Assign.To>
-        <OutArgument x:TypeArguments="x:Boolean">[boolPdfFileFound]</OutArgument>
-      </Assign.To>
-      <Assign.Value>
-        <InArgument x:TypeArguments="x:Boolean">[Not String.IsNullOrWhiteSpace(strGeneratedPdf) AndAlso System.IO.File.Exists(strGeneratedPdf)]</InArgument>
-      </Assign.Value>
-    </Assign>
-    <If Condition="[boolPdfFileFound]" DisplayName="Assert PDF Generated Successfully" sap:VirtualizedContainerService.HintSize="416,380" sap2010:WorkflowViewState.IdRef="If_1">
-      <If.Then>
-        <ui:LogMessage DisplayName="Test Passed" sap:VirtualizedContainerService.HintSize="382.4,141" sap2010:WorkflowViewState.IdRef="LogMessage_2" Level="Info" Message="[&quot;Test_Document_GeneratePdf PASSED! PDF verified at: &quot; &amp; strGeneratedPdf &amp; &quot; (DOCX: &quot; &amp; strGeneratedDocx &amp; &quot;)&quot;]" />
-      </If.Then>
-      <If.Else>
-        <ui:LogMessage DisplayName="Test Failed" sap:VirtualizedContainerService.HintSize="382.4,141" sap2010:WorkflowViewState.IdRef="LogMessage_3" Level="Error" Message="[&quot;Test_Document_GeneratePdf FAILED: Generated PDF not found.&quot;]" />
-      </If.Else>
-    </If>
+    <Sequence sap2010:Annotation.AnnotationText="[UNIT TEST] Menguji modul 04_Document_GeneratePdf.xaml menggunakan payload kurasi mock untuk memverifikasi pembuatan dokumen resmi DOCX (OpenXML) dan file PDF fisik di direktori Data/Outputs." DisplayName="Workflow Scope: Test_Document_GeneratePdf" sap:VirtualizedContainerService.HintSize="650,1800" sap2010:WorkflowViewState.IdRef="Sequence_WorkflowScope">
+      <sap:WorkflowViewStateService.ViewState>
+        <scg:Dictionary x:TypeArguments="x:String, x:Object">
+          <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+          <x:Boolean x:Key="IsAnnotationDocked">True</x:Boolean>
+        </scg:Dictionary>
+      </sap:WorkflowViewStateService.ViewState>
+      <ui:LogMessage DisplayName="Log Start Test" sap:VirtualizedContainerService.HintSize="416,141" sap2010:WorkflowViewState.IdRef="LogMessage_1" Level="Info" Message="[&quot;Starting Test_Document_GeneratePdf unit test.&quot;]" />
+      <ui:ReadTextFile File="{x:Null}" Content="[strMockCuratedJson]" DisplayName="Read Curated Resume Mock Data" FileName="Data\Mocks\CuratedResumeMock.json" sap:VirtualizedContainerService.HintSize="416,80" sap2010:WorkflowViewState.IdRef="ReadTextFile_1" />
+      <ui:InvokeWorkflowFile ArgumentsVariable="{x:Null}" DisplayName="Invoke 04_Document_GeneratePdf workflow" sap:VirtualizedContainerService.HintSize="416,113.6" sap2010:WorkflowViewState.IdRef="InvokeWorkflowFile_1" UnSafe="False" WorkflowFileName="Modules\Document\04_Document_GeneratePdf.xaml">
+        <ui:InvokeWorkflowFile.Arguments>
+          <InArgument x:TypeArguments="x:String" x:Key="in_CuratedResumeJson">[strMockCuratedJson]</InArgument>
+          <InArgument x:TypeArguments="x:String" x:Key="in_TemplatePath">["Data\Templates\ATS_Resume_Template.docx"]</InArgument>
+          <InArgument x:TypeArguments="x:String" x:Key="in_OutputDir">["Data\Outputs"]</InArgument>
+          <OutArgument x:TypeArguments="x:String" x:Key="out_GeneratedPdfPath">[strGeneratedPdf]</OutArgument>
+          <OutArgument x:TypeArguments="x:String" x:Key="out_GeneratedDocxPath">[strGeneratedDocx]</OutArgument>
+        </ui:InvokeWorkflowFile.Arguments>
+      </ui:InvokeWorkflowFile>
+      <Assign DisplayName="Check If Generated PDF Exists" sap:VirtualizedContainerService.HintSize="416,113.6" sap2010:WorkflowViewState.IdRef="Assign_1">
+        <Assign.To>
+          <OutArgument x:TypeArguments="x:Boolean">[boolPdfFileFound]</OutArgument>
+        </Assign.To>
+        <Assign.Value>
+          <InArgument x:TypeArguments="x:Boolean">[Not String.IsNullOrWhiteSpace(strGeneratedPdf) AndAlso System.IO.File.Exists(strGeneratedPdf)]</InArgument>
+        </Assign.Value>
+      </Assign>
+      <If Condition="[boolPdfFileFound]" DisplayName="Assert PDF Generated Successfully" sap:VirtualizedContainerService.HintSize="416,380" sap2010:WorkflowViewState.IdRef="If_1">
+        <If.Then>
+          <ui:LogMessage DisplayName="Test Passed" sap:VirtualizedContainerService.HintSize="382.4,141" sap2010:WorkflowViewState.IdRef="LogMessage_2" Level="Info" Message="[&quot;Test_Document_GeneratePdf PASSED! PDF verified at: &quot; &amp; strGeneratedPdf &amp; &quot; (DOCX: &quot; &amp; strGeneratedDocx &amp; &quot;)&quot;]" />
+        </If.Then>
+        <If.Else>
+          <ui:LogMessage DisplayName="Test Failed" sap:VirtualizedContainerService.HintSize="382.4,141" sap2010:WorkflowViewState.IdRef="LogMessage_3" Level="Error" Message="[&quot;Test_Document_GeneratePdf FAILED: Generated PDF not found.&quot;]" />
+        </If.Else>
+      </If>
+    </Sequence>
+    <ui:LogMessage DisplayName="Log Workflow Scope Completed" sap2010:WorkflowViewState.IdRef="LogMessage_ScopeCompleted" Level="Trace" Message="[&quot;[Test_Document_GeneratePdf] Workflow scope execution completed.&quot;]" />
   </Sequence>
 </Activity>

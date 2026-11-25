@@ -81,25 +81,35 @@
     <sap:WorkflowViewStateService.ViewState>
       <scg:Dictionary x:TypeArguments="x:String, x:Object">
         <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+        <x:Boolean x:Key="IsAnnotationDocked">True</x:Boolean>
       </scg:Dictionary>
     </sap:WorkflowViewStateService.ViewState>
-    <ui:LogMessage DisplayName="Log Test Start" sap:VirtualizedContainerService.HintSize="416,141" sap2010:WorkflowViewState.IdRef="LogMessage_1" Level="Info" Message="[&quot;Starting Test_LinkedIn_Scraper with URL: &quot; &amp; strTestUrl]" />
-    <ui:InvokeWorkflowFile ArgumentsVariable="{x:Null}" ContinueOnError="{x:Null}" DisplayName="Invoke 01_LinkedIn_ScrapeProfile workflow" sap:VirtualizedContainerService.HintSize="416,113.6" sap2010:WorkflowViewState.IdRef="InvokeWorkflowFile_1" UnSafe="False" WorkflowFileName="Modules\LinkedIn\01_LinkedIn_ScrapeProfile.xaml">
-      <ui:InvokeWorkflowFile.Arguments>
-        <InArgument x:TypeArguments="x:String" x:Key="in_LinkedInUrl">[strTestUrl]</InArgument>
-        <InArgument x:TypeArguments="x:String" x:Key="in_BrowserType">["Chrome"]</InArgument>
-        <InArgument x:TypeArguments="x:Boolean" x:Key="in_UseMockFallback">[True]</InArgument>
-        <OutArgument x:TypeArguments="x:String" x:Key="out_LinkedInDataJson">[strTestResultJson]</OutArgument>
-      </ui:InvokeWorkflowFile.Arguments>
-    </ui:InvokeWorkflowFile>
-    <ui:LogMessage DisplayName="Log Test Result" sap:VirtualizedContainerService.HintSize="416,141" sap2010:WorkflowViewState.IdRef="LogMessage_2" Level="Info" Message="[&quot;Test Result JSON: &quot; &amp; strTestResultJson]" />
-    <If Condition="[String.IsNullOrWhiteSpace(strTestResultJson) OrElse Not strTestResultJson.Contains(&quot;full_name&quot;)]" DisplayName="Assert Non-Empty Valid JSON" sap:VirtualizedContainerService.HintSize="416,280" sap2010:WorkflowViewState.IdRef="If_1">
-      <If.Then>
-        <Throw DisplayName="Test Assertion Failed" Exception="[New UiPath.Core.BusinessRuleException(&quot;Test failed: LinkedIn scraper returned empty or invalid JSON output.&quot;)]" sap:VirtualizedContainerService.HintSize="382.4,113.6" sap2010:WorkflowViewState.IdRef="Throw_1" />
-      </If.Then>
-      <If.Else>
-        <ui:LogMessage DisplayName="Test Passed" sap:VirtualizedContainerService.HintSize="382.4,141" sap2010:WorkflowViewState.IdRef="LogMessage_3" Level="Info" Message="[&quot;Test Passed! LinkedIn scraper successfully produced valid structured profile data.&quot;]" />
-      </If.Else>
-    </If>
+    <Sequence sap2010:Annotation.AnnotationText="[UNIT TEST] Menguji modul 01_LinkedIn_ScrapeProfile.xaml dengan URL profil pengujian untuk memverifikasi ekstraksi profil dan integritas skema JSON keluaran." DisplayName="Workflow Scope: Test_LinkedIn_Scraper" sap:VirtualizedContainerService.HintSize="650,1800" sap2010:WorkflowViewState.IdRef="Sequence_WorkflowScope">
+      <sap:WorkflowViewStateService.ViewState>
+        <scg:Dictionary x:TypeArguments="x:String, x:Object">
+          <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+          <x:Boolean x:Key="IsAnnotationDocked">True</x:Boolean>
+        </scg:Dictionary>
+      </sap:WorkflowViewStateService.ViewState>
+      <ui:LogMessage DisplayName="Log Test Start" sap:VirtualizedContainerService.HintSize="416,141" sap2010:WorkflowViewState.IdRef="LogMessage_1" Level="Info" Message="[&quot;Starting Test_LinkedIn_Scraper with URL: &quot; &amp; strTestUrl]" />
+      <ui:InvokeWorkflowFile ArgumentsVariable="{x:Null}" ContinueOnError="{x:Null}" DisplayName="Invoke 01_LinkedIn_ScrapeProfile workflow" sap:VirtualizedContainerService.HintSize="416,113.6" sap2010:WorkflowViewState.IdRef="InvokeWorkflowFile_1" UnSafe="False" WorkflowFileName="Modules\LinkedIn\01_LinkedIn_ScrapeProfile.xaml">
+        <ui:InvokeWorkflowFile.Arguments>
+          <InArgument x:TypeArguments="x:String" x:Key="in_LinkedInUrl">[strTestUrl]</InArgument>
+          <InArgument x:TypeArguments="x:String" x:Key="in_BrowserType">["Chrome"]</InArgument>
+          <InArgument x:TypeArguments="x:Boolean" x:Key="in_UseMockFallback">[True]</InArgument>
+          <OutArgument x:TypeArguments="x:String" x:Key="out_LinkedInDataJson">[strTestResultJson]</OutArgument>
+        </ui:InvokeWorkflowFile.Arguments>
+      </ui:InvokeWorkflowFile>
+      <ui:LogMessage DisplayName="Log Test Result" sap:VirtualizedContainerService.HintSize="416,141" sap2010:WorkflowViewState.IdRef="LogMessage_2" Level="Info" Message="[&quot;Test Result JSON: &quot; &amp; strTestResultJson]" />
+      <If Condition="[String.IsNullOrWhiteSpace(strTestResultJson) OrElse Not strTestResultJson.Contains(&quot;full_name&quot;)]" DisplayName="Assert Non-Empty Valid JSON" sap:VirtualizedContainerService.HintSize="416,280" sap2010:WorkflowViewState.IdRef="If_1">
+        <If.Then>
+          <Throw DisplayName="Test Assertion Failed" Exception="[New UiPath.Core.BusinessRuleException(&quot;Test failed: LinkedIn scraper returned empty or invalid JSON output.&quot;)]" sap:VirtualizedContainerService.HintSize="382.4,113.6" sap2010:WorkflowViewState.IdRef="Throw_1" />
+        </If.Then>
+        <If.Else>
+          <ui:LogMessage DisplayName="Test Passed" sap:VirtualizedContainerService.HintSize="382.4,141" sap2010:WorkflowViewState.IdRef="LogMessage_3" Level="Info" Message="[&quot;Test Passed! LinkedIn scraper successfully produced valid structured profile data.&quot;]" />
+        </If.Else>
+      </If>
+    </Sequence>
+    <ui:LogMessage DisplayName="Log Workflow Scope Completed" sap2010:WorkflowViewState.IdRef="LogMessage_ScopeCompleted" Level="Trace" Message="[&quot;[Test_LinkedIn_Scraper] Workflow scope execution completed.&quot;]" />
   </Sequence>
 </Activity>

@@ -78,7 +78,7 @@
       <AssemblyReference>System.Runtime.Serialization.Primitives</AssemblyReference>
     </sco:Collection>
   </TextExpression.ReferencesForImplementation>
-  <Sequence sap2010:Annotation.AnnotationText="[SINGLE RESPONSIBILITY] Pipeline Orkestrasi Fase 2 (Rendering &amp; Delivery). Bertanggung jawab mengompilasi dokumen resmi ATS (DOCX &amp; PDF) dari payload kurasi manusia (#HumanInTheLead), mendistribusikan email lampiran ke kandidat, dan mengirimkan notifikasi Webhook /complete beserta Base64 PDF ke Web Portal.&#xA;&#xA;[KONTRAK ARGUMEN]&#xA;- in_JobId (String): ID unik pekerjaan dari Web Portal (contoh: &quot;job-123&quot;).&#xA;- in_ApprovedResumePayload (String): Payload JSON resume hasil persetujuan/kurasi manusia. Wajib terisi untuk memicu Fase 2.&#xA;- in_RecipientEmail (String): Alamat email tujuan pengiriman berkas resume.&#xA;- in_WebhookBaseUrl (String): Base URL backend untuk pelaporan status final.&#xA;- out_JobStatus (String): Status akhir eksekusi (&quot;COMPLETED&quot;).&#xA;- out_OutputPdfPath (String): Path absolut file PDF resume yang berhasil digenerate." DisplayName="Pipeline: Render and Deliver" sap:VirtualizedContainerService.HintSize="576,1700" sap2010:WorkflowViewState.IdRef="Sequence_RenderAndDeliver">
+  <Sequence sap2010:Annotation.AnnotationText="[SINGLE RESPONSIBILITY] Pipeline Orkestrasi Fase 2 (Rendering &amp; Delivery). Bertanggung jawab mengompilasi dokumen resmi ATS (DOCX &amp; PDF) dari payload kurasi manusia (#HumanInTheLead), mendistribusikan email lampiran ke kandidat, dan mengirimkan notifikasi Webhook /complete beserta Base64 PDF ke Web Portal. (Lihat Workflow Scope di dalam untuk detail kontrak argumen)." DisplayName="Pipeline: Render and Deliver" sap:VirtualizedContainerService.HintSize="576,1700" sap2010:WorkflowViewState.IdRef="Sequence_RenderAndDeliver">
     <Sequence.Variables>
       <Variable x:TypeArguments="x:String" Name="strNormalizedEmail" />
       <Variable x:TypeArguments="x:String" Name="strOutputPdfPath" />
@@ -88,85 +88,113 @@
     <sap:WorkflowViewStateService.ViewState>
       <scg:Dictionary x:TypeArguments="x:String, x:Object">
         <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+        <x:Boolean x:Key="IsAnnotationDocked">True</x:Boolean>
       </scg:Dictionary>
     </sap:WorkflowViewStateService.ViewState>
+    <Sequence sap2010:Annotation.AnnotationText="[SINGLE RESPONSIBILITY] Pipeline Orkestrasi Fase 2 (Rendering &amp; Delivery). Bertanggung jawab mengompilasi dokumen resmi ATS (DOCX &amp; PDF) dari payload kurasi manusia (#HumanInTheLead), mendistribusikan email lampiran ke kandidat, dan mengirimkan notifikasi Webhook /complete beserta Base64 PDF ke Web Portal.&#xA;&#xA;[KONTRAK ARGUMEN]&#xA;- in_JobId (String): ID unik pekerjaan dari Web Portal (contoh: &quot;job-123&quot;).&#xA;- in_ApprovedResumePayload (String): Payload JSON resume hasil persetujuan/kurasi manusia. Wajib terisi untuk memicu Fase 2.&#xA;- in_RecipientEmail (String): Alamat email tujuan pengiriman berkas resume.&#xA;- in_WebhookBaseUrl (String): Base URL backend untuk pelaporan status final.&#xA;- out_JobStatus (String): Status akhir eksekusi (&quot;COMPLETED&quot;).&#xA;- out_OutputPdfPath (String): Path absolut file PDF resume yang berhasil digenerate." DisplayName="Workflow Scope: Pipeline: Render and Deliver" sap:VirtualizedContainerService.HintSize="650,1800" sap2010:WorkflowViewState.IdRef="Sequence_WorkflowScope">
+      <sap:WorkflowViewStateService.ViewState>
+        <scg:Dictionary x:TypeArguments="x:String, x:Object">
+          <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+          <x:Boolean x:Key="IsAnnotationDocked">True</x:Boolean>
+        </scg:Dictionary>
+      </sap:WorkflowViewStateService.ViewState>
+      <!-- 1. Normalization & Context Setup -->
+      <Assign DisplayName="Default Recipient Email if empty" sap:VirtualizedContainerService.HintSize="542,113.6" sap2010:WorkflowViewState.IdRef="Assign_DeliverEmail">
+        <Assign.To>
+          <OutArgument x:TypeArguments="x:String">[strNormalizedEmail]</OutArgument>
+        </Assign.To>
+        <Assign.Value>
+          <InArgument x:TypeArguments="x:String">[If(String.IsNullOrWhiteSpace(in_RecipientEmail), "farid@example.com", in_RecipientEmail)]</InArgument>
+        </Assign.Value>
+      </Assign>
 
-    <!-- 1. Normalization & Context Setup -->
-    <Assign DisplayName="Default Recipient Email if empty" sap:VirtualizedContainerService.HintSize="542,113.6" sap2010:WorkflowViewState.IdRef="Assign_DeliverEmail">
-      <Assign.To>
-        <OutArgument x:TypeArguments="x:String">[strNormalizedEmail]</OutArgument>
-      </Assign.To>
-      <Assign.Value>
-        <InArgument x:TypeArguments="x:String">[If(String.IsNullOrWhiteSpace(in_RecipientEmail), "farid@example.com", in_RecipientEmail)]</InArgument>
-      </Assign.Value>
-    </Assign>
+      <ui:LogMessage DisplayName="Log starting PDF generation" sap:VirtualizedContainerService.HintSize="542,141" sap2010:WorkflowViewState.IdRef="LogMessage_StartPdf" Level="Info" Message="[&quot;[RenderAndDeliver] Generating ATS-Compliant PDF document via 04_Document_GeneratePdf.&quot;]" />
 
-    <ui:LogMessage DisplayName="Log starting PDF generation" sap:VirtualizedContainerService.HintSize="542,141" sap2010:WorkflowViewState.IdRef="LogMessage_StartPdf" Level="Info" Message="[&quot;[RenderAndDeliver] Generating ATS-Compliant PDF document via 04_Document_GeneratePdf.&quot;]" />
+      <!-- 2. Invoke 04_Document_GeneratePdf -->
+      <ui:InvokeWorkflowFile ArgumentsVariable="{x:Null}" ContinueOnError="{x:Null}" sap2010:Annotation.AnnotationText="[SUB-WORKFLOW] Mengompilasi payload JSON menjadi dokumen DOCX (Native OpenXML) dan mengekspornya ke PDF ATS via headless browser Chromium." DisplayName="Invoke 04_Document_GeneratePdf workflow" sap:VirtualizedContainerService.HintSize="542,113.6" sap2010:WorkflowViewState.IdRef="Invoke_DocGen" UnSafe="False" WorkflowFileName="Modules\Document\04_Document_GeneratePdf.xaml">
+        <sap:WorkflowViewStateService.ViewState>
+          <scg:Dictionary x:TypeArguments="x:String, x:Object">
+            <x:Boolean x:Key="IsAnnotationDocked">True</x:Boolean>
+          </scg:Dictionary>
+        </sap:WorkflowViewStateService.ViewState>
+        <ui:InvokeWorkflowFile.Arguments>
+          <InArgument x:TypeArguments="x:String" x:Key="in_CuratedResumeJson">[in_ApprovedResumePayload]</InArgument>
+          <InArgument x:TypeArguments="x:String" x:Key="in_TemplatePath">["Data\Templates\ATS_Resume_Template.docx"]</InArgument>
+          <InArgument x:TypeArguments="x:String" x:Key="in_OutputDir">["Data\Outputs"]</InArgument>
+          <OutArgument x:TypeArguments="x:String" x:Key="out_GeneratedPdfPath">[strOutputPdfPath]</OutArgument>
+          <OutArgument x:TypeArguments="x:String" x:Key="out_GeneratedDocxPath" />
+        </ui:InvokeWorkflowFile.Arguments>
+      </ui:InvokeWorkflowFile>
 
-    <!-- 2. Invoke 04_Document_GeneratePdf -->
-    <ui:InvokeWorkflowFile ArgumentsVariable="{x:Null}" ContinueOnError="{x:Null}" sap2010:Annotation.AnnotationText="[SUB-WORKFLOW] Mengompilasi payload JSON menjadi dokumen DOCX (Native OpenXML) dan mengekspornya ke PDF ATS via headless browser Chromium." DisplayName="Invoke 04_Document_GeneratePdf workflow" sap:VirtualizedContainerService.HintSize="542,113.6" sap2010:WorkflowViewState.IdRef="Invoke_DocGen" UnSafe="False" WorkflowFileName="Modules\Document\04_Document_GeneratePdf.xaml">
-      <ui:InvokeWorkflowFile.Arguments>
-        <InArgument x:TypeArguments="x:String" x:Key="in_CuratedResumeJson">[in_ApprovedResumePayload]</InArgument>
-        <InArgument x:TypeArguments="x:String" x:Key="in_TemplatePath">["Data\Templates\ATS_Resume_Template.docx"]</InArgument>
-        <InArgument x:TypeArguments="x:String" x:Key="in_OutputDir">["Data\Outputs"]</InArgument>
-        <OutArgument x:TypeArguments="x:String" x:Key="out_GeneratedPdfPath">[strOutputPdfPath]</OutArgument>
-        <OutArgument x:TypeArguments="x:String" x:Key="out_GeneratedDocxPath" />
-      </ui:InvokeWorkflowFile.Arguments>
-    </ui:InvokeWorkflowFile>
+      <Assign DisplayName="Expose PDF output path" sap:VirtualizedContainerService.HintSize="542,113.6" sap2010:WorkflowViewState.IdRef="Assign_OutPdf">
+        <Assign.To>
+          <OutArgument x:TypeArguments="x:String">[out_OutputPdfPath]</OutArgument>
+        </Assign.To>
+        <Assign.Value>
+          <InArgument x:TypeArguments="x:String">[strOutputPdfPath]</InArgument>
+        </Assign.Value>
+      </Assign>
 
-    <Assign DisplayName="Expose PDF output path" sap:VirtualizedContainerService.HintSize="542,113.6" sap2010:WorkflowViewState.IdRef="Assign_OutPdf">
-      <Assign.To>
-        <OutArgument x:TypeArguments="x:String">[out_OutputPdfPath]</OutArgument>
-      </Assign.To>
-      <Assign.Value>
-        <InArgument x:TypeArguments="x:String">[strOutputPdfPath]</InArgument>
-      </Assign.Value>
-    </Assign>
+      <!-- 3. Invoke 05_Notification_SendMail -->
+      <ui:LogMessage DisplayName="Publish email dispatch" sap:VirtualizedContainerService.HintSize="542,141" sap2010:WorkflowViewState.IdRef="LogMessage_MailDispatch" Level="Info" Message="[&quot;[RenderAndDeliver] Delivering final ATS Resume PDF to &quot; &amp; strNormalizedEmail]" />
+      <ui:InvokeWorkflowFile ArgumentsVariable="{x:Null}" ContinueOnError="{x:Null}" sap2010:Annotation.AnnotationText="[SUB-WORKFLOW] Mengirimkan dokumen PDF resume sebagai lampiran email ke alamat kandidat (mendukung mode SMTP asli atau SIMULATION)." DisplayName="Invoke 05_Notification_SendMail workflow" sap:VirtualizedContainerService.HintSize="542,113.6" sap2010:WorkflowViewState.IdRef="Invoke_SendMail" UnSafe="False" WorkflowFileName="Modules\Notification\05_Notification_SendMail.xaml">
+        <sap:WorkflowViewStateService.ViewState>
+          <scg:Dictionary x:TypeArguments="x:String, x:Object">
+            <x:Boolean x:Key="IsAnnotationDocked">True</x:Boolean>
+          </scg:Dictionary>
+        </sap:WorkflowViewStateService.ViewState>
+        <ui:InvokeWorkflowFile.Arguments>
+          <InArgument x:TypeArguments="x:String" x:Key="in_RecipientEmail">[strNormalizedEmail]</InArgument>
+          <InArgument x:TypeArguments="x:String" x:Key="in_PdfFilePath">[strOutputPdfPath]</InArgument>
+          <InArgument x:TypeArguments="x:String" x:Key="in_CandidateName">["Candidate"]</InArgument>
+          <InArgument x:TypeArguments="x:String" x:Key="in_SmtpHost" />
+          <InArgument x:TypeArguments="x:Int32" x:Key="in_SmtpPort">[587]</InArgument>
+          <InArgument x:TypeArguments="x:String" x:Key="in_SmtpUser" />
+          <InArgument x:TypeArguments="x:String" x:Key="in_SmtpPassword" />
+          <InArgument x:TypeArguments="x:Boolean" x:Key="in_SimulationMode">[True]</InArgument>
+          <OutArgument x:TypeArguments="x:Boolean" x:Key="out_MailSent" />
+          <OutArgument x:TypeArguments="x:String" x:Key="out_DeliveryStatus" />
+        </ui:InvokeWorkflowFile.Arguments>
+      </ui:InvokeWorkflowFile>
 
-    <!-- 3. Invoke 05_Notification_SendMail -->
-    <ui:LogMessage DisplayName="Publish email dispatch" sap:VirtualizedContainerService.HintSize="542,141" sap2010:WorkflowViewState.IdRef="LogMessage_MailDispatch" Level="Info" Message="[&quot;[RenderAndDeliver] Delivering final ATS Resume PDF to &quot; &amp; strNormalizedEmail]" />
-    <ui:InvokeWorkflowFile ArgumentsVariable="{x:Null}" ContinueOnError="{x:Null}" sap2010:Annotation.AnnotationText="[SUB-WORKFLOW] Mengirimkan dokumen PDF resume sebagai lampiran email ke alamat kandidat (mendukung mode SMTP asli atau SIMULATION)." DisplayName="Invoke 05_Notification_SendMail workflow" sap:VirtualizedContainerService.HintSize="542,113.6" sap2010:WorkflowViewState.IdRef="Invoke_SendMail" UnSafe="False" WorkflowFileName="Modules\Notification\05_Notification_SendMail.xaml">
-      <ui:InvokeWorkflowFile.Arguments>
-        <InArgument x:TypeArguments="x:String" x:Key="in_RecipientEmail">[strNormalizedEmail]</InArgument>
-        <InArgument x:TypeArguments="x:String" x:Key="in_PdfFilePath">[strOutputPdfPath]</InArgument>
-        <InArgument x:TypeArguments="x:String" x:Key="in_CandidateName">["Candidate"]</InArgument>
-        <InArgument x:TypeArguments="x:String" x:Key="in_SmtpHost" />
-        <InArgument x:TypeArguments="x:Int32" x:Key="in_SmtpPort">[587]</InArgument>
-        <InArgument x:TypeArguments="x:String" x:Key="in_SmtpUser" />
-        <InArgument x:TypeArguments="x:String" x:Key="in_SmtpPassword" />
-        <InArgument x:TypeArguments="x:Boolean" x:Key="in_SimulationMode">[True]</InArgument>
-        <OutArgument x:TypeArguments="x:Boolean" x:Key="out_MailSent" />
-        <OutArgument x:TypeArguments="x:String" x:Key="out_DeliveryStatus" />
-      </ui:InvokeWorkflowFile.Arguments>
-    </ui:InvokeWorkflowFile>
+      <!-- 4. Dispatch Complete Webhook to Web App -->
+      <If Condition="[Not String.IsNullOrWhiteSpace(in_JobId) AndAlso Not String.IsNullOrWhiteSpace(in_WebhookBaseUrl)]" sap2010:Annotation.AnnotationText="[PERCABANGAN LOGIKA] Mengecek ketersediaan in_JobId dan in_WebhookBaseUrl. Jika terisi, panggil Webhook 06 dengan endpoint /complete untuk menyerahkan PDF (Base64) dan menandai job selesai pada database web." DisplayName="Check if complete webhook is configured" sap:VirtualizedContainerService.HintSize="542,400" sap2010:WorkflowViewState.IdRef="If_CompleteWebhook">
+        <sap:WorkflowViewStateService.ViewState>
+          <scg:Dictionary x:TypeArguments="x:String, x:Object">
+            <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+            <x:Boolean x:Key="IsAnnotationDocked">True</x:Boolean>
+          </scg:Dictionary>
+        </sap:WorkflowViewStateService.ViewState>
+        <If.Then>
+          <ui:InvokeWorkflowFile ArgumentsVariable="{x:Null}" ContinueOnError="True" sap2010:Annotation.AnnotationText="[SUB-WORKFLOW] Mengirimkan POST request ke Webhook backend /complete dengan Base64 PDF." DisplayName="Invoke 06_Webhook_NotifyWeb for complete" sap:VirtualizedContainerService.HintSize="416,113.6" sap2010:WorkflowViewState.IdRef="Invoke_WebhookComplete" UnSafe="False" WorkflowFileName="Modules\Webhook\06_Webhook_NotifyWeb.xaml">
+            <sap:WorkflowViewStateService.ViewState>
+              <scg:Dictionary x:TypeArguments="x:String, x:Object">
+                <x:Boolean x:Key="IsAnnotationDocked">True</x:Boolean>
+              </scg:Dictionary>
+            </sap:WorkflowViewStateService.ViewState>
+            <ui:InvokeWorkflowFile.Arguments>
+              <InArgument x:TypeArguments="x:String" x:Key="in_WebhookBaseUrl">[in_WebhookBaseUrl]</InArgument>
+              <InArgument x:TypeArguments="x:String" x:Key="in_JobId">[in_JobId]</InArgument>
+              <InArgument x:TypeArguments="x:String" x:Key="in_EndpointType">["complete"]</InArgument>
+              <InArgument x:TypeArguments="x:String" x:Key="in_PayloadJson" />
+              <InArgument x:TypeArguments="x:String" x:Key="in_PdfFilePath">[strOutputPdfPath]</InArgument>
+              <OutArgument x:TypeArguments="x:Int32" x:Key="out_StatusCode">[intWebhookStatus]</OutArgument>
+              <OutArgument x:TypeArguments="x:String" x:Key="out_ResponseContent">[strWebhookResp]</OutArgument>
+            </ui:InvokeWorkflowFile.Arguments>
+          </ui:InvokeWorkflowFile>
+        </If.Then>
+      </If>
 
-    <!-- 4. Dispatch Complete Webhook to Web App -->
-    <If Condition="[Not String.IsNullOrWhiteSpace(in_JobId) AndAlso Not String.IsNullOrWhiteSpace(in_WebhookBaseUrl)]" sap2010:Annotation.AnnotationText="[PERCABANGAN LOGIKA] Mengecek ketersediaan in_JobId dan in_WebhookBaseUrl. Jika terisi, panggil Webhook 06 dengan endpoint /complete untuk menyerahkan PDF (Base64) dan menandai job selesai pada database web." DisplayName="Check if complete webhook is configured" sap:VirtualizedContainerService.HintSize="542,400" sap2010:WorkflowViewState.IdRef="If_CompleteWebhook">
-      <If.Then>
-        <ui:InvokeWorkflowFile ArgumentsVariable="{x:Null}" ContinueOnError="True" sap2010:Annotation.AnnotationText="[SUB-WORKFLOW] Mengirimkan POST request ke Webhook backend /complete dengan Base64 PDF." DisplayName="Invoke 06_Webhook_NotifyWeb for complete" sap:VirtualizedContainerService.HintSize="416,113.6" sap2010:WorkflowViewState.IdRef="Invoke_WebhookComplete" UnSafe="False" WorkflowFileName="Modules\Webhook\06_Webhook_NotifyWeb.xaml">
-          <ui:InvokeWorkflowFile.Arguments>
-            <InArgument x:TypeArguments="x:String" x:Key="in_WebhookBaseUrl">[in_WebhookBaseUrl]</InArgument>
-            <InArgument x:TypeArguments="x:String" x:Key="in_JobId">[in_JobId]</InArgument>
-            <InArgument x:TypeArguments="x:String" x:Key="in_EndpointType">["complete"]</InArgument>
-            <InArgument x:TypeArguments="x:String" x:Key="in_PayloadJson" />
-            <InArgument x:TypeArguments="x:String" x:Key="in_PdfFilePath">[strOutputPdfPath]</InArgument>
-            <OutArgument x:TypeArguments="x:Int32" x:Key="out_StatusCode">[intWebhookStatus]</OutArgument>
-            <OutArgument x:TypeArguments="x:String" x:Key="out_ResponseContent">[strWebhookResp]</OutArgument>
-          </ui:InvokeWorkflowFile.Arguments>
-        </ui:InvokeWorkflowFile>
-      </If.Then>
-    </If>
-
-    <!-- 5. Mark Completed -->
-    <Assign DisplayName="Set completed status" sap:VirtualizedContainerService.HintSize="542,113.6" sap2010:WorkflowViewState.IdRef="Assign_DeliverCompleted">
-      <Assign.To>
-        <OutArgument x:TypeArguments="x:String">[out_JobStatus]</OutArgument>
-      </Assign.To>
-      <Assign.Value>
-        <InArgument x:TypeArguments="x:String">["COMPLETED"]</InArgument>
-      </Assign.Value>
-    </Assign>
-
+      <!-- 5. Mark Completed -->
+      <Assign DisplayName="Set completed status" sap:VirtualizedContainerService.HintSize="542,113.6" sap2010:WorkflowViewState.IdRef="Assign_DeliverCompleted">
+        <Assign.To>
+          <OutArgument x:TypeArguments="x:String">[out_JobStatus]</OutArgument>
+        </Assign.To>
+        <Assign.Value>
+          <InArgument x:TypeArguments="x:String">["COMPLETED"]</InArgument>
+        </Assign.Value>
+      </Assign>
+    </Sequence>
     <ui:LogMessage DisplayName="Log Delivery finish" sap:VirtualizedContainerService.HintSize="542,141" sap2010:WorkflowViewState.IdRef="LogMessage_DeliverDone" Level="Info" Message="[&quot;[RenderAndDeliver] COMPLETED successfully. PDF generated, delivered, and Web App notified: &quot; &amp; strOutputPdfPath]" />
   </Sequence>
 </Activity>

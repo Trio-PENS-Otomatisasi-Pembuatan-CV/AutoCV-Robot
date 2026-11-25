@@ -82,9 +82,11 @@
       <AssemblyReference>System.Runtime.Serialization.Formatters</AssemblyReference>
       <AssemblyReference>System.Private.DataContractSerialization</AssemblyReference>
       <AssemblyReference>System.Runtime.Serialization.Primitives</AssemblyReference>
+      <AssemblyReference>System.ObjectModel</AssemblyReference>
+      <AssemblyReference>System.ComponentModel.TypeConverter</AssemblyReference>
     </sco:Collection>
   </TextExpression.ReferencesForImplementation>
-  <Sequence sap2010:Annotation.AnnotationText="[SINGLE RESPONSIBILITY] Entry point router alur kerja AutoCV. Bertanggung jawab memvalidasi mode eksekusi (Smart Dual-Mode) dan mendispatch ke Pipeline 1 (Ingestion &amp; AI Synthesis) atau Pipeline 2 (Rendering &amp; Delivery) tanpa pemborosan lisensi unattended bot.&#xA;&#xA;[KONTRAK ARGUMEN]&#xA;- in_JobId (String): ID unik pekerjaan dari Web Portal (contoh: &quot;job-123&quot;).&#xA;- in_LinkedInUrl (String): URL profil publik LinkedIn (format: &quot;https://www.linkedin.com/in/...&quot;).&#xA;- in_GitHubUrl (String): URL atau username akun GitHub (contoh: &quot;https://github.com/octocat&quot; atau &quot;octocat&quot;).&#xA;- in_TargetJobRole (String): Target posisi kerja untuk pembobotan kata kunci AI (contoh: &quot;Senior Fullstack Engineer&quot;).&#xA;- in_RecipientEmail (String): Alamat email tujuan pengiriman dokumen final.&#xA;- in_ApprovedResumePayload (String): Payload JSON hasil kurasi manusia. Kunci penentu mode: jika kosong jalankan Job 1, jika terisi jalankan Job 2.&#xA;- in_WebhookBaseUrl (String): Base URL backend Web Portal (contoh: &quot;http://localhost:3000&quot;).&#xA;- in_UseMockFallback (Boolean): True = aktifkan mock fixture jika sesi eksternal offline.&#xA;- in_RequireManualApproval (Boolean): True = tahan pada status CURATING menunggu review web; False = langsung render.&#xA;- out_JobStatus (String): Status akhir eksekusi (&quot;CURATING&quot;, &quot;COMPLETED&quot;, &quot;FAILED&quot;).&#xA;- out_DraftResumePayload (String): Objek JSON draf resume hasil sintesis AI.&#xA;- out_OutputPdfPath (String): Path absolut berkas PDF hasil kompilasi." DisplayName="Main Dispatcher Sequence" sap:VirtualizedContainerService.HintSize="897.2,2200" sap2010:WorkflowViewState.IdRef="Sequence_1">
+  <Sequence sap2010:Annotation.AnnotationText="[SINGLE RESPONSIBILITY] Entry point router alur kerja AutoCV. Bertanggung jawab memvalidasi mode eksekusi (Smart Dual-Mode) dan mendispatch ke Pipeline 1 (Ingestion &amp; AI Synthesis) atau Pipeline 2 (Rendering &amp; Delivery) tanpa pemborosan lisensi unattended bot. (Lihat Workflow Scope di dalam untuk detail kontrak argumen)." DisplayName="Main Dispatcher Sequence" sap:VirtualizedContainerService.HintSize="897.2,2200" sap2010:WorkflowViewState.IdRef="Sequence_1">
     <Sequence.Variables>
       <Variable x:TypeArguments="x:String" Name="strJobStatus" />
       <Variable x:TypeArguments="x:String" Name="strDraftPayload" />
@@ -96,127 +98,148 @@
     <sap:WorkflowViewStateService.ViewState>
       <scg:Dictionary x:TypeArguments="x:String, x:Object">
         <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+        <x:Boolean x:Key="IsAnnotationDocked">True</x:Boolean>
       </scg:Dictionary>
     </sap:WorkflowViewStateService.ViewState>
-
-    <!-- 1. Initialization -->
-    <Assign DisplayName="Initialize job status" sap:VirtualizedContainerService.HintSize="616,113.6" sap2010:WorkflowViewState.IdRef="Assign_5">
-      <Assign.To>
-        <OutArgument x:TypeArguments="x:String">[strJobStatus]</OutArgument>
-      </Assign.To>
-      <Assign.Value>
-        <InArgument x:TypeArguments="x:String">["PENDING"]</InArgument>
-      </Assign.Value>
-    </Assign>
-    <Assign DisplayName="Initialize output path" sap:VirtualizedContainerService.HintSize="616,113.6" sap2010:WorkflowViewState.IdRef="Assign_6">
-      <Assign.To>
-        <OutArgument x:TypeArguments="x:String">[strOutputPdfPath]</OutArgument>
-      </Assign.To>
-      <Assign.Value>
-        <InArgument x:TypeArguments="x:String">[""]</InArgument>
-      </Assign.Value>
-    </Assign>
-
-    <!-- Determine Execution Mode: Job 1 (Ingestion & AI Synthesis) vs Job 2 (Document Rendering & Delivery) -->
-    <Assign sap2010:Annotation.AnnotationText="[LOGIKA BISNIS] Memeriksa apakah in_ApprovedResumePayload terisi. Jika kosong berarti alur berjalan sebagai Job 1 (Ingestion &amp; AI Synthesis). Jika terisi berarti alur berjalan sebagai Job 2 (Rendering DOCX/PDF &amp; Delivery)." DisplayName="Determine if Job 2 is triggered" sap:VirtualizedContainerService.HintSize="616,113.6" sap2010:WorkflowViewState.IdRef="Assign_DetermineJob2">
-      <Assign.To>
-        <OutArgument x:TypeArguments="x:Boolean">[boolIsJob2]</OutArgument>
-      </Assign.To>
-      <Assign.Value>
-        <InArgument x:TypeArguments="x:Boolean">[Not String.IsNullOrWhiteSpace(in_ApprovedResumePayload)]</InArgument>
-      </Assign.Value>
-    </Assign>
-
-    <ui:LogMessage DisplayName="Log execution mode" sap:VirtualizedContainerService.HintSize="616,141" sap2010:WorkflowViewState.IdRef="LogMessage_Mode" Level="Info" Message="[&quot;[Main Dispatcher] Execution Mode: &quot; &amp; If(boolIsJob2, &quot;JOB 2 (Rendering DOCX/PDF &amp; Delivery)&quot;, &quot;JOB 1 (Ingestion &amp; AI Synthesis)&quot;) &amp; &quot; | JobId: &quot; &amp; in_JobId &amp; &quot; | Webhook: &quot; &amp; in_WebhookBaseUrl]" />
-
-    <!-- 2. Dual-Mode Dispatcher Branching -->
-    <If Condition="[boolIsJob2]" sap2010:Annotation.AnnotationText="[PERCABANGAN LOGIKA] Smart Dual-Mode Dispatcher: Mengecek nilai boolIsJob2.&#xA;- Then: Jalankan Pipeline_RenderAndDeliver (Job 2) untuk mencetak dokumen &amp; kirim email.&#xA;- Else: Jalankan Pipeline_IngestionAndSynthesis (Job 1) untuk ekstraksi data &amp; AI synthesis." DisplayName="Smart Dual-Mode Dispatcher" sap:VirtualizedContainerService.HintSize="616,1400" sap2010:WorkflowViewState.IdRef="If_SmartDualMode">
-      <If.Then>
-        <!-- JOB 2: Document Rendering & Delivery Pipeline -->
-        <Sequence DisplayName="Job 2 Dispatch Sequence" sap:VirtualizedContainerService.HintSize="468,300" sap2010:WorkflowViewState.IdRef="Sequence_Job2Dispatch">
-          <ui:LogMessage DisplayName="Log Job 2 dispatch" sap:VirtualizedContainerService.HintSize="434,141" sap2010:WorkflowViewState.IdRef="LogMessage_Job2Dispatch" Level="Info" Message="[&quot;[Main Dispatcher] Invoking Pipeline_RenderAndDeliver for Job 2.&quot;]" />
-          <ui:InvokeWorkflowFile ArgumentsVariable="{x:Null}" ContinueOnError="{x:Null}" sap2010:Annotation.AnnotationText="[SUB-WORKFLOW] Mengorkestrasi pembuatan dokumen OpenXML DOCX &amp; PDF ATS, pengiriman email hasil akhir, dan notifikasi Webhook /complete ke Web Portal." DisplayName="Invoke Pipeline_RenderAndDeliver workflow" sap:VirtualizedContainerService.HintSize="434,113.6" sap2010:WorkflowViewState.IdRef="Invoke_PipelineRenderAndDeliver_Job2" UnSafe="False" WorkflowFileName="Modules\Pipelines\Pipeline_RenderAndDeliver.xaml">
-            <ui:InvokeWorkflowFile.Arguments>
-              <InArgument x:TypeArguments="x:String" x:Key="in_JobId">[in_JobId]</InArgument>
-              <InArgument x:TypeArguments="x:String" x:Key="in_ApprovedResumePayload">[in_ApprovedResumePayload]</InArgument>
-              <InArgument x:TypeArguments="x:String" x:Key="in_RecipientEmail">[in_RecipientEmail]</InArgument>
-              <InArgument x:TypeArguments="x:String" x:Key="in_WebhookBaseUrl">[in_WebhookBaseUrl]</InArgument>
-              <OutArgument x:TypeArguments="x:String" x:Key="out_JobStatus">[strJobStatus]</OutArgument>
-              <OutArgument x:TypeArguments="x:String" x:Key="out_OutputPdfPath">[strOutputPdfPath]</OutArgument>
-            </ui:InvokeWorkflowFile.Arguments>
-          </ui:InvokeWorkflowFile>
-        </Sequence>
-      </If.Then>
-      <If.Else>
-        <!-- JOB 1: Ingestion & AI Synthesis Pipeline -->
-        <Sequence DisplayName="Job 1 Dispatch Sequence" sap:VirtualizedContainerService.HintSize="468,900" sap2010:WorkflowViewState.IdRef="Sequence_Job1Dispatch">
-          <ui:LogMessage DisplayName="Log Job 1 dispatch" sap:VirtualizedContainerService.HintSize="434,141" sap2010:WorkflowViewState.IdRef="LogMessage_Job1Dispatch" Level="Info" Message="[&quot;[Main Dispatcher] Invoking Pipeline_IngestionAndSynthesis for Job 1.&quot;]" />
-          <ui:InvokeWorkflowFile ArgumentsVariable="{x:Null}" ContinueOnError="{x:Null}" sap2010:Annotation.AnnotationText="[SUB-WORKFLOW] Mengorkestrasi validasi masukan regex, ekstraksi LinkedIn &amp; GitHub, perumusan portofolio AI STAR/XYZ, dan pengiriman draf ke Webhook /draft." DisplayName="Invoke Pipeline_IngestionAndSynthesis workflow" sap:VirtualizedContainerService.HintSize="434,113.6" sap2010:WorkflowViewState.IdRef="Invoke_PipelineIngestionAndSynthesis" UnSafe="False" WorkflowFileName="Modules\Pipelines\Pipeline_IngestionAndSynthesis.xaml">
-            <ui:InvokeWorkflowFile.Arguments>
-              <InArgument x:TypeArguments="x:String" x:Key="in_JobId">[in_JobId]</InArgument>
-              <InArgument x:TypeArguments="x:String" x:Key="in_LinkedInUrl">[in_LinkedInUrl]</InArgument>
-              <InArgument x:TypeArguments="x:String" x:Key="in_GitHubUrl">[in_GitHubUrl]</InArgument>
-              <InArgument x:TypeArguments="x:String" x:Key="in_TargetJobRole">[in_TargetJobRole]</InArgument>
-              <InArgument x:TypeArguments="x:String" x:Key="in_RecipientEmail">[in_RecipientEmail]</InArgument>
-              <InArgument x:TypeArguments="x:String" x:Key="in_WebhookBaseUrl">[in_WebhookBaseUrl]</InArgument>
-              <InArgument x:TypeArguments="x:Boolean" x:Key="in_UseMockFallback">[in_UseMockFallback]</InArgument>
-              <InArgument x:TypeArguments="x:Boolean" x:Key="in_RequireManualApproval">[in_RequireManualApproval]</InArgument>
-              <OutArgument x:TypeArguments="x:String" x:Key="out_JobStatus">[strJobStatus]</OutArgument>
-              <OutArgument x:TypeArguments="x:String" x:Key="out_DraftResumePayload">[strDraftPayload]</OutArgument>
-              <OutArgument x:TypeArguments="x:String" x:Key="out_NormalizedEmail">[strNormalizedEmail]</OutArgument>
-              <OutArgument x:TypeArguments="x:Boolean" x:Key="out_ShouldProceedToDelivery">[boolShouldAutoDeliver]</OutArgument>
-            </ui:InvokeWorkflowFile.Arguments>
-          </ui:InvokeWorkflowFile>
-
-          <Assign DisplayName="Expose draft payload to Orchestrator output" sap:VirtualizedContainerService.HintSize="434,113.6" sap2010:WorkflowViewState.IdRef="Assign_ExposeDraftPayload">
-            <Assign.To>
-              <OutArgument x:TypeArguments="x:String">[out_DraftResumePayload]</OutArgument>
-            </Assign.To>
-            <Assign.Value>
-              <InArgument x:TypeArguments="x:String">[strDraftPayload]</InArgument>
-            </Assign.Value>
-          </Assign>
-
-          <!-- If Auto-Approve is enabled (in_RequireManualApproval=False), proceed to delivery pipeline -->
-          <If Condition="[boolShouldAutoDeliver]" sap2010:Annotation.AnnotationText="[LOGIKA BISNIS] Mengecek apakah opsi persetujuan manual dimatikan (in_RequireManualApproval=False). Jika False, alur langsung meluncurkan Pipeline_RenderAndDeliver secara otomatis tanpa menunggu persetujuan di Web Portal." DisplayName="Check if auto-approval proceeds to delivery" sap:VirtualizedContainerService.HintSize="434,400" sap2010:WorkflowViewState.IdRef="If_AutoDeliverBranch">
-            <If.Then>
-              <Sequence DisplayName="Auto Deliver Sequence" sap:VirtualizedContainerService.HintSize="416,250" sap2010:WorkflowViewState.IdRef="Sequence_AutoDeliver">
-                <ui:LogMessage DisplayName="Log auto-delivery dispatch" sap:VirtualizedContainerService.HintSize="382,141" sap2010:WorkflowViewState.IdRef="LogMessage_AutoDeliver" Level="Info" Message="[&quot;[Main Dispatcher] in_RequireManualApproval=False. Proceeding immediately to Pipeline_RenderAndDeliver.&quot;]" />
-                <ui:InvokeWorkflowFile ArgumentsVariable="{x:Null}" ContinueOnError="{x:Null}" DisplayName="Invoke Pipeline_RenderAndDeliver for Auto-Approve" sap:VirtualizedContainerService.HintSize="382,113.6" sap2010:WorkflowViewState.IdRef="Invoke_PipelineRenderAndDeliver_Auto" UnSafe="False" WorkflowFileName="Modules\Pipelines\Pipeline_RenderAndDeliver.xaml">
-                  <ui:InvokeWorkflowFile.Arguments>
-                    <InArgument x:TypeArguments="x:String" x:Key="in_JobId">[in_JobId]</InArgument>
-                    <InArgument x:TypeArguments="x:String" x:Key="in_ApprovedResumePayload">[strDraftPayload]</InArgument>
-                    <InArgument x:TypeArguments="x:String" x:Key="in_RecipientEmail">[strNormalizedEmail]</InArgument>
-                    <InArgument x:TypeArguments="x:String" x:Key="in_WebhookBaseUrl">[in_WebhookBaseUrl]</InArgument>
-                    <OutArgument x:TypeArguments="x:String" x:Key="out_JobStatus">[strJobStatus]</OutArgument>
-                    <OutArgument x:TypeArguments="x:String" x:Key="out_OutputPdfPath">[strOutputPdfPath]</OutArgument>
-                  </ui:InvokeWorkflowFile.Arguments>
-                </ui:InvokeWorkflowFile>
-              </Sequence>
-            </If.Then>
-          </If>
-        </Sequence>
-      </If.Else>
-    </If>
-
-    <!-- 3. Expose final outputs to Orchestrator -->
-    <Assign DisplayName="Expose final job status" sap:VirtualizedContainerService.HintSize="616,113.6" sap2010:WorkflowViewState.IdRef="Assign_FinalStatus">
-      <Assign.To>
-        <OutArgument x:TypeArguments="x:String">[out_JobStatus]</OutArgument>
-      </Assign.To>
-      <Assign.Value>
-        <InArgument x:TypeArguments="x:String">[strJobStatus]</InArgument>
-      </Assign.Value>
-    </Assign>
-    <Assign DisplayName="Expose final PDF output path" sap:VirtualizedContainerService.HintSize="616,113.6" sap2010:WorkflowViewState.IdRef="Assign_FinalOutPdf">
-      <Assign.To>
-        <OutArgument x:TypeArguments="x:String">[out_OutputPdfPath]</OutArgument>
-      </Assign.To>
-      <Assign.Value>
-        <InArgument x:TypeArguments="x:String">[strOutputPdfPath]</InArgument>
-      </Assign.Value>
-    </Assign>
-
+    <Sequence sap2010:Annotation.AnnotationText="[SINGLE RESPONSIBILITY] Entry point router alur kerja AutoCV. Bertanggung jawab memvalidasi mode eksekusi (Smart Dual-Mode) dan mendispatch ke Pipeline 1 (Ingestion &amp; AI Synthesis) atau Pipeline 2 (Rendering &amp; Delivery) tanpa pemborosan lisensi unattended bot.&#xA;&#xA;[KONTRAK ARGUMEN]&#xA;- in_JobId (String): ID unik pekerjaan dari Web Portal (contoh: &quot;job-123&quot;).&#xA;- in_LinkedInUrl (String): URL profil publik LinkedIn (format: &quot;https://www.linkedin.com/in/...&quot;).&#xA;- in_GitHubUrl (String): URL atau username akun GitHub (contoh: &quot;https://github.com/octocat&quot; atau &quot;octocat&quot;).&#xA;- in_TargetJobRole (String): Target posisi kerja untuk pembobotan kata kunci AI (contoh: &quot;Senior Fullstack Engineer&quot;).&#xA;- in_RecipientEmail (String): Alamat email tujuan pengiriman dokumen final.&#xA;- in_ApprovedResumePayload (String): Payload JSON hasil kurasi manusia. Kunci penentu mode: jika kosong jalankan Job 1, jika terisi jalankan Job 2.&#xA;- in_WebhookBaseUrl (String): Base URL backend Web Portal (contoh: &quot;http://localhost:3000&quot;).&#xA;- in_UseMockFallback (Boolean): True = aktifkan mock fixture jika sesi eksternal offline.&#xA;- in_RequireManualApproval (Boolean): True = tahan pada status CURATING menunggu review web; False = langsung render.&#xA;- out_JobStatus (String): Status akhir eksekusi (&quot;CURATING&quot;, &quot;COMPLETED&quot;, &quot;FAILED&quot;).&#xA;- out_DraftResumePayload (String): Objek JSON draf resume hasil sintesis AI.&#xA;- out_OutputPdfPath (String): Path absolut berkas PDF hasil kompilasi." DisplayName="Workflow Scope: Main Dispatcher Sequence" sap:VirtualizedContainerService.HintSize="650,1800" sap2010:WorkflowViewState.IdRef="Sequence_WorkflowScope">
+      <sap:WorkflowViewStateService.ViewState>
+        <scg:Dictionary x:TypeArguments="x:String, x:Object">
+          <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+          <x:Boolean x:Key="IsAnnotationDocked">True</x:Boolean>
+        </scg:Dictionary>
+      </sap:WorkflowViewStateService.ViewState>
+      <Assign DisplayName="Initialize job status" sap:VirtualizedContainerService.HintSize="616,113.6" sap2010:WorkflowViewState.IdRef="Assign_5">
+        <Assign.To>
+          <OutArgument x:TypeArguments="x:String">[strJobStatus]</OutArgument>
+        </Assign.To>
+        <Assign.Value>
+          <InArgument x:TypeArguments="x:String">["PENDING"]</InArgument>
+        </Assign.Value>
+      </Assign>
+      <Assign DisplayName="Initialize output path" sap:VirtualizedContainerService.HintSize="616,113.6" sap2010:WorkflowViewState.IdRef="Assign_6">
+        <Assign.To>
+          <OutArgument x:TypeArguments="x:String">[strOutputPdfPath]</OutArgument>
+        </Assign.To>
+        <Assign.Value>
+          <InArgument x:TypeArguments="x:String">[""]</InArgument>
+        </Assign.Value>
+      </Assign>
+      <Assign sap2010:Annotation.AnnotationText="[LOGIKA BISNIS] Memeriksa apakah in_ApprovedResumePayload terisi. Jika kosong berarti alur berjalan sebagai Job 1 (Ingestion &amp; AI Synthesis). Jika terisi berarti alur berjalan sebagai Job 2 (Rendering DOCX/PDF &amp; Delivery)." DisplayName="Determine if Job 2 is triggered" sap:VirtualizedContainerService.HintSize="616,113.6" sap2010:WorkflowViewState.IdRef="Assign_DetermineJob2">
+        <sap:WorkflowViewStateService.ViewState>
+          <scg:Dictionary x:TypeArguments="x:String, x:Object">
+            <x:Boolean x:Key="IsAnnotationDocked">True</x:Boolean>
+          </scg:Dictionary>
+        </sap:WorkflowViewStateService.ViewState>
+        <Assign.To>
+          <OutArgument x:TypeArguments="x:Boolean">[boolIsJob2]</OutArgument>
+        </Assign.To>
+        <Assign.Value>
+          <InArgument x:TypeArguments="x:Boolean">[Not String.IsNullOrWhiteSpace(in_ApprovedResumePayload)]</InArgument>
+        </Assign.Value>
+      </Assign>
+      <ui:LogMessage DisplayName="Log execution mode" sap:VirtualizedContainerService.HintSize="616,141" sap2010:WorkflowViewState.IdRef="LogMessage_Mode" Level="Info" Message="[&quot;[Main Dispatcher] Execution Mode: &quot; &amp; If(boolIsJob2, &quot;JOB 2 (Rendering DOCX/PDF &amp; Delivery)&quot;, &quot;JOB 1 (Ingestion &amp; AI Synthesis)&quot;) &amp; &quot; | JobId: &quot; &amp; in_JobId &amp; &quot; | Webhook: &quot; &amp; in_WebhookBaseUrl]" />
+      <If sap2010:Annotation.AnnotationText="[PERCABANGAN LOGIKA] Smart Dual-Mode Dispatcher: Mengecek nilai boolIsJob2.&#xA;- Then: Jalankan Pipeline_RenderAndDeliver (Job 2) untuk mencetak dokumen &amp; kirim email.&#xA;- Else: Jalankan Pipeline_IngestionAndSynthesis (Job 1) untuk ekstraksi data &amp; AI synthesis." Condition="[boolIsJob2]" DisplayName="Smart Dual-Mode Dispatcher" sap:VirtualizedContainerService.HintSize="616,1400" sap2010:WorkflowViewState.IdRef="If_SmartDualMode">
+        <sap:WorkflowViewStateService.ViewState>
+          <scg:Dictionary x:TypeArguments="x:String, x:Object">
+            <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+            <x:Boolean x:Key="IsAnnotationDocked">True</x:Boolean>
+          </scg:Dictionary>
+        </sap:WorkflowViewStateService.ViewState>
+        <If.Then>
+          <Sequence DisplayName="Job 2 Dispatch Sequence" sap:VirtualizedContainerService.HintSize="468,300" sap2010:WorkflowViewState.IdRef="Sequence_Job2Dispatch">
+            <ui:LogMessage DisplayName="Log Job 2 dispatch" sap:VirtualizedContainerService.HintSize="434,141" sap2010:WorkflowViewState.IdRef="LogMessage_Job2Dispatch" Level="Info" Message="[&quot;[Main Dispatcher] Invoking Pipeline_RenderAndDeliver for Job 2.&quot;]" />
+            <ui:InvokeWorkflowFile ArgumentsVariable="{x:Null}" sap2010:Annotation.AnnotationText="[SUB-WORKFLOW] Mengorkestrasi pembuatan dokumen OpenXML DOCX &amp; PDF ATS, pengiriman email hasil akhir, dan notifikasi Webhook /complete ke Web Portal." DisplayName="Invoke Pipeline_RenderAndDeliver workflow" sap:VirtualizedContainerService.HintSize="434,113.6" sap2010:WorkflowViewState.IdRef="Invoke_PipelineRenderAndDeliver_Job2" UnSafe="False" WorkflowFileName="Modules\Pipelines\Pipeline_RenderAndDeliver.xaml">
+              <sap:WorkflowViewStateService.ViewState>
+                <scg:Dictionary x:TypeArguments="x:String, x:Object">
+                  <x:Boolean x:Key="IsAnnotationDocked">True</x:Boolean>
+                </scg:Dictionary>
+              </sap:WorkflowViewStateService.ViewState>
+              <ui:InvokeWorkflowFile.Arguments>
+                <InArgument x:TypeArguments="x:String" x:Key="in_JobId">[in_JobId]</InArgument>
+                <InArgument x:TypeArguments="x:String" x:Key="in_ApprovedResumePayload">[in_ApprovedResumePayload]</InArgument>
+                <InArgument x:TypeArguments="x:String" x:Key="in_RecipientEmail">[in_RecipientEmail]</InArgument>
+                <InArgument x:TypeArguments="x:String" x:Key="in_WebhookBaseUrl">[in_WebhookBaseUrl]</InArgument>
+                <OutArgument x:TypeArguments="x:String" x:Key="out_JobStatus">[strJobStatus]</OutArgument>
+                <OutArgument x:TypeArguments="x:String" x:Key="out_OutputPdfPath">[strOutputPdfPath]</OutArgument>
+              </ui:InvokeWorkflowFile.Arguments>
+            </ui:InvokeWorkflowFile>
+          </Sequence>
+        </If.Then>
+        <If.Else>
+          <Sequence DisplayName="Job 1 Dispatch Sequence" sap:VirtualizedContainerService.HintSize="468,900" sap2010:WorkflowViewState.IdRef="Sequence_Job1Dispatch">
+            <ui:LogMessage DisplayName="Log Job 1 dispatch" sap:VirtualizedContainerService.HintSize="434,141" sap2010:WorkflowViewState.IdRef="LogMessage_Job1Dispatch" Level="Info" Message="[&quot;[Main Dispatcher] Invoking Pipeline_IngestionAndSynthesis for Job 1.&quot;]" />
+            <ui:InvokeWorkflowFile ArgumentsVariable="{x:Null}" sap2010:Annotation.AnnotationText="[SUB-WORKFLOW] Mengorkestrasi validasi masukan regex, ekstraksi LinkedIn &amp; GitHub, perumusan portofolio AI STAR/XYZ, dan pengiriman draf ke Webhook /draft." DisplayName="Invoke Pipeline_IngestionAndSynthesis workflow" sap:VirtualizedContainerService.HintSize="434,113.6" sap2010:WorkflowViewState.IdRef="Invoke_PipelineIngestionAndSynthesis" UnSafe="False" WorkflowFileName="Modules\Pipelines\Pipeline_IngestionAndSynthesis.xaml">
+              <sap:WorkflowViewStateService.ViewState>
+                <scg:Dictionary x:TypeArguments="x:String, x:Object">
+                  <x:Boolean x:Key="IsAnnotationDocked">True</x:Boolean>
+                </scg:Dictionary>
+              </sap:WorkflowViewStateService.ViewState>
+              <ui:InvokeWorkflowFile.Arguments>
+                <InArgument x:TypeArguments="x:String" x:Key="in_JobId">[in_JobId]</InArgument>
+                <InArgument x:TypeArguments="x:String" x:Key="in_LinkedInUrl">[in_LinkedInUrl]</InArgument>
+                <InArgument x:TypeArguments="x:String" x:Key="in_GitHubUrl">[in_GitHubUrl]</InArgument>
+                <InArgument x:TypeArguments="x:String" x:Key="in_TargetJobRole">[in_TargetJobRole]</InArgument>
+                <InArgument x:TypeArguments="x:String" x:Key="in_RecipientEmail">[in_RecipientEmail]</InArgument>
+                <InArgument x:TypeArguments="x:String" x:Key="in_WebhookBaseUrl">[in_WebhookBaseUrl]</InArgument>
+                <InArgument x:TypeArguments="x:Boolean" x:Key="in_UseMockFallback">[in_UseMockFallback]</InArgument>
+                <InArgument x:TypeArguments="x:Boolean" x:Key="in_RequireManualApproval">[in_RequireManualApproval]</InArgument>
+                <OutArgument x:TypeArguments="x:String" x:Key="out_JobStatus">[strJobStatus]</OutArgument>
+                <OutArgument x:TypeArguments="x:String" x:Key="out_DraftResumePayload">[strDraftPayload]</OutArgument>
+                <OutArgument x:TypeArguments="x:String" x:Key="out_NormalizedEmail">[strNormalizedEmail]</OutArgument>
+                <OutArgument x:TypeArguments="x:Boolean" x:Key="out_ShouldProceedToDelivery">[boolShouldAutoDeliver]</OutArgument>
+              </ui:InvokeWorkflowFile.Arguments>
+            </ui:InvokeWorkflowFile>
+            <Assign DisplayName="Expose draft payload to Orchestrator output" sap:VirtualizedContainerService.HintSize="434,113.6" sap2010:WorkflowViewState.IdRef="Assign_ExposeDraftPayload">
+              <Assign.To>
+                <OutArgument x:TypeArguments="x:String">[out_DraftResumePayload]</OutArgument>
+              </Assign.To>
+              <Assign.Value>
+                <InArgument x:TypeArguments="x:String">[strDraftPayload]</InArgument>
+              </Assign.Value>
+            </Assign>
+            <If sap2010:Annotation.AnnotationText="[LOGIKA BISNIS] Mengecek apakah opsi persetujuan manual dimatikan (in_RequireManualApproval=False). Jika False, alur langsung meluncurkan Pipeline_RenderAndDeliver secara otomatis tanpa menunggu persetujuan di Web Portal." Condition="[boolShouldAutoDeliver]" DisplayName="Check if auto-approval proceeds to delivery" sap:VirtualizedContainerService.HintSize="434,400" sap2010:WorkflowViewState.IdRef="If_AutoDeliverBranch">
+              <sap:WorkflowViewStateService.ViewState>
+                <scg:Dictionary x:TypeArguments="x:String, x:Object">
+                  <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+                  <x:Boolean x:Key="IsAnnotationDocked">True</x:Boolean>
+                </scg:Dictionary>
+              </sap:WorkflowViewStateService.ViewState>
+              <If.Then>
+                <Sequence DisplayName="Auto Deliver Sequence" sap:VirtualizedContainerService.HintSize="416,250" sap2010:WorkflowViewState.IdRef="Sequence_AutoDeliver">
+                  <ui:LogMessage DisplayName="Log auto-delivery dispatch" sap:VirtualizedContainerService.HintSize="382,141" sap2010:WorkflowViewState.IdRef="LogMessage_AutoDeliver" Level="Info" Message="[&quot;[Main Dispatcher] in_RequireManualApproval=False. Proceeding immediately to Pipeline_RenderAndDeliver.&quot;]" />
+                  <ui:InvokeWorkflowFile ArgumentsVariable="{x:Null}" DisplayName="Invoke Pipeline_RenderAndDeliver for Auto-Approve" sap:VirtualizedContainerService.HintSize="382,113.6" sap2010:WorkflowViewState.IdRef="Invoke_PipelineRenderAndDeliver_Auto" UnSafe="False" WorkflowFileName="Modules\Pipelines\Pipeline_RenderAndDeliver.xaml">
+                    <ui:InvokeWorkflowFile.Arguments>
+                      <InArgument x:TypeArguments="x:String" x:Key="in_JobId">[in_JobId]</InArgument>
+                      <InArgument x:TypeArguments="x:String" x:Key="in_ApprovedResumePayload">[strDraftPayload]</InArgument>
+                      <InArgument x:TypeArguments="x:String" x:Key="in_RecipientEmail">[strNormalizedEmail]</InArgument>
+                      <InArgument x:TypeArguments="x:String" x:Key="in_WebhookBaseUrl">[in_WebhookBaseUrl]</InArgument>
+                      <OutArgument x:TypeArguments="x:String" x:Key="out_JobStatus">[strJobStatus]</OutArgument>
+                      <OutArgument x:TypeArguments="x:String" x:Key="out_OutputPdfPath">[strOutputPdfPath]</OutArgument>
+                    </ui:InvokeWorkflowFile.Arguments>
+                  </ui:InvokeWorkflowFile>
+                </Sequence>
+              </If.Then>
+            </If>
+          </Sequence>
+        </If.Else>
+      </If>
+      <Assign DisplayName="Expose final job status" sap:VirtualizedContainerService.HintSize="616,113.6" sap2010:WorkflowViewState.IdRef="Assign_FinalStatus">
+        <Assign.To>
+          <OutArgument x:TypeArguments="x:String">[out_JobStatus]</OutArgument>
+        </Assign.To>
+        <Assign.Value>
+          <InArgument x:TypeArguments="x:String">[strJobStatus]</InArgument>
+        </Assign.Value>
+      </Assign>
+      <Assign DisplayName="Expose final PDF output path" sap:VirtualizedContainerService.HintSize="616,113.6" sap2010:WorkflowViewState.IdRef="Assign_FinalOutPdf">
+        <Assign.To>
+          <OutArgument x:TypeArguments="x:String">[out_OutputPdfPath]</OutArgument>
+        </Assign.To>
+        <Assign.Value>
+          <InArgument x:TypeArguments="x:String">[strOutputPdfPath]</InArgument>
+        </Assign.Value>
+      </Assign>
+    </Sequence>
     <ui:LogMessage DisplayName="Publish run outcome" sap:VirtualizedContainerService.HintSize="616,141" sap2010:WorkflowViewState.IdRef="LogMessage_12" Level="Info" Message="[&quot;[Main Dispatcher] RUN ENDED NORMALLY: execution finished with status &quot; &amp; strJobStatus &amp; &quot;. This is a normal end of run, not a crash or force exit.&quot;]" />
   </Sequence>
 </Activity>

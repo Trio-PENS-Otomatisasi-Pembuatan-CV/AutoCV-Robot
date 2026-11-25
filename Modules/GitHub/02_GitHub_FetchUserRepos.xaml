@@ -79,7 +79,7 @@
       <AssemblyReference>System.IO.FileSystem.DriveInfo</AssemblyReference>
     </sco:Collection>
   </TextExpression.ReferencesForImplementation>
-  <Sequence sap2010:Annotation.AnnotationText="[SINGLE RESPONSIBILITY] Mengambil data repositori publik kandidat dari GitHub (stars, forks, bahasa pemrograman, deskripsi, topik) melalui skrip runner RunGitHubFetch.ps1. Dilengkapi penanganan toleransi kesalahan otomatis beralih ke mock fixture lokal jika terjadi rate limit (HTTP 403) atau ketiadaan koneksi.&#xA;&#xA;[KONTRAK ARGUMEN]&#xA;- in_GitHubUsername (String): Username atau URL profil GitHub (contoh: &quot;octocat&quot; atau &quot;https://github.com/octocat&quot;).&#xA;- in_GitHubToken (String opsional): Token Personal Access Token untuk kuota API lebih tinggi.&#xA;- in_UseMockFallback (Boolean): True = gunakan mock fixture jika API eksternal gagal.&#xA;- out_GitHubReposJson (String): Objek JSON terstruktur data profil dan repositori GitHub.&#xA;- out_FetchStatus (String): Status eksekusi (&quot;SUCCESS_LIVE&quot; atau &quot;SUCCESS_MOCK_FALLBACK&quot;)." DisplayName="02_GitHub_FetchUserRepos" sap:VirtualizedContainerService.HintSize="688,2800" sap2010:WorkflowViewState.IdRef="Sequence_1">
+  <Sequence sap2010:Annotation.AnnotationText="[SINGLE RESPONSIBILITY] Mengambil data repositori publik kandidat dari GitHub (stars, forks, bahasa pemrograman, deskripsi, topik) melalui skrip runner RunGitHubFetch.ps1. Dilengkapi penanganan toleransi kesalahan otomatis beralih ke mock fixture lokal jika terjadi rate limit (HTTP 403) atau ketiadaan koneksi. (Lihat Workflow Scope di dalam untuk detail kontrak argumen)." DisplayName="02_GitHub_FetchUserRepos" sap:VirtualizedContainerService.HintSize="688,2800" sap2010:WorkflowViewState.IdRef="Sequence_1">
     <Sequence.Variables>
       <Variable x:TypeArguments="x:String" Name="strGitHubInput" />
       <Variable x:TypeArguments="x:String" Name="strGitHubToken" />
@@ -96,154 +96,222 @@
     <sap:WorkflowViewStateService.ViewState>
       <scg:Dictionary x:TypeArguments="x:String, x:Object">
         <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+        <x:Boolean x:Key="IsAnnotationDocked">True</x:Boolean>
       </scg:Dictionary>
     </sap:WorkflowViewStateService.ViewState>
+    <Sequence sap2010:Annotation.AnnotationText="[SINGLE RESPONSIBILITY] Mengambil data repositori publik kandidat dari GitHub (stars, forks, bahasa pemrograman, deskripsi, topik) melalui skrip runner RunGitHubFetch.ps1. Dilengkapi penanganan toleransi kesalahan otomatis beralih ke mock fixture lokal jika terjadi rate limit (HTTP 403) atau ketiadaan koneksi.&#xA;&#xA;[KONTRAK ARGUMEN]&#xA;- in_GitHubUsername (String): Username atau URL profil GitHub (contoh: &quot;octocat&quot; atau &quot;https://github.com/octocat&quot;).&#xA;- in_GitHubToken (String opsional): Token Personal Access Token untuk kuota API lebih tinggi.&#xA;- in_UseMockFallback (Boolean): True = gunakan mock fixture jika API eksternal gagal.&#xA;- out_GitHubReposJson (String): Objek JSON terstruktur data profil dan repositori GitHub.&#xA;- out_FetchStatus (String): Status eksekusi (&quot;SUCCESS_LIVE&quot; atau &quot;SUCCESS_MOCK_FALLBACK&quot;)." DisplayName="Workflow Scope: 02_GitHub_FetchUserRepos" sap:VirtualizedContainerService.HintSize="650,1800" sap2010:WorkflowViewState.IdRef="Sequence_WorkflowScope">
+      <sap:WorkflowViewStateService.ViewState>
+        <scg:Dictionary x:TypeArguments="x:String, x:Object">
+          <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+          <x:Boolean x:Key="IsAnnotationDocked">True</x:Boolean>
+        </scg:Dictionary>
+      </sap:WorkflowViewStateService.ViewState>
+      <!-- 1. Normalize and Initialize Inputs -->
+      <Assign DisplayName="Normalize GitHub Input" sap:VirtualizedContainerService.HintSize="626,113.6" sap2010:WorkflowViewState.IdRef="Assign_1">
+        <Assign.To>
+          <OutArgument x:TypeArguments="x:String">[strGitHubInput]</OutArgument>
+        </Assign.To>
+        <Assign.Value>
+          <InArgument x:TypeArguments="x:String">[If(String.IsNullOrWhiteSpace(in_GitHubUsername), "", in_GitHubUsername.Trim())]</InArgument>
+        </Assign.Value>
+      </Assign>
 
-    <!-- 1. Normalize and Initialize Inputs -->
-    <Assign DisplayName="Normalize GitHub Input" sap:VirtualizedContainerService.HintSize="626,113.6" sap2010:WorkflowViewState.IdRef="Assign_1">
-      <Assign.To>
-        <OutArgument x:TypeArguments="x:String">[strGitHubInput]</OutArgument>
-      </Assign.To>
-      <Assign.Value>
-        <InArgument x:TypeArguments="x:String">[If(String.IsNullOrWhiteSpace(in_GitHubUsername), "", in_GitHubUsername.Trim())]</InArgument>
-      </Assign.Value>
-    </Assign>
+      <Assign DisplayName="Normalize GitHub Token" sap:VirtualizedContainerService.HintSize="626,113.6" sap2010:WorkflowViewState.IdRef="Assign_2">
+        <Assign.To>
+          <OutArgument x:TypeArguments="x:String">[strGitHubToken]</OutArgument>
+        </Assign.To>
+        <Assign.Value>
+          <InArgument x:TypeArguments="x:String">[If(String.IsNullOrWhiteSpace(in_GitHubToken), "", in_GitHubToken.Trim())]</InArgument>
+        </Assign.Value>
+      </Assign>
 
-    <Assign DisplayName="Normalize GitHub Token" sap:VirtualizedContainerService.HintSize="626,113.6" sap2010:WorkflowViewState.IdRef="Assign_2">
-      <Assign.To>
-        <OutArgument x:TypeArguments="x:String">[strGitHubToken]</OutArgument>
-      </Assign.To>
-      <Assign.Value>
-        <InArgument x:TypeArguments="x:String">[If(String.IsNullOrWhiteSpace(in_GitHubToken), "", in_GitHubToken.Trim())]</InArgument>
-      </Assign.Value>
-    </Assign>
+      <Assign DisplayName="Set Mock Fallback Policy" sap:VirtualizedContainerService.HintSize="626,113.6" sap2010:WorkflowViewState.IdRef="Assign_3">
+        <Assign.To>
+          <OutArgument x:TypeArguments="x:Boolean">[boolUseMockFallback]</OutArgument>
+        </Assign.To>
+        <Assign.Value>
+          <InArgument x:TypeArguments="x:Boolean">[in_UseMockFallback]</InArgument>
+        </Assign.Value>
+      </Assign>
 
-    <Assign DisplayName="Set Mock Fallback Policy" sap:VirtualizedContainerService.HintSize="626,113.6" sap2010:WorkflowViewState.IdRef="Assign_3">
-      <Assign.To>
-        <OutArgument x:TypeArguments="x:Boolean">[boolUseMockFallback]</OutArgument>
-      </Assign.To>
-      <Assign.Value>
-        <InArgument x:TypeArguments="x:Boolean">[in_UseMockFallback]</InArgument>
-      </Assign.Value>
-    </Assign>
+      <Assign DisplayName="Set Script Path" sap:VirtualizedContainerService.HintSize="626,113.6" sap2010:WorkflowViewState.IdRef="Assign_4">
+        <Assign.To>
+          <OutArgument x:TypeArguments="x:String">[strScriptPath]</OutArgument>
+        </Assign.To>
+        <Assign.Value>
+          <InArgument x:TypeArguments="x:String">["Data\Scripts\GitHub\RunGitHubFetch.ps1"]</InArgument>
+        </Assign.Value>
+      </Assign>
 
-    <Assign DisplayName="Set Script Path" sap:VirtualizedContainerService.HintSize="626,113.6" sap2010:WorkflowViewState.IdRef="Assign_4">
-      <Assign.To>
-        <OutArgument x:TypeArguments="x:String">[strScriptPath]</OutArgument>
-      </Assign.To>
-      <Assign.Value>
-        <InArgument x:TypeArguments="x:String">["Data\Scripts\GitHub\RunGitHubFetch.ps1"]</InArgument>
-      </Assign.Value>
-    </Assign>
+      <Assign DisplayName="Set Output Directory" sap:VirtualizedContainerService.HintSize="626,113.6" sap2010:WorkflowViewState.IdRef="Assign_5">
+        <Assign.To>
+          <OutArgument x:TypeArguments="x:String">[strOutputDir]</OutArgument>
+        </Assign.To>
+        <Assign.Value>
+          <InArgument x:TypeArguments="x:String">["Data\Outputs"]</InArgument>
+        </Assign.Value>
+      </Assign>
 
-    <Assign DisplayName="Set Output Directory" sap:VirtualizedContainerService.HintSize="626,113.6" sap2010:WorkflowViewState.IdRef="Assign_5">
-      <Assign.To>
-        <OutArgument x:TypeArguments="x:String">[strOutputDir]</OutArgument>
-      </Assign.To>
-      <Assign.Value>
-        <InArgument x:TypeArguments="x:String">["Data\Outputs"]</InArgument>
-      </Assign.Value>
-    </Assign>
+      <Assign DisplayName="Set Result File Path" sap:VirtualizedContainerService.HintSize="626,113.6" sap2010:WorkflowViewState.IdRef="Assign_6">
+        <Assign.To>
+          <OutArgument x:TypeArguments="x:String">[strResultFilePath]</OutArgument>
+        </Assign.To>
+        <Assign.Value>
+          <InArgument x:TypeArguments="x:String">[System.IO.Path.Combine(strOutputDir, "github_repos_result.json")]</InArgument>
+        </Assign.Value>
+      </Assign>
 
-    <Assign DisplayName="Set Result File Path" sap:VirtualizedContainerService.HintSize="626,113.6" sap2010:WorkflowViewState.IdRef="Assign_6">
-      <Assign.To>
-        <OutArgument x:TypeArguments="x:String">[strResultFilePath]</OutArgument>
-      </Assign.To>
-      <Assign.Value>
-        <InArgument x:TypeArguments="x:String">[System.IO.Path.Combine(strOutputDir, "github_repos_result.json")]</InArgument>
-      </Assign.Value>
-    </Assign>
+      <ui:LogMessage DisplayName="Log Start GitHub Ingestion" sap:VirtualizedContainerService.HintSize="626,141" sap2010:WorkflowViewState.IdRef="LogMessage_1" Level="Info" Message="[&quot;[02_GitHub_FetchUserRepos] Starting repository ingestion for: &quot; &amp; strGitHubInput &amp; &quot; (MockFallback: &quot; &amp; boolUseMockFallback.ToString() &amp; &quot;)&quot;]" />
 
-    <ui:LogMessage DisplayName="Log Start GitHub Ingestion" sap:VirtualizedContainerService.HintSize="626,141" sap2010:WorkflowViewState.IdRef="LogMessage_1" Level="Info" Message="[&quot;[02_GitHub_FetchUserRepos] Starting repository ingestion for: &quot; &amp; strGitHubInput &amp; &quot; (MockFallback: &quot; &amp; boolUseMockFallback.ToString() &amp; &quot;)&quot;]" />
+      <!-- 2. Ensure Output Directory Exists -->
+      <Assign DisplayName="Check Directory Existence" sap:VirtualizedContainerService.HintSize="626,113.6" sap2010:WorkflowViewState.IdRef="Assign_7">
+        <Assign.To>
+          <OutArgument x:TypeArguments="x:Boolean">[boolOutputDirExists]</OutArgument>
+        </Assign.To>
+        <Assign.Value>
+          <InArgument x:TypeArguments="x:Boolean">[System.IO.Directory.Exists(strOutputDir)]</InArgument>
+        </Assign.Value>
+      </Assign>
 
-    <!-- 2. Ensure Output Directory Exists -->
-    <Assign DisplayName="Check Directory Existence" sap:VirtualizedContainerService.HintSize="626,113.6" sap2010:WorkflowViewState.IdRef="Assign_7">
-      <Assign.To>
-        <OutArgument x:TypeArguments="x:Boolean">[boolOutputDirExists]</OutArgument>
-      </Assign.To>
-      <Assign.Value>
-        <InArgument x:TypeArguments="x:Boolean">[System.IO.Directory.Exists(strOutputDir)]</InArgument>
-      </Assign.Value>
-    </Assign>
+      <If Condition="[Not boolOutputDirExists]" DisplayName="Create Directory If Missing" sap:VirtualizedContainerService.HintSize="626,260" sap2010:WorkflowViewState.IdRef="If_1">
+        <If.Then>
+          <ui:CreateDirectory ContinueOnError="{x:Null}" Output="{x:Null}" DisplayName="Create Output Directory" sap:VirtualizedContainerService.HintSize="334,80" sap2010:WorkflowViewState.IdRef="CreateDirectory_1" Path="[strOutputDir]" />
+        </If.Then>
+      </If>
 
-    <If Condition="[Not boolOutputDirExists]" DisplayName="Create Directory If Missing" sap:VirtualizedContainerService.HintSize="626,260" sap2010:WorkflowViewState.IdRef="If_1">
-      <If.Then>
-        <ui:CreateDirectory ContinueOnError="{x:Null}" Output="{x:Null}" DisplayName="Create Output Directory" sap:VirtualizedContainerService.HintSize="334,80" sap2010:WorkflowViewState.IdRef="CreateDirectory_1" Path="[strOutputDir]" />
-      </If.Then>
-    </If>
+      <!-- 3. Precondition: Check Empty Input -->
+      <If Condition="[String.IsNullOrWhiteSpace(strGitHubInput)]" sap2010:Annotation.AnnotationText="[PERCABANGAN LOGIKA] Mengecek apakah input akun GitHub terisi. Jika kosong, alur otomatis memuat berkas mock Data/Mocks/mock_github_repos.json dan menetapkan status SUCCESS_MOCK_FALLBACK." DisplayName="Check If Input Is Empty" sap:VirtualizedContainerService.HintSize="626,500" sap2010:WorkflowViewState.IdRef="If_2">
+        <sap:WorkflowViewStateService.ViewState>
+          <scg:Dictionary x:TypeArguments="x:String, x:Object">
+            <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+            <x:Boolean x:Key="IsAnnotationDocked">True</x:Boolean>
+          </scg:Dictionary>
+        </sap:WorkflowViewStateService.ViewState>
+        <If.Then>
+          <Sequence DisplayName="Handle Empty Input Fallback" sap:VirtualizedContainerService.HintSize="449.6,350" sap2010:WorkflowViewState.IdRef="Sequence_2">
+            <sap:WorkflowViewStateService.ViewState>
+              <scg:Dictionary x:TypeArguments="x:String, x:Object">
+                <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+              </scg:Dictionary>
+            </sap:WorkflowViewStateService.ViewState>
+            <ui:LogMessage DisplayName="Log Empty Input Fallback" sap:VirtualizedContainerService.HintSize="416,141" sap2010:WorkflowViewState.IdRef="LogMessage_2" Level="Warn" Message="[&quot;[02_GitHub_FetchUserRepos] No GitHub username or URL provided. Loading mock data fallback.&quot;]" />
+            <ui:ReadTextFile File="{x:Null}" Content="[strReposJson]" DisplayName="Read Mock GitHub File" FileName="Data\Mocks\mock_github_repos.json" sap:VirtualizedContainerService.HintSize="416,80" sap2010:WorkflowViewState.IdRef="ReadTextFile_1" />
+            <Assign DisplayName="Set Mock Status" sap:VirtualizedContainerService.HintSize="416,60" sap2010:WorkflowViewState.IdRef="Assign_8">
+              <Assign.To>
+                <OutArgument x:TypeArguments="x:String">[strFetchStatus]</OutArgument>
+              </Assign.To>
+              <Assign.Value>
+                <InArgument x:TypeArguments="x:String">["SUCCESS_MOCK_FALLBACK"]</InArgument>
+              </Assign.Value>
+            </Assign>
+          </Sequence>
+        </If.Then>
+        <If.Else>
+          <!-- 4. Execution via PowerShell Runner -->
+          <TryCatch sap2010:Annotation.AnnotationText="[PENANGANAN ERROR] Mencoba mengeksekusi PowerShell runner RunGitHubFetch.ps1. Jika terjadi kegagalan eksekusi skrip atau timeout, blok Catch menangkap exception dan mengalihkan alur ke mock fallback tanpa menggagalkan job robot." DisplayName="Try Fetch GitHub Repos via Runner" sap:VirtualizedContainerService.HintSize="516,750" sap2010:WorkflowViewState.IdRef="TryCatch_1">
+            <sap:WorkflowViewStateService.ViewState>
+              <scg:Dictionary x:TypeArguments="x:String, x:Object">
+                <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+                <x:Boolean x:Key="IsAnnotationDocked">True</x:Boolean>
+              </scg:Dictionary>
+            </sap:WorkflowViewStateService.ViewState>
+            <TryCatch.Try>
+              <Sequence DisplayName="Execute GitHub Fetch Runner" sap:VirtualizedContainerService.HintSize="480,520" sap2010:WorkflowViewState.IdRef="Sequence_3">
+                <sap:WorkflowViewStateService.ViewState>
+                  <scg:Dictionary x:TypeArguments="x:String, x:Object">
+                    <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+                  </scg:Dictionary>
+                </sap:WorkflowViewStateService.ViewState>
 
-    <!-- 3. Precondition: Check Empty Input -->
-    <If Condition="[String.IsNullOrWhiteSpace(strGitHubInput)]" sap2010:Annotation.AnnotationText="[PERCABANGAN LOGIKA] Mengecek apakah input akun GitHub terisi. Jika kosong, alur otomatis memuat berkas mock Data/Mocks/mock_github_repos.json dan menetapkan status SUCCESS_MOCK_FALLBACK." DisplayName="Check If Input Is Empty" sap:VirtualizedContainerService.HintSize="626,500" sap2010:WorkflowViewState.IdRef="If_2">
-      <If.Then>
-        <Sequence DisplayName="Handle Empty Input Fallback" sap:VirtualizedContainerService.HintSize="449.6,350" sap2010:WorkflowViewState.IdRef="Sequence_2">
-          <sap:WorkflowViewStateService.ViewState>
-            <scg:Dictionary x:TypeArguments="x:String, x:Object">
-              <x:Boolean x:Key="IsExpanded">True</x:Boolean>
-            </scg:Dictionary>
-          </sap:WorkflowViewStateService.ViewState>
-          <ui:LogMessage DisplayName="Log Empty Input Fallback" sap:VirtualizedContainerService.HintSize="416,141" sap2010:WorkflowViewState.IdRef="LogMessage_2" Level="Warn" Message="[&quot;[02_GitHub_FetchUserRepos] No GitHub username or URL provided. Loading mock data fallback.&quot;]" />
-          <ui:ReadTextFile File="{x:Null}" Content="[strReposJson]" DisplayName="Read Mock GitHub File" FileName="Data\Mocks\mock_github_repos.json" sap:VirtualizedContainerService.HintSize="416,80" sap2010:WorkflowViewState.IdRef="ReadTextFile_1" />
-          <Assign DisplayName="Set Mock Status" sap:VirtualizedContainerService.HintSize="416,60" sap2010:WorkflowViewState.IdRef="Assign_8">
-            <Assign.To>
-              <OutArgument x:TypeArguments="x:String">[strFetchStatus]</OutArgument>
-            </Assign.To>
-            <Assign.Value>
-              <InArgument x:TypeArguments="x:String">["SUCCESS_MOCK_FALLBACK"]</InArgument>
-            </Assign.Value>
-          </Assign>
-        </Sequence>
-      </If.Then>
-      <If.Else>
-        <!-- 4. Execution via PowerShell Runner -->
-        <TryCatch sap2010:Annotation.AnnotationText="[PENANGANAN ERROR] Mencoba mengeksekusi PowerShell runner RunGitHubFetch.ps1. Jika terjadi kegagalan eksekusi skrip atau timeout, blok Catch menangkap exception dan mengalihkan alur ke mock fallback tanpa menggagalkan job robot." DisplayName="Try Fetch GitHub Repos via Runner" sap:VirtualizedContainerService.HintSize="516,750" sap2010:WorkflowViewState.IdRef="TryCatch_1">
-          <TryCatch.Try>
-            <Sequence DisplayName="Execute GitHub Fetch Runner" sap:VirtualizedContainerService.HintSize="480,520" sap2010:WorkflowViewState.IdRef="Sequence_3">
-              <sap:WorkflowViewStateService.ViewState>
-                <scg:Dictionary x:TypeArguments="x:String, x:Object">
-                  <x:Boolean x:Key="IsExpanded">True</x:Boolean>
-                </scg:Dictionary>
-              </sap:WorkflowViewStateService.ViewState>
+                <Assign DisplayName="Build PowerShell Command" sap:VirtualizedContainerService.HintSize="448,113.6" sap2010:WorkflowViewState.IdRef="Assign_9">
+                  <Assign.To>
+                    <OutArgument x:TypeArguments="x:String">[strRunnerCommand]</OutArgument>
+                  </Assign.To>
+                  <Assign.Value>
+                    <InArgument x:TypeArguments="x:String">[String.Format("-ExecutionPolicy Bypass -File ""{0}"" -GitHubInput ""{1}"" -GitHubToken ""{2}"" -UseMockFallback ${3} -OutputDir ""{4}""", strScriptPath, strGitHubInput, strGitHubToken, boolUseMockFallback.ToString().ToLower(), strOutputDir)]</InArgument>
+                  </Assign.Value>
+                </Assign>
 
-              <Assign DisplayName="Build PowerShell Command" sap:VirtualizedContainerService.HintSize="448,113.6" sap2010:WorkflowViewState.IdRef="Assign_9">
-                <Assign.To>
-                  <OutArgument x:TypeArguments="x:String">[strRunnerCommand]</OutArgument>
-                </Assign.To>
-                <Assign.Value>
-                  <InArgument x:TypeArguments="x:String">[String.Format("-ExecutionPolicy Bypass -File ""{0}"" -GitHubInput ""{1}"" -GitHubToken ""{2}"" -UseMockFallback ${3} -OutputDir ""{4}""", strScriptPath, strGitHubInput, strGitHubToken, boolUseMockFallback.ToString().ToLower(), strOutputDir)]</InArgument>
-                </Assign.Value>
-              </Assign>
+                <Assign DisplayName="Execute Script Runner" sap:VirtualizedContainerService.HintSize="448,113.6" sap2010:WorkflowViewState.IdRef="Assign_10">
+                  <Assign.To>
+                    <OutArgument x:TypeArguments="x:String">[strRunnerOutput]</OutArgument>
+                  </Assign.To>
+                  <Assign.Value>
+                    <InArgument x:TypeArguments="x:String">[System.Diagnostics.Process.Start(New System.Diagnostics.ProcessStartInfo("powershell.exe", strRunnerCommand) With {.RedirectStandardOutput = True, .UseShellExecute = False, .CreateNoWindow = True}).StandardOutput.ReadToEnd()]</InArgument>
+                  </Assign.Value>
+                </Assign>
 
-              <Assign DisplayName="Execute Script Runner" sap:VirtualizedContainerService.HintSize="448,113.6" sap2010:WorkflowViewState.IdRef="Assign_10">
-                <Assign.To>
-                  <OutArgument x:TypeArguments="x:String">[strRunnerOutput]</OutArgument>
-                </Assign.To>
-                <Assign.Value>
-                  <InArgument x:TypeArguments="x:String">[System.Diagnostics.Process.Start(New System.Diagnostics.ProcessStartInfo("powershell.exe", strRunnerCommand) With {.RedirectStandardOutput = True, .UseShellExecute = False, .CreateNoWindow = True}).StandardOutput.ReadToEnd()]</InArgument>
-                </Assign.Value>
-              </Assign>
+                <If Condition="[System.IO.File.Exists(strResultFilePath)]" DisplayName="Read Result From File Or Output" sap:VirtualizedContainerService.HintSize="448,220" sap2010:WorkflowViewState.IdRef="If_3">
+                  <If.Then>
+                    <ui:ReadTextFile File="{x:Null}" Content="[strReposJson]" DisplayName="Read Result Output File" Encoding="utf-8" FileName="[strResultFilePath]" sap:VirtualizedContainerService.HintSize="334,80" sap2010:WorkflowViewState.IdRef="ReadTextFile_2" />
+                  </If.Then>
+                  <If.Else>
+                    <Assign DisplayName="Use Process Stdout" sap:VirtualizedContainerService.HintSize="262,60" sap2010:WorkflowViewState.IdRef="Assign_11">
+                      <Assign.To>
+                        <OutArgument x:TypeArguments="x:String">[strReposJson]</OutArgument>
+                      </Assign.To>
+                      <Assign.Value>
+                        <InArgument x:TypeArguments="x:String">[strRunnerOutput]</InArgument>
+                      </Assign.Value>
+                    </Assign>
+                  </If.Else>
+                </If>
 
-              <If Condition="[System.IO.File.Exists(strResultFilePath)]" DisplayName="Read Result From File Or Output" sap:VirtualizedContainerService.HintSize="448,220" sap2010:WorkflowViewState.IdRef="If_3">
-                <If.Then>
-                  <ui:ReadTextFile File="{x:Null}" Content="[strReposJson]" DisplayName="Read Result Output File" Encoding="utf-8" FileName="[strResultFilePath]" sap:VirtualizedContainerService.HintSize="334,80" sap2010:WorkflowViewState.IdRef="ReadTextFile_2" />
-                </If.Then>
-                <If.Else>
-                  <Assign DisplayName="Use Process Stdout" sap:VirtualizedContainerService.HintSize="262,60" sap2010:WorkflowViewState.IdRef="Assign_11">
-                    <Assign.To>
-                      <OutArgument x:TypeArguments="x:String">[strReposJson]</OutArgument>
-                    </Assign.To>
-                    <Assign.Value>
-                      <InArgument x:TypeArguments="x:String">[strRunnerOutput]</InArgument>
-                    </Assign.Value>
-                  </Assign>
-                </If.Else>
-              </If>
-
-              <If Condition="[Not (strReposJson IsNot Nothing AndAlso strReposJson.Trim().Trim(System.Convert.ToChar(65279)).Trim().StartsWith(&quot;{&quot;))]" sap2010:Annotation.AnnotationText="[PERCABANGAN LOGIKA] Memvalidasi apakah output runner menghasilkan format JSON yang valid. Jika output kosong atau bukan JSON, alur otomatis beralih ke mock fallback." DisplayName="Validate Runner Output Is JSON" sap:VirtualizedContainerService.HintSize="448,360" sap2010:WorkflowViewState.IdRef="If_4">
-                <If.Then>
-                  <Sequence DisplayName="Fallback To Mock On Invalid Output" sap:VirtualizedContainerService.HintSize="416,260" sap2010:WorkflowViewState.IdRef="Sequence_5">
-                    <ui:LogMessage DisplayName="Log Invalid Runner Output" sap:VirtualizedContainerService.HintSize="416,141" sap2010:WorkflowViewState.IdRef="LogMessage_5" Level="Warn" Message="[&quot;[02_GitHub_FetchUserRepos] Runner returned no usable JSON (length=&quot; &amp; If(strReposJson Is Nothing, &quot;0&quot;, strReposJson.Length.ToString()) &amp; &quot;). Falling back to Data/Mocks/mock_github_repos.json - verify node.js is on PATH and that RunGitHubFetch.ps1 completed.&quot;]" />
-                    <ui:ReadTextFile File="{x:Null}" Content="[strReposJson]" DisplayName="Read Mock On Invalid Output" Encoding="utf-8" FileName="Data\Mocks\mock_github_repos.json" sap:VirtualizedContainerService.HintSize="416,80" sap2010:WorkflowViewState.IdRef="ReadTextFile_4" />
-                    <Assign DisplayName="Set Fallback Status On Invalid Output" sap:VirtualizedContainerService.HintSize="416,60" sap2010:WorkflowViewState.IdRef="Assign_16">
+                <If Condition="[Not (strReposJson IsNot Nothing AndAlso strReposJson.Trim().Trim(System.Convert.ToChar(65279)).Trim().StartsWith(&quot;{&quot;))]" sap2010:Annotation.AnnotationText="[PERCABANGAN LOGIKA] Memvalidasi apakah output runner menghasilkan format JSON yang valid. Jika output kosong atau bukan JSON, alur otomatis beralih ke mock fallback." DisplayName="Validate Runner Output Is JSON" sap:VirtualizedContainerService.HintSize="448,360" sap2010:WorkflowViewState.IdRef="If_4">
+                  <sap:WorkflowViewStateService.ViewState>
+                    <scg:Dictionary x:TypeArguments="x:String, x:Object">
+                      <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+                      <x:Boolean x:Key="IsAnnotationDocked">True</x:Boolean>
+                    </scg:Dictionary>
+                  </sap:WorkflowViewStateService.ViewState>
+                  <If.Then>
+                    <Sequence DisplayName="Fallback To Mock On Invalid Output" sap:VirtualizedContainerService.HintSize="416,260" sap2010:WorkflowViewState.IdRef="Sequence_5">
+                      <ui:LogMessage DisplayName="Log Invalid Runner Output" sap:VirtualizedContainerService.HintSize="416,141" sap2010:WorkflowViewState.IdRef="LogMessage_5" Level="Warn" Message="[&quot;[02_GitHub_FetchUserRepos] Runner returned no usable JSON (length=&quot; &amp; If(strReposJson Is Nothing, &quot;0&quot;, strReposJson.Length.ToString()) &amp; &quot;). Falling back to Data/Mocks/mock_github_repos.json - verify node.js is on PATH and that RunGitHubFetch.ps1 completed.&quot;]" />
+                      <ui:ReadTextFile File="{x:Null}" Content="[strReposJson]" DisplayName="Read Mock On Invalid Output" Encoding="utf-8" FileName="Data\Mocks\mock_github_repos.json" sap:VirtualizedContainerService.HintSize="416,80" sap2010:WorkflowViewState.IdRef="ReadTextFile_4" />
+                      <Assign DisplayName="Set Fallback Status On Invalid Output" sap:VirtualizedContainerService.HintSize="416,60" sap2010:WorkflowViewState.IdRef="Assign_16">
+                        <Assign.To>
+                          <OutArgument x:TypeArguments="x:String">[strFetchStatus]</OutArgument>
+                        </Assign.To>
+                        <Assign.Value>
+                          <InArgument x:TypeArguments="x:String">["SUCCESS_MOCK_FALLBACK"]</InArgument>
+                        </Assign.Value>
+                      </Assign>
+                    </Sequence>
+                  </If.Then>
+                  <If.Else>
+                    <Assign DisplayName="Determine Fetch Status" sap:VirtualizedContainerService.HintSize="448,113.6" sap2010:WorkflowViewState.IdRef="Assign_12">
+                      <Assign.To>
+                        <OutArgument x:TypeArguments="x:String">[strFetchStatus]</OutArgument>
+                      </Assign.To>
+                      <Assign.Value>
+                        <InArgument x:TypeArguments="x:String">[If(strReposJson.Contains("""mock_fallback"""), "SUCCESS_MOCK_FALLBACK", "SUCCESS_LIVE")]</InArgument>
+                      </Assign.Value>
+                    </Assign>
+                  </If.Else>
+                </If>
+              </Sequence>
+            </TryCatch.Try>
+            <TryCatch.Catches>
+              <Catch x:TypeArguments="s:Exception" sap:VirtualizedContainerService.HintSize="484,22" sap2010:WorkflowViewState.IdRef="Catch`1_1">
+                <sap:WorkflowViewStateService.ViewState>
+                  <scg:Dictionary x:TypeArguments="x:String, x:Object">
+                    <x:Boolean x:Key="IsExpanded">False</x:Boolean>
+                    <x:Boolean x:Key="IsPinned">False</x:Boolean>
+                  </scg:Dictionary>
+                </sap:WorkflowViewStateService.ViewState>
+                <ActivityAction x:TypeArguments="s:Exception">
+                  <ActivityAction.Argument>
+                    <DelegateInArgument x:TypeArguments="s:Exception" Name="exception" />
+                  </ActivityAction.Argument>
+                  <Sequence DisplayName="Handle Fetch Exception" sap:VirtualizedContainerService.HintSize="449.6,350" sap2010:WorkflowViewState.IdRef="Sequence_4">
+                    <sap:WorkflowViewStateService.ViewState>
+                      <scg:Dictionary x:TypeArguments="x:String, x:Object">
+                        <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+                      </scg:Dictionary>
+                    </sap:WorkflowViewStateService.ViewState>
+                    <ui:LogMessage DisplayName="Log Runner Exception" sap:VirtualizedContainerService.HintSize="416,141" sap2010:WorkflowViewState.IdRef="LogMessage_3" Level="Warn" Message="[&quot;[02_GitHub_FetchUserRepos] Exception during GitHub fetch: &quot; &amp; exception.Message &amp; &quot;. Utilizing mock fallback.&quot;]" />
+                    <ui:ReadTextFile File="{x:Null}" Content="[strReposJson]" DisplayName="Read Mock On Exception" FileName="Data\Mocks\mock_github_repos.json" sap:VirtualizedContainerService.HintSize="416,80" sap2010:WorkflowViewState.IdRef="ReadTextFile_3" />
+                    <Assign DisplayName="Set Fallback Status On Exception" sap:VirtualizedContainerService.HintSize="416,60" sap2010:WorkflowViewState.IdRef="Assign_13">
                       <Assign.To>
                         <OutArgument x:TypeArguments="x:String">[strFetchStatus]</OutArgument>
                       </Assign.To>
@@ -252,75 +320,32 @@
                       </Assign.Value>
                     </Assign>
                   </Sequence>
-                </If.Then>
-                <If.Else>
-                  <Assign DisplayName="Determine Fetch Status" sap:VirtualizedContainerService.HintSize="448,113.6" sap2010:WorkflowViewState.IdRef="Assign_12">
-                    <Assign.To>
-                      <OutArgument x:TypeArguments="x:String">[strFetchStatus]</OutArgument>
-                    </Assign.To>
-                    <Assign.Value>
-                      <InArgument x:TypeArguments="x:String">[If(strReposJson.Contains("""mock_fallback"""), "SUCCESS_MOCK_FALLBACK", "SUCCESS_LIVE")]</InArgument>
-                    </Assign.Value>
-                  </Assign>
-                </If.Else>
-              </If>
-            </Sequence>
-          </TryCatch.Try>
-          <TryCatch.Catches>
-            <Catch x:TypeArguments="s:Exception" sap:VirtualizedContainerService.HintSize="484,22" sap2010:WorkflowViewState.IdRef="Catch`1_1">
-              <sap:WorkflowViewStateService.ViewState>
-                <scg:Dictionary x:TypeArguments="x:String, x:Object">
-                  <x:Boolean x:Key="IsExpanded">False</x:Boolean>
-                  <x:Boolean x:Key="IsPinned">False</x:Boolean>
-                </scg:Dictionary>
-              </sap:WorkflowViewStateService.ViewState>
-              <ActivityAction x:TypeArguments="s:Exception">
-                <ActivityAction.Argument>
-                  <DelegateInArgument x:TypeArguments="s:Exception" Name="exception" />
-                </ActivityAction.Argument>
-                <Sequence DisplayName="Handle Fetch Exception" sap:VirtualizedContainerService.HintSize="449.6,350" sap2010:WorkflowViewState.IdRef="Sequence_4">
-                  <sap:WorkflowViewStateService.ViewState>
-                    <scg:Dictionary x:TypeArguments="x:String, x:Object">
-                      <x:Boolean x:Key="IsExpanded">True</x:Boolean>
-                    </scg:Dictionary>
-                  </sap:WorkflowViewStateService.ViewState>
-                  <ui:LogMessage DisplayName="Log Runner Exception" sap:VirtualizedContainerService.HintSize="416,141" sap2010:WorkflowViewState.IdRef="LogMessage_3" Level="Warn" Message="[&quot;[02_GitHub_FetchUserRepos] Exception during GitHub fetch: &quot; &amp; exception.Message &amp; &quot;. Utilizing mock fallback.&quot;]" />
-                  <ui:ReadTextFile File="{x:Null}" Content="[strReposJson]" DisplayName="Read Mock On Exception" FileName="Data\Mocks\mock_github_repos.json" sap:VirtualizedContainerService.HintSize="416,80" sap2010:WorkflowViewState.IdRef="ReadTextFile_3" />
-                  <Assign DisplayName="Set Fallback Status On Exception" sap:VirtualizedContainerService.HintSize="416,60" sap2010:WorkflowViewState.IdRef="Assign_13">
-                    <Assign.To>
-                      <OutArgument x:TypeArguments="x:String">[strFetchStatus]</OutArgument>
-                    </Assign.To>
-                    <Assign.Value>
-                      <InArgument x:TypeArguments="x:String">["SUCCESS_MOCK_FALLBACK"]</InArgument>
-                    </Assign.Value>
-                  </Assign>
-                </Sequence>
-              </ActivityAction>
-            </Catch>
-          </TryCatch.Catches>
-        </TryCatch>
-      </If.Else>
-    </If>
+                </ActivityAction>
+              </Catch>
+            </TryCatch.Catches>
+          </TryCatch>
+        </If.Else>
+      </If>
 
-    <!-- 5. Assign Output Arguments -->
-    <Assign DisplayName="Assign Output Repos JSON" sap:VirtualizedContainerService.HintSize="626,113.6" sap2010:WorkflowViewState.IdRef="Assign_14">
-      <Assign.To>
-        <OutArgument x:TypeArguments="x:String">[out_GitHubReposJson]</OutArgument>
-      </Assign.To>
-      <Assign.Value>
-        <InArgument x:TypeArguments="x:String">[strReposJson]</InArgument>
-      </Assign.Value>
-    </Assign>
+      <!-- 5. Assign Output Arguments -->
+      <Assign DisplayName="Assign Output Repos JSON" sap:VirtualizedContainerService.HintSize="626,113.6" sap2010:WorkflowViewState.IdRef="Assign_14">
+        <Assign.To>
+          <OutArgument x:TypeArguments="x:String">[out_GitHubReposJson]</OutArgument>
+        </Assign.To>
+        <Assign.Value>
+          <InArgument x:TypeArguments="x:String">[strReposJson]</InArgument>
+        </Assign.Value>
+      </Assign>
 
-    <Assign DisplayName="Assign Output Status" sap:VirtualizedContainerService.HintSize="626,113.6" sap2010:WorkflowViewState.IdRef="Assign_15">
-      <Assign.To>
-        <OutArgument x:TypeArguments="x:String">[out_FetchStatus]</OutArgument>
-      </Assign.To>
-      <Assign.Value>
-        <InArgument x:TypeArguments="x:String">[strFetchStatus]</InArgument>
-      </Assign.Value>
-    </Assign>
-
+      <Assign DisplayName="Assign Output Status" sap:VirtualizedContainerService.HintSize="626,113.6" sap2010:WorkflowViewState.IdRef="Assign_15">
+        <Assign.To>
+          <OutArgument x:TypeArguments="x:String">[out_FetchStatus]</OutArgument>
+        </Assign.To>
+        <Assign.Value>
+          <InArgument x:TypeArguments="x:String">[strFetchStatus]</InArgument>
+        </Assign.Value>
+      </Assign>
+    </Sequence>
     <ui:LogMessage DisplayName="Log Ingestion Complete" sap:VirtualizedContainerService.HintSize="626,141" sap2010:WorkflowViewState.IdRef="LogMessage_4" Level="Info" Message="[&quot;[02_GitHub_FetchUserRepos] Ingestion completed with status: &quot; &amp; strFetchStatus &amp; &quot;. Payload size: &quot; &amp; If(strReposJson IsNot Nothing, strReposJson.Length.ToString(), &quot;0&quot;) &amp; &quot; chars.&quot;]" />
   </Sequence>
 </Activity>

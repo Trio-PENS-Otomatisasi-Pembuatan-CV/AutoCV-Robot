@@ -79,28 +79,38 @@
     <sap:WorkflowViewStateService.ViewState>
       <scg:Dictionary x:TypeArguments="x:String, x:Object">
         <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+        <x:Boolean x:Key="IsAnnotationDocked">True</x:Boolean>
       </scg:Dictionary>
     </sap:WorkflowViewStateService.ViewState>
-    <ui:LogMessage DisplayName="Log Start Test" sap:VirtualizedContainerService.HintSize="416,141" sap2010:WorkflowViewState.IdRef="LogMessage_1" Level="Info" Message="[&quot;Starting Test_Validate_Inputs unit test.&quot;]" />
-    <ui:InvokeWorkflowFile ArgumentsVariable="{x:Null}" ContinueOnError="{x:Null}" DisplayName="Invoke 00_ValidateAndNormalizeInputs" sap:VirtualizedContainerService.HintSize="416,113.6" sap2010:WorkflowViewState.IdRef="InvokeWorkflowFile_1" UnSafe="False" WorkflowFileName="Modules\Validation\00_ValidateAndNormalizeInputs.xaml">
-      <ui:InvokeWorkflowFile.Arguments>
-        <InArgument x:TypeArguments="x:String" x:Key="in_LinkedInUrl">https://www.linkedin.com/in/john-doe</InArgument>
-        <InArgument x:TypeArguments="x:String" x:Key="in_GitHubUrl">johndoe</InArgument>
-        <InArgument x:TypeArguments="x:String" x:Key="in_TargetJobRole">Fullstack Engineer</InArgument>
-        <InArgument x:TypeArguments="x:String" x:Key="in_RecipientEmail">john.doe@example.com</InArgument>
-        <OutArgument x:TypeArguments="x:String" x:Key="out_NormalizedLinkedInUrl">[strOutLinkedIn]</OutArgument>
-        <OutArgument x:TypeArguments="x:String" x:Key="out_NormalizedGitHubUrl">[strOutGitHub]</OutArgument>
-        <OutArgument x:TypeArguments="x:String" x:Key="out_NormalizedRole">[strOutRole]</OutArgument>
-        <OutArgument x:TypeArguments="x:String" x:Key="out_NormalizedEmail">[strOutEmail]</OutArgument>
-      </ui:InvokeWorkflowFile.Arguments>
-    </ui:InvokeWorkflowFile>
-    <If Condition="[strOutGitHub.Equals(&quot;https://github.com/johndoe&quot;) AndAlso strOutLinkedIn.Equals(&quot;https://www.linkedin.com/in/john-doe&quot;) AndAlso strOutEmail.Equals(&quot;john.doe@example.com&quot;)]" DisplayName="Assert Correct Normalization" sap:VirtualizedContainerService.HintSize="416,280" sap2010:WorkflowViewState.IdRef="If_1">
-      <If.Then>
-        <ui:LogMessage DisplayName="Test Passed" sap:VirtualizedContainerService.HintSize="382.4,141" sap2010:WorkflowViewState.IdRef="LogMessage_2" Level="Info" Message="[&quot;Test_Validate_Inputs Passed! All parameters normalized and validated properly.&quot;]" />
-      </If.Then>
-      <If.Else>
-        <Throw DisplayName="Assertion Error" Exception="[New UiPath.Core.BusinessRuleException(&quot;Test_Validate_Inputs Failed: Outputs did not match expected normalized values.&quot;)]" sap:VirtualizedContainerService.HintSize="382.4,113.6" sap2010:WorkflowViewState.IdRef="Throw_1" />
-      </If.Else>
-    </If>
+    <Sequence sap2010:Annotation.AnnotationText="[UNIT TEST] Menguji modul 00_ValidateAndNormalizeInputs.xaml untuk memastikan masukan URL LinkedIn, username GitHub, target role, dan email berhasil dinormalisasi dan divalidasi sesuai ekspektasi." DisplayName="Workflow Scope: Test_Validate_Inputs" sap:VirtualizedContainerService.HintSize="650,1800" sap2010:WorkflowViewState.IdRef="Sequence_WorkflowScope">
+      <sap:WorkflowViewStateService.ViewState>
+        <scg:Dictionary x:TypeArguments="x:String, x:Object">
+          <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+          <x:Boolean x:Key="IsAnnotationDocked">True</x:Boolean>
+        </scg:Dictionary>
+      </sap:WorkflowViewStateService.ViewState>
+      <ui:LogMessage DisplayName="Log Start Test" sap:VirtualizedContainerService.HintSize="416,141" sap2010:WorkflowViewState.IdRef="LogMessage_1" Level="Info" Message="[&quot;Starting Test_Validate_Inputs unit test.&quot;]" />
+      <ui:InvokeWorkflowFile ArgumentsVariable="{x:Null}" ContinueOnError="{x:Null}" DisplayName="Invoke 00_ValidateAndNormalizeInputs" sap:VirtualizedContainerService.HintSize="416,113.6" sap2010:WorkflowViewState.IdRef="InvokeWorkflowFile_1" UnSafe="False" WorkflowFileName="Modules\Validation\00_ValidateAndNormalizeInputs.xaml">
+        <ui:InvokeWorkflowFile.Arguments>
+          <InArgument x:TypeArguments="x:String" x:Key="in_LinkedInUrl">https://www.linkedin.com/in/john-doe</InArgument>
+          <InArgument x:TypeArguments="x:String" x:Key="in_GitHubUrl">johndoe</InArgument>
+          <InArgument x:TypeArguments="x:String" x:Key="in_TargetJobRole">Fullstack Engineer</InArgument>
+          <InArgument x:TypeArguments="x:String" x:Key="in_RecipientEmail">john.doe@example.com</InArgument>
+          <OutArgument x:TypeArguments="x:String" x:Key="out_NormalizedLinkedInUrl">[strOutLinkedIn]</OutArgument>
+          <OutArgument x:TypeArguments="x:String" x:Key="out_NormalizedGitHubUrl">[strOutGitHub]</OutArgument>
+          <OutArgument x:TypeArguments="x:String" x:Key="out_NormalizedRole">[strOutRole]</OutArgument>
+          <OutArgument x:TypeArguments="x:String" x:Key="out_NormalizedEmail">[strOutEmail]</OutArgument>
+        </ui:InvokeWorkflowFile.Arguments>
+      </ui:InvokeWorkflowFile>
+      <If Condition="[strOutGitHub.Equals(&quot;https://github.com/johndoe&quot;) AndAlso strOutLinkedIn.Equals(&quot;https://www.linkedin.com/in/john-doe&quot;) AndAlso strOutEmail.Equals(&quot;john.doe@example.com&quot;)]" DisplayName="Assert Correct Normalization" sap:VirtualizedContainerService.HintSize="416,280" sap2010:WorkflowViewState.IdRef="If_1">
+        <If.Then>
+          <ui:LogMessage DisplayName="Test Passed" sap:VirtualizedContainerService.HintSize="382.4,141" sap2010:WorkflowViewState.IdRef="LogMessage_2" Level="Info" Message="[&quot;Test_Validate_Inputs Passed! All parameters normalized and validated properly.&quot;]" />
+        </If.Then>
+        <If.Else>
+          <Throw DisplayName="Assertion Error" Exception="[New UiPath.Core.BusinessRuleException(&quot;Test_Validate_Inputs Failed: Outputs did not match expected normalized values.&quot;)]" sap:VirtualizedContainerService.HintSize="382.4,113.6" sap2010:WorkflowViewState.IdRef="Throw_1" />
+        </If.Else>
+      </If>
+    </Sequence>
+    <ui:LogMessage DisplayName="Log Workflow Scope Completed" sap2010:WorkflowViewState.IdRef="LogMessage_ScopeCompleted" Level="Trace" Message="[&quot;[Test_Validate_Inputs] Workflow scope execution completed.&quot;]" />
   </Sequence>
 </Activity>

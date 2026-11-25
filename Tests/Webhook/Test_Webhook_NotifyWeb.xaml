@@ -63,39 +63,46 @@
     <sap:WorkflowViewStateService.ViewState>
       <scg:Dictionary x:TypeArguments="x:String, x:Object">
         <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+        <x:Boolean x:Key="IsAnnotationDocked">True</x:Boolean>
       </scg:Dictionary>
     </sap:WorkflowViewStateService.ViewState>
+    <Sequence sap2010:Annotation.AnnotationText="[UNIT TEST] Menguji modul 06_Webhook_NotifyWeb.xaml untuk memvalidasi penanganan konfigurasi kosong (skips cleanly) serta pemanggilan webhook endpoint draf." DisplayName="Workflow Scope: Test_Webhook_NotifyWeb" sap:VirtualizedContainerService.HintSize="650,1800" sap2010:WorkflowViewState.IdRef="Sequence_WorkflowScope">
+      <sap:WorkflowViewStateService.ViewState>
+        <scg:Dictionary x:TypeArguments="x:String, x:Object">
+          <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+          <x:Boolean x:Key="IsAnnotationDocked">True</x:Boolean>
+        </scg:Dictionary>
+      </sap:WorkflowViewStateService.ViewState>
+      <ui:LogMessage DisplayName="Log test start" sap:VirtualizedContainerService.HintSize="434,141" sap2010:WorkflowViewState.IdRef="LogMessage_1" Level="Info" Message="[&quot;Starting Test_Webhook_NotifyWeb...&quot;]" />
 
-    <ui:LogMessage DisplayName="Log test start" sap:VirtualizedContainerService.HintSize="434,141" sap2010:WorkflowViewState.IdRef="LogMessage_1" Level="Info" Message="[&quot;Starting Test_Webhook_NotifyWeb...&quot;]" />
+      <!-- Test Case 1: Empty JobId / BaseUrl skips cleanly -->
+      <ui:InvokeWorkflowFile ArgumentsVariable="{x:Null}" ContinueOnError="{x:Null}" DisplayName="Invoke 06_Webhook_NotifyWeb with empty config" sap:VirtualizedContainerService.HintSize="434,113.6" sap2010:WorkflowViewState.IdRef="Invoke_TestEmpty" UnSafe="False" WorkflowFileName="Modules\Webhook\06_Webhook_NotifyWeb.xaml">
+        <ui:InvokeWorkflowFile.Arguments>
+          <InArgument x:TypeArguments="x:String" x:Key="in_WebhookBaseUrl" />
+          <InArgument x:TypeArguments="x:String" x:Key="in_JobId" />
+          <InArgument x:TypeArguments="x:String" x:Key="in_EndpointType">["draft"]</InArgument>
+          <InArgument x:TypeArguments="x:String" x:Key="in_PayloadJson">["{}"]</InArgument>
+          <InArgument x:TypeArguments="x:String" x:Key="in_PdfFilePath" />
+          <OutArgument x:TypeArguments="x:Int32" x:Key="out_StatusCode">[intStatusCode]</OutArgument>
+          <OutArgument x:TypeArguments="x:String" x:Key="out_ResponseContent">[strResponse]</OutArgument>
+        </ui:InvokeWorkflowFile.Arguments>
+      </ui:InvokeWorkflowFile>
 
-    <!-- Test Case 1: Empty JobId / BaseUrl skips cleanly -->
-    <ui:InvokeWorkflowFile ArgumentsVariable="{x:Null}" ContinueOnError="{x:Null}" DisplayName="Invoke 06_Webhook_NotifyWeb with empty config" sap:VirtualizedContainerService.HintSize="434,113.6" sap2010:WorkflowViewState.IdRef="Invoke_TestEmpty" UnSafe="False" WorkflowFileName="Modules\Webhook\06_Webhook_NotifyWeb.xaml">
-      <ui:InvokeWorkflowFile.Arguments>
-        <InArgument x:TypeArguments="x:String" x:Key="in_WebhookBaseUrl" />
-        <InArgument x:TypeArguments="x:String" x:Key="in_JobId" />
-        <InArgument x:TypeArguments="x:String" x:Key="in_EndpointType">["draft"]</InArgument>
-        <InArgument x:TypeArguments="x:String" x:Key="in_PayloadJson">["{}"]</InArgument>
-        <InArgument x:TypeArguments="x:String" x:Key="in_PdfFilePath" />
-        <OutArgument x:TypeArguments="x:Int32" x:Key="out_StatusCode">[intStatusCode]</OutArgument>
-        <OutArgument x:TypeArguments="x:String" x:Key="out_ResponseContent">[strResponse]</OutArgument>
-      </ui:InvokeWorkflowFile.Arguments>
-    </ui:InvokeWorkflowFile>
+      <ui:LogMessage DisplayName="Log test empty result" sap:VirtualizedContainerService.HintSize="434,141" sap2010:WorkflowViewState.IdRef="LogMessage_2" Level="Info" Message="[&quot;Test Case 1 Passed: Empty config skipped cleanly without error.&quot;]" />
 
-    <ui:LogMessage DisplayName="Log test empty result" sap:VirtualizedContainerService.HintSize="434,141" sap2010:WorkflowViewState.IdRef="LogMessage_2" Level="Info" Message="[&quot;Test Case 1 Passed: Empty config skipped cleanly without error.&quot;]" />
-
-    <!-- Test Case 2: Dispatch draft with dummy JobId and simulated endpoint -->
-    <ui:InvokeWorkflowFile ArgumentsVariable="{x:Null}" ContinueOnError="True" DisplayName="Invoke 06_Webhook_NotifyWeb with test endpoint" sap:VirtualizedContainerService.HintSize="434,113.6" sap2010:WorkflowViewState.IdRef="Invoke_TestDispatch" UnSafe="False" WorkflowFileName="Modules\Webhook\06_Webhook_NotifyWeb.xaml">
-      <ui:InvokeWorkflowFile.Arguments>
-        <InArgument x:TypeArguments="x:String" x:Key="in_WebhookBaseUrl">["http://localhost:3000"]</InArgument>
-        <InArgument x:TypeArguments="x:String" x:Key="in_JobId">["test-job-uuid"]</InArgument>
-        <InArgument x:TypeArguments="x:String" x:Key="in_EndpointType">["draft"]</InArgument>
-        <InArgument x:TypeArguments="x:String" x:Key="in_PayloadJson">["{""personal_info"":{""recipient_email"":""test@example.com""}}"]</InArgument>
-        <InArgument x:TypeArguments="x:String" x:Key="in_PdfFilePath" />
-        <OutArgument x:TypeArguments="x:Int32" x:Key="out_StatusCode">[intStatusCode]</OutArgument>
-        <OutArgument x:TypeArguments="x:String" x:Key="out_ResponseContent">[strResponse]</OutArgument>
-      </ui:InvokeWorkflowFile.Arguments>
-    </ui:InvokeWorkflowFile>
-
+      <!-- Test Case 2: Dispatch draft with dummy JobId and simulated endpoint -->
+      <ui:InvokeWorkflowFile ArgumentsVariable="{x:Null}" ContinueOnError="True" DisplayName="Invoke 06_Webhook_NotifyWeb with test endpoint" sap:VirtualizedContainerService.HintSize="434,113.6" sap2010:WorkflowViewState.IdRef="Invoke_TestDispatch" UnSafe="False" WorkflowFileName="Modules\Webhook\06_Webhook_NotifyWeb.xaml">
+        <ui:InvokeWorkflowFile.Arguments>
+          <InArgument x:TypeArguments="x:String" x:Key="in_WebhookBaseUrl">["http://localhost:3000"]</InArgument>
+          <InArgument x:TypeArguments="x:String" x:Key="in_JobId">["test-job-uuid"]</InArgument>
+          <InArgument x:TypeArguments="x:String" x:Key="in_EndpointType">["draft"]</InArgument>
+          <InArgument x:TypeArguments="x:String" x:Key="in_PayloadJson">["{""personal_info"":{""recipient_email"":""test@example.com""}}"]</InArgument>
+          <InArgument x:TypeArguments="x:String" x:Key="in_PdfFilePath" />
+          <OutArgument x:TypeArguments="x:Int32" x:Key="out_StatusCode">[intStatusCode]</OutArgument>
+          <OutArgument x:TypeArguments="x:String" x:Key="out_ResponseContent">[strResponse]</OutArgument>
+        </ui:InvokeWorkflowFile.Arguments>
+      </ui:InvokeWorkflowFile>
+    </Sequence>
     <ui:LogMessage DisplayName="Log test dispatch completed" sap:VirtualizedContainerService.HintSize="434,141" sap2010:WorkflowViewState.IdRef="LogMessage_3" Level="Info" Message="[&quot;Test Case 2 Passed: Dispatch invoked with status code &quot; &amp; intStatusCode.ToString]" />
   </Sequence>
 </Activity>

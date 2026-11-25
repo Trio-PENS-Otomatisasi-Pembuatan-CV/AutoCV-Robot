@@ -66,38 +66,47 @@
     <sap:WorkflowViewStateService.ViewState>
       <scg:Dictionary x:TypeArguments="x:String, x:Object">
         <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+        <x:Boolean x:Key="IsAnnotationDocked">True</x:Boolean>
       </scg:Dictionary>
     </sap:WorkflowViewStateService.ViewState>
+    <Sequence sap2010:Annotation.AnnotationText="[UNIT TEST] Menguji modul 02_GitHub_FetchUserRepos.xaml untuk mengambil repositori akun GitHub (misal: octocat) dan memverifikasi array repositori serta status pengambilan." DisplayName="Workflow Scope: Test_GitHub_FetchRepos" sap:VirtualizedContainerService.HintSize="650,1800" sap2010:WorkflowViewState.IdRef="Sequence_WorkflowScope">
+      <sap:WorkflowViewStateService.ViewState>
+        <scg:Dictionary x:TypeArguments="x:String, x:Object">
+          <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+          <x:Boolean x:Key="IsAnnotationDocked">True</x:Boolean>
+        </scg:Dictionary>
+      </sap:WorkflowViewStateService.ViewState>
+      <ui:LogMessage DisplayName="Log Start Test" sap:VirtualizedContainerService.HintSize="416,141" sap2010:WorkflowViewState.IdRef="LogMessage_1" Level="Info" Message="[&quot;Starting Test_GitHub_FetchRepos unit test.&quot;]" />
 
-    <ui:LogMessage DisplayName="Log Start Test" sap:VirtualizedContainerService.HintSize="416,141" sap2010:WorkflowViewState.IdRef="LogMessage_1" Level="Info" Message="[&quot;Starting Test_GitHub_FetchRepos unit test.&quot;]" />
+      <!-- Invoke 02_GitHub_FetchUserRepos with sample user -->
+      <ui:InvokeWorkflowFile ArgumentsVariable="{x:Null}" ContinueOnError="{x:Null}" DisplayName="Invoke 02_GitHub_FetchUserRepos workflow" sap:VirtualizedContainerService.HintSize="416,113.6" sap2010:WorkflowViewState.IdRef="InvokeWorkflowFile_1" UnSafe="False" WorkflowFileName="Modules\GitHub\02_GitHub_FetchUserRepos.xaml">
+        <ui:InvokeWorkflowFile.Arguments>
+          <InArgument x:TypeArguments="x:String" x:Key="in_GitHubUsername">https://github.com/octocat</InArgument>
+          <InArgument x:TypeArguments="x:String" x:Key="in_GitHubToken" />
+          <InArgument x:TypeArguments="x:Boolean" x:Key="in_UseMockFallback">[True]</InArgument>
+          <OutArgument x:TypeArguments="x:String" x:Key="out_GitHubReposJson">[strReposJson]</OutArgument>
+          <OutArgument x:TypeArguments="x:String" x:Key="out_FetchStatus">[strFetchStatus]</OutArgument>
+        </ui:InvokeWorkflowFile.Arguments>
+      </ui:InvokeWorkflowFile>
 
-    <!-- Invoke 02_GitHub_FetchUserRepos with sample user -->
-    <ui:InvokeWorkflowFile ArgumentsVariable="{x:Null}" ContinueOnError="{x:Null}" DisplayName="Invoke 02_GitHub_FetchUserRepos workflow" sap:VirtualizedContainerService.HintSize="416,113.6" sap2010:WorkflowViewState.IdRef="InvokeWorkflowFile_1" UnSafe="False" WorkflowFileName="Modules\GitHub\02_GitHub_FetchUserRepos.xaml">
-      <ui:InvokeWorkflowFile.Arguments>
-        <InArgument x:TypeArguments="x:String" x:Key="in_GitHubUsername">https://github.com/octocat</InArgument>
-        <InArgument x:TypeArguments="x:String" x:Key="in_GitHubToken" />
-        <InArgument x:TypeArguments="x:Boolean" x:Key="in_UseMockFallback">[True]</InArgument>
-        <OutArgument x:TypeArguments="x:String" x:Key="out_GitHubReposJson">[strReposJson]</OutArgument>
-        <OutArgument x:TypeArguments="x:String" x:Key="out_FetchStatus">[strFetchStatus]</OutArgument>
-      </ui:InvokeWorkflowFile.Arguments>
-    </ui:InvokeWorkflowFile>
+      <Assign DisplayName="Evaluate Test Success" sap:VirtualizedContainerService.HintSize="416,113.6" sap2010:WorkflowViewState.IdRef="Assign_1">
+        <Assign.To>
+          <OutArgument x:TypeArguments="x:Boolean">[boolTestPassed]</OutArgument>
+        </Assign.To>
+        <Assign.Value>
+          <InArgument x:TypeArguments="x:Boolean">[Not String.IsNullOrWhiteSpace(strReposJson) AndAlso strReposJson.Contains("repositories") AndAlso (strFetchStatus.Equals("SUCCESS_LIVE") OrElse strFetchStatus.Equals("SUCCESS_MOCK_FALLBACK"))]</InArgument>
+        </Assign.Value>
+      </Assign>
 
-    <Assign DisplayName="Evaluate Test Success" sap:VirtualizedContainerService.HintSize="416,113.6" sap2010:WorkflowViewState.IdRef="Assign_1">
-      <Assign.To>
-        <OutArgument x:TypeArguments="x:Boolean">[boolTestPassed]</OutArgument>
-      </Assign.To>
-      <Assign.Value>
-        <InArgument x:TypeArguments="x:Boolean">[Not String.IsNullOrWhiteSpace(strReposJson) AndAlso strReposJson.Contains("repositories") AndAlso (strFetchStatus.Equals("SUCCESS_LIVE") OrElse strFetchStatus.Equals("SUCCESS_MOCK_FALLBACK"))]</InArgument>
-      </Assign.Value>
-    </Assign>
-
-    <If Condition="[boolTestPassed]" DisplayName="Assert GitHub Ingestion Output" sap:VirtualizedContainerService.HintSize="416,380" sap2010:WorkflowViewState.IdRef="If_1">
-      <If.Then>
-        <ui:LogMessage DisplayName="Test Passed" sap:VirtualizedContainerService.HintSize="382.4,141" sap2010:WorkflowViewState.IdRef="LogMessage_2" Level="Info" Message="[&quot;Test_GitHub_FetchRepos PASSED! Status: &quot; &amp; strFetchStatus &amp; &quot;, Payload length: &quot; &amp; strReposJson.Length.ToString()]" />
-      </If.Then>
-      <If.Else>
-        <ui:LogMessage DisplayName="Test Failed" sap:VirtualizedContainerService.HintSize="382.4,141" sap2010:WorkflowViewState.IdRef="LogMessage_3" Level="Error" Message="[&quot;Test_GitHub_FetchRepos FAILED! ReposJson is empty or status is invalid.&quot;]" />
-      </If.Else>
-    </If>
+      <If Condition="[boolTestPassed]" DisplayName="Assert GitHub Ingestion Output" sap:VirtualizedContainerService.HintSize="416,380" sap2010:WorkflowViewState.IdRef="If_1">
+        <If.Then>
+          <ui:LogMessage DisplayName="Test Passed" sap:VirtualizedContainerService.HintSize="382.4,141" sap2010:WorkflowViewState.IdRef="LogMessage_2" Level="Info" Message="[&quot;Test_GitHub_FetchRepos PASSED! Status: &quot; &amp; strFetchStatus &amp; &quot;, Payload length: &quot; &amp; strReposJson.Length.ToString()]" />
+        </If.Then>
+        <If.Else>
+          <ui:LogMessage DisplayName="Test Failed" sap:VirtualizedContainerService.HintSize="382.4,141" sap2010:WorkflowViewState.IdRef="LogMessage_3" Level="Error" Message="[&quot;Test_GitHub_FetchRepos FAILED! ReposJson is empty or status is invalid.&quot;]" />
+        </If.Else>
+      </If>
+    </Sequence>
+    <ui:LogMessage DisplayName="Log Workflow Scope Completed" sap2010:WorkflowViewState.IdRef="LogMessage_ScopeCompleted" Level="Trace" Message="[&quot;[Test_GitHub_FetchRepos] Workflow scope execution completed.&quot;]" />
   </Sequence>
 </Activity>
